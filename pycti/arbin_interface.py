@@ -13,8 +13,6 @@ class ArbinInterface:
     Class for controlling Maccor Cycler using MacNet.
     """
 
-    __msg_buffer_size_bytes = 2**12
-
     def __init__(self, config: dict):
         """
         Creates a class instance. The `start()` method still needs to be run to create the connection
@@ -23,19 +21,17 @@ class ArbinInterface:
         Parameters
         ----------
         config : dict
-            A configuration dictionary containing relevant. See the README.md
-            for a detailed breakdown of all parameters that must be included.
+            A configuration dictionary.
         """
 
-        # Channels are zero indexed within Macnet so we must subtract one here.
-        self.channel = config['channel']
-
+        # Channels are zero indexed within CTI so we must subtract one here.
+        self.channel = config['channel'] -1
         self.config = config
         self.__sock = None
 
     def start(self) -> bool:
         """
-        Creates connection to Arbin server.
+        Verifies the config, creates a connection to the Arbin, and logs in.
 
         Returns
         -------
@@ -59,17 +55,7 @@ class ArbinInterface:
         status : dict
             A dictionary detailing the status of the channel. Returns None if there is an issue.
         """
-
-        msg_outging_dict = copy.deepcopy(pymacnet.messages.tx_read_status_msg)
-        msg_outging_dict['params']['Chan'] = self.channel
-
-        status = self.__send_receive_msg(msg_outging_dict)
-
-        if status:
-            return status['result']
-        else:
-            logger.error("Failed to read channel status")
-            return None
+        return {}
         
     def __verify_config(self) -> bool:
         """
@@ -84,6 +70,7 @@ class ArbinInterface:
                                 'password',
                                 'test_name',
                                 'schedule',
+                                'channel',
                                 'arbin_ip',
                                 'arbin_port']
 
@@ -120,6 +107,7 @@ class ArbinInterface:
         login_msg += struct.pack('<H', sum(login_msg))
 
         response = self.__send_receive_msg(login_msg)
+        print(response)
         success = True
 
         return success
@@ -140,11 +128,12 @@ class ArbinInterface:
             self.__sock = socket.socket(
                 socket.AF_INET, socket.SOCK_STREAM
             )
+            self.__sock.settimeout(Constants.MSG.TIMEOUT_S)
             self.__sock.connect(
                 (self.config['arbin_ip'], self.config['arbin_port'])
             )
-            success = True
             logger.info("Connected to Arbin server!")
+            success = True
         except:
             logger.error(
                 "Failed to create TCP/IP connection with Arbin server!", exc_info=True)
@@ -167,12 +156,12 @@ class ArbinInterface:
         """
         self.__sock.send(tx_msg_bytearray)
         data = b''
-        incoming = self.__sock.recv(self.__msg_buffer_size_bytes)
+        incoming = self.__sock.recv(Constants.MSG.BUFFER_SIZE_BYTES)
         data_len = struct.unpack('<L', incoming[8:12])[0]
         data += incoming
         while len(data) < data_len:
             try:
-                incoming = self.sock.recv(self.__msg_buffer_size_bytes)
+                incoming = self.sock.recv(Constants.MSG.BUFFER_SIZE_BYTES)
                 data += incoming
             except:
                 logger.error("Error receiving msg")

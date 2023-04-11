@@ -1,5 +1,10 @@
 class Constants:
+    
     class MSG:
+        TIMEOUT_S = 3
+
+        BUFFER_SIZE_BYTES = 2**12
+
         HEADER = 0x11DDDDDDDDDDDDDD
 
         COMMAND_CODES = {
