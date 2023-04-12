@@ -3,7 +3,7 @@ class Constants:
     class MSG:
         TIMEOUT_S = 3
 
-        BUFFER_SIZE_BYTES = 2**12
+        BUFFER_SIZE_BYTES = 2**10
 
         HEADER = 0x11DDDDDDDDDDDDDD
 

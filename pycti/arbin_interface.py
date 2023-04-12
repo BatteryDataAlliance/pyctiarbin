@@ -161,7 +161,9 @@ class ArbinInterface:
         data += incoming
         while len(data) < data_len:
             try:
-                incoming = self.sock.recv(Constants.MSG.BUFFER_SIZE_BYTES)
+                print("here")
+                incoming = self.__sock.recv(Constants.MSG.BUFFER_SIZE_BYTES)
+                print("Now here")
                 data += incoming
             except:
                 logger.error("Error receiving msg")

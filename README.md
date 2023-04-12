@@ -8,6 +8,7 @@
 - [Installation](#Installation)
     - [Requirements](#Requirements)
     - [Source Installation](#source-installation)
+- [CTI Message Anatomy]
 - [Examples](#Examples)
   - [Getting Started](#getting-started)
     - [Configuration](#Configuration)
@@ -55,6 +56,20 @@ To install from source clone [this repository](https://github.com/BattGenie/pyct
 pip install .
 ```
 
+# CTI Message Anatomy
+
+CTI messages have the following anatomy 
+
+- Header
+  - Token : len = 8 bytes : Always contains 0x11dddddddddddddd
+  - dwLen : len = 4 bytes : Length of combined command, command arguments, and checksum
+- Command code
+  - dwCmd : len = 4 bytes : The command code. Varies on command sent.
+  - dwCmd_Extend : len = 4 bytes : Always equals 0x00000000.
+- Command Arguments : len = variables : Depends on command type.
+Checksum
+  - Checksum : len = 2 bytes : Sum of bytes in  header + command arguments
+  
 # <a name="Examples"></a>Examples
 
 ## <a name="Getting Started"></a>Getting Started
