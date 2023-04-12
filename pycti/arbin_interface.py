@@ -59,20 +59,13 @@ class ArbinInterface:
         status : dict
             A dictionary detailing the status of the channel. Returns None if there is an issue.
         """
-        '''
-        msg = bytearray([])
-        msg += struct.pack('<Q', header)
-        msg += struct.pack('<L', 4+4+2+2+4+32+2)
-        msg += struct.pack('<LL', command_codes["GET_CHANNELS_INFO"], 0x00000000)
-        # Channel number (aka index) and info type
-        msg += struct.pack('<hh', chan_num-1, 1)
-        # Aux data options
-        msg += struct.pack('<L', 0)
-        msg += bytearray([0x00 for i in range(32)])
-        msg += struct.pack('<H', sum(msg))
-        '''
+        
+        channel_info_msg_tx  = TX_MSG.CHAN_INFO.build_msg(channel=1)
 
-        return {}
+        # Receive message response and parse it
+        channel_info_msg_rx = self.__send_receive_msg(channel_info_msg_tx)
+
+        return channel_info_msg_rx
 
     def __verify_config(self) -> bool:
         """
@@ -114,21 +107,7 @@ class ArbinInterface:
         username = '123'
         password = '123'
 
-        # Prepare username and password as bytearrays
-        username_bytearray = struct.pack(
-            TX_MSG.LOGIN.STRING_FORMAT, username.encode(TX_MSG.LOGIN.STRING_ENCODING))
-        password_bytearray = struct.pack(
-            TX_MSG.LOGIN.STRING_FORMAT, password.encode(TX_MSG.LOGIN.STRING_ENCODING))
-
-        # Put the message together
-        login_msg_tx = bytearray([])
-        login_msg_tx += TX_MSG.HEADER_BYTEARRAY
-        login_msg_tx += TX_MSG.LOGIN.MSG_LENGTH_BYTEARRAY
-        login_msg_tx += TX_MSG.LOGIN.COMMAND_CODE_BYTEARRAY
-        login_msg_tx += TX_MSG.LOGIN.EXTENDED_COMMAND_CODE_BYTEARRAY
-        login_msg_tx += username_bytearray
-        login_msg_tx += password_bytearray
-        login_msg_tx += struct.pack('<H', sum(login_msg_tx))  # Checksum
+        login_msg_tx = TX_MSG.LOGIN.build_msg(username, password)
 
         # Receive message response and parse it
         login_msg_rx = self.__send_receive_msg(login_msg_tx)
