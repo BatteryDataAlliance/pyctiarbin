@@ -42,9 +42,10 @@ class ArbinInterface:
 
         if self.__verify_config():
             if self.__create_connection():
-                if self.__arbin_login():
-                    success = True
-        return success
+                pass
+                #if self.__arbin_login():
+                #    success = True
+        return self.__arbin_login()
         
     def read_status(self) -> dict:
         """
@@ -107,10 +108,9 @@ class ArbinInterface:
         login_msg += struct.pack('<H', sum(login_msg))
 
         response = self.__send_receive_msg(login_msg)
-        print(response)
         success = True
 
-        return success
+        return response
 
 
     def __create_connection(self) -> bool:
@@ -140,7 +140,7 @@ class ArbinInterface:
 
         return success
 
-    def __send_receive_msg(self, tx_msg_bytearray):
+    def __send_receive_msg(self, tx_msg):
         """
         Sends the passed message to the MITS server and receives the response.
 
@@ -154,6 +154,8 @@ class ArbinInterface:
         bytearray:
             Response from the server.
         """
+        '''
+        
         self.__sock.send(tx_msg_bytearray)
         data = b''
         incoming = self.__sock.recv(Constants.MSG.BUFFER_SIZE_BYTES)
@@ -170,3 +172,25 @@ class ArbinInterface:
                 break
         # return self.sock.recv(MSG_BUFFER_SIZE)
         return data
+        '''
+
+        rx_msg = b''
+        send_msg_success = False
+
+        try:
+            self.__sock.send(tx_msg)
+            send_msg_success = True 
+        except:
+            logger.error(
+                "Failed to send message to Arbin server!", exc_info=True)
+
+        if send_msg_success:
+            try:
+                rx_msg += self.__sock.recv(Constants.MSG.BUFFER_SIZE_BYTES)
+                rx_msg_len = struct.unpack('<L', rx_msg[8:12])[0]
+                while len(rx_msg) < rx_msg_len:
+                        rx_msg += self.__sock.recv(Constants.MSG.BUFFER_SIZE_BYTES)
+            except:
+                logger.error("Error receiving msg", exc_info=True)
+                
+        return rx_msg
