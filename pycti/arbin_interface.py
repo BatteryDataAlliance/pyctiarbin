@@ -1,7 +1,6 @@
 import socket
 import logging
 import struct
-import copy
 
 from .constants import Constants
 
@@ -58,6 +57,38 @@ class ArbinInterface:
         status : dict
             A dictionary detailing the status of the channel. Returns None if there is an issue.
         """
+        '''
+        msg = bytearray([])
+        msg += struct.pack('<Q', header)
+        msg += struct.pack('<L', 4+4+2+2+4+32+2)
+        msg += struct.pack('<LL', command_codes["GET_CHANNELS_INFO"], 0x00000000)
+        # Channel number (aka index) and info type
+        msg += struct.pack('<hh', chan_num-1, 1)
+        # Aux data options
+        msg += struct.pack('<L', 0)
+        msg += bytearray([0x00 for i in range(32)])
+        msg += struct.pack('<H', sum(msg))
+        
+        # # Prepare the pieces of the login message
+        packed_header = struct.pack(
+            Constants.TX_MSG.HEADER_FORMAT, Constants.TX_MSG.HEADER)
+        packed_msg_length = struct.pack(
+            Constants.TX_MSG.MSG_LENGTH_FORMAT, Constants.TX_MSG.MSG_LENGTH['LOGIN'])
+        packed_command_code = struct.pack(
+            Constants.TX_MSG.COMMAND_CODE_FORMAT, Constants.TX_MSG.COMMAND_CODES["LOGIN"])
+        packed_command_code_extended = struct.pack(
+            Constants.TX_MSG.EXTENDED_COMMAND_FORMAT, Constants.TX_MSG.EXTENDED_COMMAND_CODE)
+        packed_username = struct.pack(
+            Constants.TX_MSG.STRING_FORMAT, username.encode(Constants.TX_MSG.STRING_ENCODING))
+        packed_password = struct.pack(
+            Constants.TX_MSG.STRING_FORMAT, password.encode(Constants.TX_MSG.STRING_ENCODING))
+        # Put the message together
+        login_msg_tx = packed_header + packed_msg_length + packed_command_code + \
+            packed_command_code_extended + packed_username + packed_password
+        # Add the checksum at the end
+        login_msg_tx += struct.pack('<H', sum(login_msg_tx))
+        '''
+
         return {}
 
     def __verify_config(self) -> bool:
@@ -99,24 +130,21 @@ class ArbinInterface:
         username = '123'
         password = '123'
 
-        # # Prepare the pieces of the login message
-        packed_header = struct.pack(
-            Constants.TX_MSG.HEADER_FORMAT, Constants.TX_MSG.HEADER)
-        packed_msg_length = struct.pack(
-            Constants.TX_MSG.MSG_LENGTH_FORMAT, Constants.TX_MSG.MSG_LENGTH['LOGIN'])
-        packed_command_code = struct.pack(
-            Constants.TX_MSG.COMMAND_CODE_FORMAT, Constants.TX_MSG.COMMAND_CODES["LOGIN"])
-        packed_command_code_extended = struct.pack(
-            Constants.TX_MSG.EXTENDED_COMMAND_FORMAT, Constants.TX_MSG.EXTENDED_COMMAND_CODE)
-        packed_username = struct.pack(
-            Constants.TX_MSG.STRING_FORMAT, username.encode(Constants.TX_MSG.STRING_ENCODING))
-        packed_password = struct.pack(
-            Constants.TX_MSG.STRING_FORMAT, password.encode(Constants.TX_MSG.STRING_ENCODING))
+        # Prepare username and password as bytearrays
+        username_bytearray = struct.pack(
+            Constants.TX_MSG.LOGIN.STRING_FORMAT, username.encode(Constants.TX_MSG.LOGIN.STRING_ENCODING))
+        password_bytearray = struct.pack(
+            Constants.TX_MSG.LOGIN.STRING_FORMAT, password.encode(Constants.TX_MSG.LOGIN.STRING_ENCODING))
+
         # Put the message together
-        login_msg_tx = packed_header + packed_msg_length + packed_command_code + \
-            packed_command_code_extended + packed_username + packed_password
-        # Add the checksum at the end
-        login_msg_tx += struct.pack('<H', sum(login_msg_tx))
+        login_msg_tx = bytearray([])
+        login_msg_tx += Constants.TX_MSG.HEADER_BYTEARRAY
+        login_msg_tx += Constants.TX_MSG.LOGIN.MSG_LENGTH_BYTEARRAY
+        login_msg_tx += Constants.TX_MSG.LOGIN.COMMAND_CODE_BYTEARRAY
+        login_msg_tx += Constants.TX_MSG.LOGIN.EXTENDED_COMMAND_CODE_BYTEARRAY
+        login_msg_tx += username_bytearray
+        login_msg_tx += password_bytearray
+        login_msg_tx += struct.pack('<H', sum(login_msg_tx)) # Checksum
 
         # Receive message response and parse it
         login_msg_rx = self.__send_receive_msg(login_msg_tx)
@@ -140,8 +168,8 @@ class ArbinInterface:
             cycler_sn_bytearray = struct.unpack(
                 Constants.RX_MSG.LOGIN.SERIAL_NUMBER_FORMAT,
                 login_msg_rx[Constants.RX_MSG.LOGIN.SERIAL_NUMBER_START_BYTE:Constants.RX_MSG.LOGIN.SERIAL_NUMBER_END_BYTE])[0]
-            self.cycler_sn = cycler_sn_bytearray.decode(Constants.RX_MSG.LOGIN.SERIAL_NUMBER_ENCODING)
-            print(self.cycler_sn)
+            self.cycler_sn = cycler_sn_bytearray.decode(
+                Constants.RX_MSG.LOGIN.SERIAL_NUMBER_ENCODING)
 
         return success
 
