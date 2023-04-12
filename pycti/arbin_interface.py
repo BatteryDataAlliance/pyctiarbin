@@ -13,6 +13,8 @@ class ArbinInterface:
     Class for controlling Maccor Cycler using MacNet.
     """
 
+    cycler_sn = None
+
     def __init__(self, config: dict):
         """
         Creates a class instance. The `start()` method still needs to be run to create the connection
@@ -130,9 +132,16 @@ class ArbinInterface:
                 success = True
                 logger.info("Already logged in!")
             elif login_result == Constants.RX_MSG.LOGIN.FAIL_RESULT_CODE:
-                logger.error("Login failed for provided credentials!")
+                logger.error("Login failed with provided credentials!")
             else:
                 logger.error("Unknown login result response code")
+
+            # Get cycler serial number
+            cycler_sn_bytearray = struct.unpack(
+                Constants.RX_MSG.LOGIN.SERIAL_NUMBER_FORMAT,
+                login_msg_rx[Constants.RX_MSG.LOGIN.SERIAL_NUMBER_START_BYTE:Constants.RX_MSG.LOGIN.SERIAL_NUMBER_END_BYTE])[0]
+            self.cycler_sn = cycler_sn_bytearray.decode(Constants.RX_MSG.LOGIN.SERIAL_NUMBER_ENCODING)
+            print(self.cycler_sn)
 
         return success
 
