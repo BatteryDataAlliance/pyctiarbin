@@ -2,7 +2,8 @@ import socket
 import logging
 import struct
 
-from .constants import Constants
+from .messages.tx_messages import TX_MSG
+from .messages.rx_messages import RX_MSG
 
 logger = logging.getLogger(__name__)
 
@@ -27,6 +28,7 @@ class ArbinInterface:
 
         # Channels are zero indexed within CTI so we must subtract one here.
         self.channel = config['channel'] - 1
+        self.timeout_s = config['timeout_s']
         self.config = config
         self.__sock = None
 
@@ -43,7 +45,7 @@ class ArbinInterface:
 
         if self.__verify_config():
             if self.__create_connection():
-                if self.__arbin_login():
+                if self.__login():
                     success = True
 
         return success
@@ -68,25 +70,6 @@ class ArbinInterface:
         msg += struct.pack('<L', 0)
         msg += bytearray([0x00 for i in range(32)])
         msg += struct.pack('<H', sum(msg))
-        
-        # # Prepare the pieces of the login message
-        packed_header = struct.pack(
-            Constants.TX_MSG.HEADER_FORMAT, Constants.TX_MSG.HEADER)
-        packed_msg_length = struct.pack(
-            Constants.TX_MSG.MSG_LENGTH_FORMAT, Constants.TX_MSG.MSG_LENGTH['LOGIN'])
-        packed_command_code = struct.pack(
-            Constants.TX_MSG.COMMAND_CODE_FORMAT, Constants.TX_MSG.COMMAND_CODES["LOGIN"])
-        packed_command_code_extended = struct.pack(
-            Constants.TX_MSG.EXTENDED_COMMAND_FORMAT, Constants.TX_MSG.EXTENDED_COMMAND_CODE)
-        packed_username = struct.pack(
-            Constants.TX_MSG.STRING_FORMAT, username.encode(Constants.TX_MSG.STRING_ENCODING))
-        packed_password = struct.pack(
-            Constants.TX_MSG.STRING_FORMAT, password.encode(Constants.TX_MSG.STRING_ENCODING))
-        # Put the message together
-        login_msg_tx = packed_header + packed_msg_length + packed_command_code + \
-            packed_command_code_extended + packed_username + packed_password
-        # Add the checksum at the end
-        login_msg_tx += struct.pack('<H', sum(login_msg_tx))
         '''
 
         return {}
@@ -106,7 +89,8 @@ class ArbinInterface:
                                 'schedule',
                                 'channel',
                                 'arbin_ip',
-                                'arbin_port']
+                                'arbin_port',
+                                'timeout_s']
 
         for key in required_config_keys:
             if key not in self.config:
@@ -115,7 +99,7 @@ class ArbinInterface:
         logger.info("Verified config")
         return True
 
-    def __arbin_login(self) -> bool:
+    def __login(self) -> bool:
         """
         Logs into the Arbin server with the username/password defined in the config. 
         Must be done before issuing other commands.
@@ -132,44 +116,45 @@ class ArbinInterface:
 
         # Prepare username and password as bytearrays
         username_bytearray = struct.pack(
-            Constants.TX_MSG.LOGIN.STRING_FORMAT, username.encode(Constants.TX_MSG.LOGIN.STRING_ENCODING))
+            TX_MSG.LOGIN.STRING_FORMAT, username.encode(TX_MSG.LOGIN.STRING_ENCODING))
         password_bytearray = struct.pack(
-            Constants.TX_MSG.LOGIN.STRING_FORMAT, password.encode(Constants.TX_MSG.LOGIN.STRING_ENCODING))
+            TX_MSG.LOGIN.STRING_FORMAT, password.encode(TX_MSG.LOGIN.STRING_ENCODING))
 
         # Put the message together
         login_msg_tx = bytearray([])
-        login_msg_tx += Constants.TX_MSG.HEADER_BYTEARRAY
-        login_msg_tx += Constants.TX_MSG.LOGIN.MSG_LENGTH_BYTEARRAY
-        login_msg_tx += Constants.TX_MSG.LOGIN.COMMAND_CODE_BYTEARRAY
-        login_msg_tx += Constants.TX_MSG.LOGIN.EXTENDED_COMMAND_CODE_BYTEARRAY
+        login_msg_tx += TX_MSG.HEADER_BYTEARRAY
+        login_msg_tx += TX_MSG.LOGIN.MSG_LENGTH_BYTEARRAY
+        login_msg_tx += TX_MSG.LOGIN.COMMAND_CODE_BYTEARRAY
+        login_msg_tx += TX_MSG.LOGIN.EXTENDED_COMMAND_CODE_BYTEARRAY
         login_msg_tx += username_bytearray
         login_msg_tx += password_bytearray
-        login_msg_tx += struct.pack('<H', sum(login_msg_tx)) # Checksum
+        login_msg_tx += struct.pack('<H', sum(login_msg_tx))  # Checksum
 
         # Receive message response and parse it
         login_msg_rx = self.__send_receive_msg(login_msg_tx)
         if login_msg_rx:
             # Get login result
             login_result = struct.unpack(
-                Constants.RX_MSG.LOGIN.RESULT_FORMAT,
-                login_msg_rx[Constants.RX_MSG.LOGIN.RESULT_START_BYTE:Constants.RX_MSG.LOGIN.RESULT_END_BYTE])[0]
-            if login_result == Constants.RX_MSG.LOGIN.SUCESS_RESULT_CODE:
+                RX_MSG.LOGIN.RESULT_FORMAT,
+                login_msg_rx[RX_MSG.LOGIN.RESULT_START_BYTE:RX_MSG.LOGIN.RESULT_END_BYTE])[0]
+            if login_result == RX_MSG.LOGIN.SUCESS_RESULT_CODE:
                 success = True
                 logger.info("Login success!")
-            elif login_result == Constants.RX_MSG.LOGIN.ALREADY_LOGGED_IN_CODE:
+            elif login_result == RX_MSG.LOGIN.ALREADY_LOGGED_IN_CODE:
                 success = True
                 logger.info("Already logged in!")
-            elif login_result == Constants.RX_MSG.LOGIN.FAIL_RESULT_CODE:
+            elif login_result == RX_MSG.LOGIN.FAIL_RESULT_CODE:
                 logger.error("Login failed with provided credentials!")
             else:
-                logger.error("Unknown login result response code")
+                logger.error("Unknown login result response code!")
 
             # Get cycler serial number
             cycler_sn_bytearray = struct.unpack(
-                Constants.RX_MSG.LOGIN.SERIAL_NUMBER_FORMAT,
-                login_msg_rx[Constants.RX_MSG.LOGIN.SERIAL_NUMBER_START_BYTE:Constants.RX_MSG.LOGIN.SERIAL_NUMBER_END_BYTE])[0]
+                RX_MSG.LOGIN.SERIAL_NUMBER_FORMAT,
+                login_msg_rx[RX_MSG.LOGIN.SERIAL_NUMBER_START_BYTE:RX_MSG.LOGIN.SERIAL_NUMBER_END_BYTE])[0]
             self.cycler_sn = cycler_sn_bytearray.decode(
-                Constants.RX_MSG.LOGIN.SERIAL_NUMBER_ENCODING)
+                RX_MSG.LOGIN.SERIAL_NUMBER_ENCODING)
+            logger.info("Cycler SN: " + str(self.cycler_sn))
 
         return success
 
@@ -188,7 +173,7 @@ class ArbinInterface:
             self.__sock = socket.socket(
                 socket.AF_INET, socket.SOCK_STREAM
             )
-            self.__sock.settimeout(Constants.TX_MSG.TIMEOUT_S)
+            self.__sock.settimeout(self.timeout_s)
             self.__sock.connect(
                 (self.config['arbin_ip'], self.config['arbin_port'])
             )
@@ -227,12 +212,13 @@ class ArbinInterface:
 
         if send_msg_success:
             try:
-                rx_msg += self.__sock.recv(Constants.TX_MSG.BUFFER_SIZE_BYTES)
-                rx_msg_len = struct.unpack('<L', rx_msg[8:12])[0]
+                rx_msg += self.__sock.recv(RX_MSG.BUFFER_SIZE)
+                rx_msg_len = struct.unpack(
+                    RX_MSG.MSG_LENGTH_FORMAT, rx_msg[RX_MSG.MSG_LENGTH_START_BYTE:RX_MSG.MSG_LENGTH_END_BYTE])[0]
                 while len(rx_msg) < rx_msg_len:
                     rx_msg += self.__sock.recv(
-                        Constants.TX_MSG.BUFFER_SIZE_BYTES)
+                        RX_MSG.BUFFER_SIZE)
             except:
-                logger.error("Error receiving TX_MSG", exc_info=True)
+                logger.error("Error receiving message!!", exc_info=True)
 
         return rx_msg
