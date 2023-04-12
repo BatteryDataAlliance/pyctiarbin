@@ -13,7 +13,8 @@ class ArbinInterface:
     Class for controlling Maccor Cycler using MacNet.
     """
 
-    cycler_sn = None
+    # The messages respoanse from login
+    login_response_dict = {}
 
     def __init__(self, config: dict):
         """
@@ -59,13 +60,15 @@ class ArbinInterface:
         status : dict
             A dictionary detailing the status of the channel. Returns None if there is an issue.
         """
-        
-        channel_info_msg_tx  = TX_MSG.CHAN_INFO.build_msg(channel=1)
+
+        channel_info_msg_tx = TX_MSG.CHAN_INFO.build_msg(self.channel)
 
         # Receive message response and parse it
         channel_info_msg_rx = self.__send_receive_msg(channel_info_msg_tx)
 
-        return channel_info_msg_rx
+        channel_info_msg_rx_dict = RX_MSG.CHAN_INFO.parse_msg(channel_info_msg_rx)
+
+        return channel_info_msg_rx_dict
 
     def __verify_config(self) -> bool:
         """
@@ -89,7 +92,7 @@ class ArbinInterface:
             if key not in self.config:
                 logger.error("Missing key from config! Missing : " + key)
                 return False
-        logger.info("Verified config")
+        logger.info("Config check passed")
         return True
 
     def __login(self) -> bool:
@@ -108,32 +111,25 @@ class ArbinInterface:
         password = '123'
 
         login_msg_tx = TX_MSG.LOGIN.build_msg(username, password)
-
-        # Receive message response and parse it
         login_msg_rx = self.__send_receive_msg(login_msg_tx)
+
         if login_msg_rx:
-            # Get login result
-            login_result = struct.unpack(
-                RX_MSG.LOGIN.RESULT_FORMAT,
-                login_msg_rx[RX_MSG.LOGIN.RESULT_START_BYTE:RX_MSG.LOGIN.RESULT_END_BYTE])[0]
-            if login_result == RX_MSG.LOGIN.SUCESS_RESULT_CODE:
+            login_msg_rx_dict = RX_MSG.LOGIN.parse_msg(login_msg_rx)
+
+            if login_msg_rx_dict['login_result'] == RX_MSG.LOGIN.SUCESS_RESULT_CODE:
                 success = True
-                logger.info("Login success!")
-            elif login_result == RX_MSG.LOGIN.ALREADY_LOGGED_IN_CODE:
+                logger.info("Successfully logged in to cycler " +
+                            str(login_msg_rx_dict['cycler_sn']))
+            elif login_msg_rx_dict['login_result'] == RX_MSG.LOGIN.ALREADY_LOGGED_IN_CODE:
                 success = True
-                logger.info("Already logged in!")
-            elif login_result == RX_MSG.LOGIN.FAIL_RESULT_CODE:
+                logger.info("Already logged in to cycler " +
+                            str(login_msg_rx_dict['cycler_sn']))
+            elif login_msg_rx_dict['login_result'] == RX_MSG.LOGIN.FAIL_RESULT_CODE:
                 logger.error("Login failed with provided credentials!")
             else:
                 logger.error("Unknown login result response code!")
 
-            # Get cycler serial number
-            cycler_sn_bytearray = struct.unpack(
-                RX_MSG.LOGIN.SERIAL_NUMBER_FORMAT,
-                login_msg_rx[RX_MSG.LOGIN.SERIAL_NUMBER_START_BYTE:RX_MSG.LOGIN.SERIAL_NUMBER_END_BYTE])[0]
-            self.cycler_sn = cycler_sn_bytearray.decode(
-                RX_MSG.LOGIN.SERIAL_NUMBER_ENCODING)
-            logger.info("Cycler SN: " + str(self.cycler_sn))
+            self.login_response_dict = login_msg_rx_dict
 
         return success
 

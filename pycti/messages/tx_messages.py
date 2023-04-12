@@ -123,6 +123,8 @@ class TX_MSG:
             rx_msg : bytearray
                 Response message from the server.
             """
+            print(channel)
+
             msg = bytearray([])
             msg += TX_MSG.HEADER_BYTEARRAY
             msg += TX_MSG.CHAN_INFO.MSG_LENGTH_BYTEARRAY
