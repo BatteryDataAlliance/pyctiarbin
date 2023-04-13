@@ -63,8 +63,8 @@ class ArbinInterface:
 
         channel_info_msg_tx = Msg.ChannelInfo.Client.build_msg(
             {'channel': self.channel})
-
-        channel_info_msg_rx = self.__send_receive_msg(channel_info_msg_tx)
+        channel_info_msg_rx = self.__send_receive_msg(
+            channel_info_msg_tx)
 
         if channel_info_msg_rx:
             channel_info_msg_rx_dict = Msg.ChannelInfo.Server.parse_msg(
