@@ -1,9 +1,8 @@
 import socket
 import logging
 import struct
-
-from .messages.tx_messages import TX_MSG
-from .messages.rx_messages import RX_MSG
+from .messages import Msg
+from .messages import MessageABC
 
 logger = logging.getLogger(__name__)
 
@@ -60,13 +59,16 @@ class ArbinInterface:
         status : dict
             A dictionary detailing the status of the channel. Returns None if there is an issue.
         """
+        channel_info_msg_rx_dict = {}
 
-        channel_info_msg_tx = TX_MSG.CHAN_INFO.build_msg(self.channel)
+        channel_info_msg_tx = Msg.ChannelInfo.Client.build_msg(
+            {'channel': self.channel})
 
-        # Receive message response and parse it
         channel_info_msg_rx = self.__send_receive_msg(channel_info_msg_tx)
 
-        channel_info_msg_rx_dict = RX_MSG.CHAN_INFO.parse_msg(channel_info_msg_rx)
+        if channel_info_msg_rx:
+            channel_info_msg_rx_dict = Msg.ChannelInfo.Server.parse_msg(
+                channel_info_msg_rx)
 
         return channel_info_msg_rx_dict
 
@@ -86,7 +88,8 @@ class ArbinInterface:
                                 'channel',
                                 'arbin_ip',
                                 'arbin_port',
-                                'timeout_s']
+                                'timeout_s',
+                                'msg_buffer_size']
 
         for key in required_config_keys:
             if key not in self.config:
@@ -110,24 +113,28 @@ class ArbinInterface:
         username = '123'
         password = '123'
 
-        login_msg_tx = TX_MSG.LOGIN.build_msg(username, password)
+        login_msg_tx = Msg.Login.Client.build_msg(
+            msg_values={'username': username, 'password': password})
+
         login_msg_rx = self.__send_receive_msg(login_msg_tx)
 
         if login_msg_rx:
-            login_msg_rx_dict = RX_MSG.LOGIN.parse_msg(login_msg_rx)
+            login_msg_rx_dict = Msg.Login.Server.parse_msg(login_msg_rx)
 
-            if login_msg_rx_dict['login_result'] == RX_MSG.LOGIN.SUCESS_RESULT_CODE:
+            if login_msg_rx_dict['result'] == 'success':
                 success = True
-                logger.info("Successfully logged in to cycler " +
-                            str(login_msg_rx_dict['cycler_sn']))
-            elif login_msg_rx_dict['login_result'] == RX_MSG.LOGIN.ALREADY_LOGGED_IN_CODE:
+                logger.info(
+                    "Successfully logged in to cycler " + str(login_msg_rx_dict['cycler_sn']))
+            elif login_msg_rx_dict['result'] == "aleady logged in":
                 success = True
-                logger.info("Already logged in to cycler " +
-                            str(login_msg_rx_dict['cycler_sn']))
-            elif login_msg_rx_dict['login_result'] == RX_MSG.LOGIN.FAIL_RESULT_CODE:
-                logger.error("Login failed with provided credentials!")
+                logger.info(
+                    "Already logged in to cycler " +str(login_msg_rx_dict['cycler_sn']))
+            elif login_msg_rx_dict['result'] == 'fail':
+                logger.error(
+                    "Login failed with provided credentials!")
             else:
-                logger.error("Unknown login result response code!")
+                logger.error(
+                    f'Unknown login result {login_msg_rx_dict["result"]}')
 
             self.login_response_dict = login_msg_rx_dict
 
@@ -178,6 +185,11 @@ class ArbinInterface:
         rx_msg = b''
         send_msg_success = False
 
+        msg_length_format = MessageABC.base_encoding['msg_length']['format']
+        msg_length_start_byte_idx = MessageABC.base_encoding['msg_length']['start_byte']
+        msg_length_end_byte_idx = msg_length_start_byte_idx + \
+            struct.calcsize(msg_length_format)
+
         try:
             self.__sock.send(tx_msg)
             send_msg_success = True
@@ -187,12 +199,15 @@ class ArbinInterface:
 
         if send_msg_success:
             try:
-                rx_msg += self.__sock.recv(RX_MSG.BUFFER_SIZE)
+                # Receive first part of message and determine length of entire message.
+                rx_msg += self.__sock.recv(self.config['msg_buffer_size'])
                 rx_msg_len = struct.unpack(
-                    RX_MSG.MSG_LENGTH_FORMAT, rx_msg[RX_MSG.MSG_LENGTH_START_BYTE:RX_MSG.MSG_LENGTH_END_BYTE])[0]
+                    msg_length_format,
+                    rx_msg[msg_length_start_byte_idx:msg_length_end_byte_idx])[0]
+                # Keep reading in message until rx_msg is as long as we expect it to get.
                 while len(rx_msg) < rx_msg_len:
                     rx_msg += self.__sock.recv(
-                        RX_MSG.BUFFER_SIZE)
+                        self.config['msg_buffer_size'])
             except:
                 logger.error("Error receiving message!!", exc_info=True)
 
