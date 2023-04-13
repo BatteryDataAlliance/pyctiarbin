@@ -118,6 +118,7 @@ class MessageABC(ABC):
 
         # Update default msg values with those in the msg_values dict
         for key in msg_values.keys():
+            print(templet.keys())
             if key in templet.keys():
                 templet[key]['value'] = msg_values[key]
             else:
