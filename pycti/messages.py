@@ -5,11 +5,6 @@ from abc import ABC
 
 logger = logging.getLogger(__name__)
 
-# Defines the command codes used for messages
-CMD_CODES = {
-    'Login': 0xEEAB0001
-}
-
 
 class MessageABC(ABC):
 
@@ -82,13 +77,14 @@ class MessageABC(ABC):
                 decoded_msg_dict[item_name] = decoded_msg_dict[item_name].decode(
                     item['text_encoding']).rstrip('\x00')
 
-        '''
-        TODO : Add check to make sure command code is what we excpet
-        if decoded_msg_dict['command_code']['value'] != cls.command_code:
+        if decoded_msg_dict['command_code'] != cls.command_code:
             logger.warning(
                 f'Decoded command code {decoded_msg_dict["command_code"]} does not match what was expcected!')
-        '''
-
+            
+        if decoded_msg_dict['msg_length'] != cls.msg_length:
+            logger.warning(
+                f'Decoded message length {decoded_msg_dict["msg_length"]} does not match what was expcected!')
+            
         return decoded_msg_dict
 
     @classmethod
@@ -144,7 +140,7 @@ class MessageABC(ABC):
             end_idx = item['start_byte'] + struct.calcsize(item['format'])
             msg[start_idx:end_idx] = packed_item
 
-        # Append a checksum to the end
+        # Append a checksum to the end of the message
         msg += struct.pack('<H', sum(msg))
 
         return msg
@@ -157,7 +153,7 @@ class Msg:
         '''
         class Client(MessageABC):
             msg_length = 74
-            command_code  = CMD_CODES['Login']
+            command_code = 0xEEAB0001
 
             msg_specific_templet = {
                 'username': {
@@ -176,7 +172,7 @@ class Msg:
 
         class Server(MessageABC):
             msg_length = 8678
-            command_code  = CMD_CODES['Login']
+            command_code = 0xEEBA0001
 
             msg_specific_templet = {
                 'result': {
