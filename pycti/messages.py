@@ -117,8 +117,6 @@ class MessageABC(ABC):
         templet['msg_length']['value'] = cls.msg_length
         templet['command_code']['value'] = cls.command_code
 
-        print(templet)
-
         # Create a message bytearray that will be loaded with message contents
         msg = bytearray(templet['msg_length']['value'])
 
@@ -177,7 +175,7 @@ class Msg:
             }
 
         class Server(MessageABC):
-            msg_length = 128
+            msg_length = 8678
             command_code  = CMD_CODES['Login']
 
             msg_specific_templet = {
@@ -188,7 +186,7 @@ class Msg:
                 },
                 'cycler_sn': {
                     'format': '16s',
-                    'start_byte': 52,
+                    'start_byte': 28,
                     'text_encoding': 'ascii',
                     'value': '00000000'
                 },
@@ -201,7 +199,7 @@ class Msg:
             @classmethod
             def parse_msg(cls, msg: bytearray) -> dict:
                 """
-                Same as the parrent class, but converts the result based on the
+                Same as the parrent method, but converts the result based on the
                 login_result_decoder.
 
                 Parameters
@@ -215,8 +213,6 @@ class Msg:
                     The message with items decoded into a dictionary
                 """
                 msg_dict = super().parse_msg(msg)
-                print("Server resposne message = ")
-                print(msg_dict)
                 msg_dict['result'] = cls.login_result_decoder[msg_dict['result']]
                 return msg_dict
 

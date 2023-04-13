@@ -136,7 +136,7 @@ class ArbinInterface:
                 logger.error(
                     f'Unknown login result {login_msg_rx_dict["result"]}')
 
-            self.login_response_dict = login_msg_rx_dict
+            self.login_result = login_msg_rx_dict
 
         return success
 
@@ -201,11 +201,11 @@ class ArbinInterface:
             try:
                 # Receive first part of message and determine length of entire message.
                 rx_msg += self.__sock.recv(self.config['msg_buffer_size'])
-                rx_msg_len = struct.unpack(
+                expected_rx_msg_len = struct.unpack(
                     msg_length_format,
                     rx_msg[msg_length_start_byte_idx:msg_length_end_byte_idx])[0]
-                # Keep reading in message until rx_msg is as long as we expect it to get.
-                while len(rx_msg) < rx_msg_len:
+                # Keep reading message in pieces until rx_msg is as long as expected_rx_msg_len
+                while len(rx_msg) < expected_rx_msg_len:
                     rx_msg += self.__sock.recv(
                         self.config['msg_buffer_size'])
             except:
