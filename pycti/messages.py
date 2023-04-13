@@ -13,11 +13,17 @@ CMD_CODES = {
 
 class MessageABC(ABC):
 
-    '''
-    msg_encoding is a dictionary of dictionaries that detail how the 
-    message is formated. All messages have the following four fields:
-    '''
-    base_encoding = {
+    # The length of the message. Should be overwritten in child class
+    msg_length = 0
+
+    # The message command code. Should be overwritten in child class
+    command_code = 0x00
+
+    # Templet that is specific to each message type. Should be overwritten in child class
+    msg_specific_templet = {}
+
+    # Base message templet that is common for all messasges
+    base_templet = {
         'header': {
             'format': '<Q',
             'start_byte': 0,
@@ -40,11 +46,6 @@ class MessageABC(ABC):
         },
     }
 
-    '''
-    Each child class should overwrite msg_specific_encoding for that message.
-    '''
-    msg_specific_encoding = {}
-
     @classmethod
     def parse_msg(cls, msg: bytearray) -> dict:
         """
@@ -62,11 +63,13 @@ class MessageABC(ABC):
         decoded_msg_dict : dict
             The message items decoded into a dictionary.
         """
-        encoding = {**deepcopy(cls.base_encoding),
-                    **deepcopy(cls.msg_specific_encoding)}
         decoded_msg_dict = {}
 
-        for item_name, item in encoding.items():
+        # Create a templet to parse message with
+        templet = {**deepcopy(cls.base_templet),
+                   **deepcopy(cls.msg_specific_templet)}
+
+        for item_name, item in templet.items():
 
             start_idx = item['start_byte']
             end_idx = item['start_byte'] + struct.calcsize(item['format'])
@@ -78,6 +81,13 @@ class MessageABC(ABC):
             if item['format'].endswith('s'):
                 decoded_msg_dict[item_name] = decoded_msg_dict[item_name].decode(
                     item['text_encoding']).rstrip('\x00')
+
+        '''
+        TODO : Add check to make sure command code is what we excpet
+        if decoded_msg_dict['command_code']['value'] != cls.command_code:
+            logger.warning(
+                f'Decoded command code {decoded_msg_dict["command_code"]} does not match what was expcected!')
+        '''
 
         return decoded_msg_dict
 
@@ -99,12 +109,17 @@ class MessageABC(ABC):
         msg : bytearray
             Response message from the server.
         """
+        # Create a template to build messages from.
+        templet = {**deepcopy(cls.base_templet),
+                   **deepcopy(cls.msg_specific_templet)}
+        
+        # Update the templet with message specific length and command code
+        templet['msg_length']['value'] = cls.msg_length
+        templet['command_code']['value'] = cls.command_code
 
-        # Make a copy so we don't mess with the default message encoding
-        templet = {**deepcopy(cls.base_encoding),
-                   **deepcopy(cls.msg_specific_encoding)}
+        print(templet)
 
-        # Create a message byte array that we will modify
+        # Create a message bytearray that will be loaded with message contents
         msg = bytearray(templet['msg_length']['value'])
 
         # Update default msg values with those in the msg_values dict
@@ -143,10 +158,10 @@ class Msg:
         Message for logging into Arbin cycler.
         '''
         class Client(MessageABC):
-            MessageABC.base_encoding['msg_length']['value'] = 74
-            MessageABC.base_encoding['command_code']['value'] = CMD_CODES['Login']
+            msg_length = 74
+            command_code  = CMD_CODES['Login']
 
-            msg_specific_encoding = {
+            msg_specific_templet = {
                 'username': {
                     'format': '32s',
                     'start_byte': 20,
@@ -162,10 +177,10 @@ class Msg:
             }
 
         class Server(MessageABC):
-            MessageABC.base_encoding['msg_length']['value'] = 74
-            MessageABC.base_encoding['command_code']['value'] = CMD_CODES['Login']
+            msg_length = 128
+            command_code  = CMD_CODES['Login']
 
-            msg_specific_encoding = {
+            msg_specific_templet = {
                 'result': {
                     'format': 'I',
                     'start_byte': 20,
@@ -208,5 +223,6 @@ class Msg:
     class ChannelInfo:
         class Client(MessageABC):
             pass
+
         class Server(MessageABC):
             pass

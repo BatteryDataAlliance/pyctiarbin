@@ -185,8 +185,8 @@ class ArbinInterface:
         rx_msg = b''
         send_msg_success = False
 
-        msg_length_format = MessageABC.base_encoding['msg_length']['format']
-        msg_length_start_byte_idx = MessageABC.base_encoding['msg_length']['start_byte']
+        msg_length_format = MessageABC.base_templet['msg_length']['format']
+        msg_length_start_byte_idx = MessageABC.base_templet['msg_length']['start_byte']
         msg_length_end_byte_idx = msg_length_start_byte_idx + \
             struct.calcsize(msg_length_format)
 
