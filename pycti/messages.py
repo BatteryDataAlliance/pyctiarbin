@@ -260,20 +260,6 @@ class Msg:
 
             command_code = 0xEEBA0003
 
-            # Used to determine index positions in THIRD_PARTY_AUX_VALUE struct
-            __aux_voltage_count = 0
-            __aux_temperature_count = 0
-            __aux_pressure_count = 0
-            __aux_external_count = 0
-            __aux_flow_count = 0
-            __aux_ao_count = 0
-            __aux_di_count = 0
-            __aux_do_count = 0
-            __aux_humidity_count = 0
-            __aux_safety_count = 0
-            __aux_ph_count = 0
-            __aux_density_count = 0
-
             msg_specific_templet = {
                 'number_of_channels': {
                     'format': '<I',
@@ -508,7 +494,7 @@ class Msg:
                 return msg_dict
 
             @classmethod
-            def aux_readings_parser(msg_dict: dict, msg_bin: bytearray, starting_aux_idx=1777):
+            def aux_readings_parser(cls, msg_dict: dict, msg_bin: bytearray, starting_aux_idx = 1777):
                 """
                 Parses the auxiliary readings in msg_bin based on the aux readings
                 counts in msg_dict. Aux readings are then added as items to the msg_dict. 
@@ -527,36 +513,61 @@ class Msg:
                 msg_dict : dict
                     The message with items decoded into a dictionary
                 """
-                aux_voltages = [None for x in range(
-                    msg_dict['aux_voltage_count'])]
-                aux_voltage_dt = [None for x in range(
-                    msg_dict['aux_voltage_count'])]
-                aux_voltage_readings = [
-                    aux_voltages,
-                    aux_voltage_dt
-                ]
+                aux_lists = []
 
-                aux_temperatures = [None for x in range(
-                    msg_dict['aux_voltage_count'])]
-                aux_temperatures_dt = [None for x in range(
-                    msg_dict['aux_voltage_count'])]
-                aux_temperature_readings = [
-                    aux_temperatures,
-                    aux_temperatures_dt
-                ]
+                # # Prepare the aux entires. Order of the Aux lists here is important. Don't move them.
+                if msg_dict['aux_voltage_count']:
+                    msg_dict['aux_voltages'] = [0 for x in range(
+                        msg_dict['aux_voltage_count'])]
+                    msg_dict['aux_voltages_dt'] = [0 for x in range(
+                        msg_dict['aux_voltage_count'])]
+                    aux_lists.append(
+                        [msg_dict['aux_voltages'], msg_dict['aux_voltages_dt']])
+                else:
+                    msg_dict['aux_voltages'] = []
+                    msg_dict['aux_voltages_dt'] = []
 
-                aux_lists = [
-                    aux_voltage_readings,
-                    aux_temperature_readings,
-                ]
+                if msg_dict['aux_temperature_count']:
+                    msg_dict['aux_temperatures'] = [0 for x in range(
+                        msg_dict['aux_temperature_count'])]
+                    msg_dict['aux_temperatures_dt'] = [0 for x in range(
+                        msg_dict['aux_temperature_count'])]
+                    aux_lists.append(
+                        [msg_dict['aux_temperatures'], msg_dict['aux_temperatures_dt']])
+                else:
+                    msg_dict['aux_temperatures'] = []
+                    msg_dict['aux_temperatures_dt'] = []
+
+                msg_dict['aux_pressures'] = []
+                msg_dict['aux_pressures_dt'] = []
+                msg_dict['aux_externals'] = []
+                msg_dict['aux_externals_dt'] = []
+                msg_dict['aux_flows'] = []
+                msg_dict['aux_flows_dt'] = []
+                msg_dict['aux_aos'] = []
+                msg_dict['aux_aos_dt'] = []
+                msg_dict['aux_dis'] = []
+                msg_dict['aux_dis_dt'] = []
+                msg_dict['aux_dos'] = []
+                msg_dict['aux_dos_dt'] = []
+                msg_dict['aux_humidities'] = []
+                msg_dict['aux_humidities_dt'] = []
+                msg_dict['aux_safeties'] = []
+                msg_dict['aux_safeties_dt'] = []
+                msg_dict['aux_phs'] = []
+                msg_dict['aux_phs_dt'] = []
+                msg_dict['aux_densities'] = []
+                msg_dict['aux_densities_dt'] = []
 
                 current_aux_idx = starting_aux_idx
                 for readings_list in aux_lists:
-                    if len(readings_list[0]):
+                    for i in range(0, len(readings_list[0])):
                         # The first list in reading list is reading itself
-                        readings_list[0].append(
-                            struct.unpack('<f', msg_bin[current_aux_idx:current_aux_idx+4])[0])
+                        readings_list[0][i] = struct.unpack(
+                            '<f', msg_bin[current_aux_idx:current_aux_idx+4])[0]
                         # The second reading in the list is the dt value.
-                        readings_list[1].append(
-                            struct.unpack('<f', msg_bin[current_aux_idx+4:current_aux_idx+8])[0])
+                        readings_list[1][i] = struct.unpack(
+                            '<f', msg_bin[current_aux_idx+4:current_aux_idx+8])[0]
                         current_aux_idx += 8
+
+                return msg_dict
