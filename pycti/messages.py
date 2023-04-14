@@ -255,8 +255,9 @@ class Msg:
 
         class Server(MessageABC):
 
-            # Message length will vary based on number of aux readings.
+            # Default message length for 1 channel with no aux readings. Will be larger as those grow.
             msg_length = 1779
+
             command_code = 0xEEBA0003
 
             # Used to determine index positions in THIRD_PARTY_AUX_VALUE struct
@@ -267,7 +268,7 @@ class Msg:
             __aux_flow_count = 0
             __aux_ao_count = 0
             __aux_di_count = 0
-            __aux_do_count = 0 
+            __aux_do_count = 0
             __aux_humidity_count = 0
             __aux_safety_count = 0
             __aux_ph_count = 0
@@ -487,3 +488,75 @@ class Msg:
                     'value': 0,
                 },
             }
+
+            @classmethod
+            def parse(cls, msg: bytearray) -> dict:
+                """
+                Same as the parent method, but uses aux counts to parse aux readings
+
+                Parameters
+                ----------
+                msg : bytearry
+                    The message to parse.
+
+                Returns
+                -------
+                msg_dict : dict
+                    The message with items decoded into a dictionary
+                """
+                msg_dict = super().parse(msg)
+                return msg_dict
+
+            @classmethod
+            def aux_readings_parser(msg_dict: dict, msg_bin: bytearray, starting_aux_idx=1777):
+                """
+                Parses the auxiliary readings in msg_bin based on the aux readings
+                counts in msg_dict. Aux readings are then added as items to the msg_dict. 
+
+                Parameters
+                ----------
+                msg_dict : dict
+                    A dictionary containing the aux readings counts (aux_voltage_count, aux_voltage_count, etc)
+                msg_bin : bytearray
+                    The message to parse as a byte array.
+                starting_aux_idx : int
+                    The starting index in the msg_bin for aux readings. 1777 in single channel messages
+
+                Returns
+                -------
+                msg_dict : dict
+                    The message with items decoded into a dictionary
+                """
+                aux_voltages = [None for x in range(
+                    msg_dict['aux_voltage_count'])]
+                aux_voltage_dt = [None for x in range(
+                    msg_dict['aux_voltage_count'])]
+                aux_voltage_readings = [
+                    aux_voltages,
+                    aux_voltage_dt
+                ]
+
+                aux_temperatures = [None for x in range(
+                    msg_dict['aux_voltage_count'])]
+                aux_temperatures_dt = [None for x in range(
+                    msg_dict['aux_voltage_count'])]
+                aux_temperature_readings = [
+                    aux_temperatures,
+                    aux_temperatures_dt
+                ]
+
+                aux_lists = [
+                    aux_voltage_readings,
+                    aux_temperature_readings,
+                ]
+
+                current_aux_idx = starting_aux_idx
+                for readings_list in aux_lists:
+                    if len(readings_list[0]):
+                        # The first list in reading list is reading itself
+                        readings_list[0].append(
+                            struct.unpack('<f', msg_bin[current_aux_idx:current_aux_idx+4])[0])
+                        # The second reading in the list is the dt value.
+                        readings_list[1].append(
+                            struct.unpack('<f', msg_bin[current_aux_idx+4:current_aux_idx+8])[0])
+                        current_aux_idx += 8
