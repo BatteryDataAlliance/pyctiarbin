@@ -68,7 +68,6 @@ class MessageABC(ABC):
 
             start_idx = item['start_byte']
             end_idx = item['start_byte'] + struct.calcsize(item['format'])
-
             decoded_msg_dict[item_name] = struct.unpack(
                 item['format'], msg[start_idx:end_idx])[0]
 
@@ -90,20 +89,20 @@ class MessageABC(ABC):
     @classmethod
     def build_msg(cls, msg_values={}) -> bytearray:
         """
-        Packs a message based on the message encoding given in the msg_encoding
+        Packs a message based on the message encoding given in the msg_specific_templet
         dictionary. Values can be substituted for default values if they are included 
-        in the `msg_values` argument
+        in the `msg_values` argument.
 
         Parameters
         ----------
         msg_values : dict
-            A dictionary detailing which default values in the msg_encoding should be 
+            A dictionary detailing which default values in the messtage temple should be 
             updated.
 
         Returns
         -------
         msg : bytearray
-            Response message from the server.
+            Packed response message.
         """
         # Create a template to build messages from
         templet = {**deepcopy(cls.base_templet),
