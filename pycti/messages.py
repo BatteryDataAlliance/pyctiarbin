@@ -65,7 +65,6 @@ class MessageABC(ABC):
                    **deepcopy(cls.msg_specific_templet)}
 
         for item_name, item in templet.items():
-
             start_idx = item['start_byte']
             end_idx = item['start_byte'] + struct.calcsize(item['format'])
             decoded_msg_dict[item_name] = struct.unpack(
@@ -155,7 +154,9 @@ class MessageABC(ABC):
 class Msg:
     class Login:
         '''
-        Message for logging into Arbin cycler.
+        Message for logging into Arbin cycler. See
+        CTI_REQUEST_LOGIN/CTI_REQUEST_LOGIN_FEEDBACK 
+        in Arbin docs for more info.
         '''
         class Client(MessageABC):
             msg_length = 74
@@ -219,8 +220,270 @@ class Msg:
                 return msg_dict
 
     class ChannelInfo:
+        '''
+        Message for getting channel info from cycler. See
+        CTI_REQUEST_GET_CHANNELS_INFO/CTI_REQUEST_GET_CHANNELS_INFO_FEED_BACK 
+        in Arbin docs for more info.
+        '''
         class Client(MessageABC):
-            pass
+            msg_length = 50
+            command_code = 0xEEAB0003
+
+            msg_specific_templet = {
+                'channel': {
+                    'format': '<h',
+                    'start_byte': 20,
+                    'value': 0
+                },
+                'channe_selection': {
+                    'format': '<h',
+                    'start_byte': 22,
+                    'value': 1
+                },
+                'aux_options': {
+                    'format': '<I',
+                    'start_byte': 24,
+                    'value': 0x00
+                },
+                'reseved': {
+                    'format': '32s',
+                    'start_byte': 28,
+                    'value': ''.join(['\0' for i in range(32)]),
+                    'text_encoding': 'utf-8',
+                },
+            }
 
         class Server(MessageABC):
-            pass
+
+            # Message length will vary based on number of aux readings.
+            msg_length = 1779
+            command_code = 0xEEBA0003
+
+            # Used to determine index positions in THIRD_PARTY_AUX_VALUE struct
+            __aux_voltage_count = 0
+            __aux_temperature_count = 0
+            __aux_pressure_count = 0
+            __aux_external_count = 0
+            __aux_flow_count = 0
+            __aux_ao_count = 0
+            __aux_di_count = 0
+            __aux_do_count = 0 
+            __aux_humidity_count = 0
+            __aux_safety_count = 0
+            __aux_ph_count = 0
+            __aux_density_count = 0
+
+            msg_specific_templet = {
+                'number_of_channels': {
+                    'format': '<I',
+                    'start_byte': 20,
+                    'value': 1
+                },
+                'channel': {
+                    'format': '<I',
+                    'start_byte': 24,
+                    'value': 0
+                },
+                'status': {
+                    'format': '<h',
+                    'start_byte': 28,
+                    'value': 0x00
+                },
+                'comm_failure': {
+                    'format': '<B',
+                    'start_byte': 30,
+                    'value': 0
+                },
+                'schedule': {
+                    # Stored as wchar_t[200]. Each wchar_t is 2 bytes, twice as big as standard char in Python
+                    'format': '400s',
+                    'start_byte': 31,
+                    'value': 'fake_schedule',
+                    'text_encoding': 'utf-16',
+                },
+                'testname': {
+                    # Stored as wchar_t[72]
+                    'format': '144s',
+                    'start_byte': 431,
+                    'value': 'fake_testname',
+                    'text_encoding': 'utf-16',
+                },
+                'exit_condition': {
+                    'format': '100s',
+                    'start_byte': 575,
+                    'value': 'none',
+                    'text_encoding': 'utf-8',
+                },
+                'step_and_cycle_format': {
+                    'format': '64s',
+                    'start_byte': 675,
+                    'value': 'none',
+                    'text_encoding': 'utf-8',
+                },
+                # Stored as wchar_t[72]
+                'barcode': {
+                    'format': '144s',
+                    'start_byte': 739,
+                    'value': 'none',
+                    'text_encoding': 'utf-16',
+                },
+                # Stored as wchar_t[72]
+                'can_config_name': {
+                    'format': '400s',
+                    'start_byte': 883,
+                    'value': 'none',
+                    'text_encoding': 'utf-16',
+                },
+                # Stored as wchar_t[72]
+                'smb_config_name': {
+                    'format': '400s',
+                    'start_byte': 1283,
+                    'value': 'none',
+                    'text_encoding': 'utf-16',
+                },
+                'master_channel': {
+                    'format': '<H',
+                    'start_byte': 1683,
+                    'value': 0,
+                },
+                'test_time_s': {
+                    'format': '<d',
+                    'start_byte': 1685,
+                    'value': 0,
+                },
+                'step_time_s': {
+                    'format': '<d',
+                    'start_byte': 1693,
+                    'value': 0,
+                },
+                'voltage_v': {
+                    'format': '<f',
+                    'start_byte': 1701,
+                    'value': 0,
+                },
+                'current_a': {
+                    'format': '<f',
+                    'start_byte': 1705,
+                    'value': 0,
+                },
+                'power_w': {
+                    'format': '<f',
+                    'start_byte': 1709,
+                    'value': 0,
+                },
+                'charge_capacity_ah': {
+                    'format': '<f',
+                    'start_byte': 1713,
+                    'value': 0,
+                },
+                'discharge_capacity_ah': {
+                    'format': '<f',
+                    'start_byte': 1717,
+                    'value': 0,
+                },
+                'charge_energy_wh': {
+                    'format': '<f',
+                    'start_byte': 1721,
+                    'value': 0,
+                },
+                'discharge_energy_wh': {
+                    'format': '<f',
+                    'start_byte': 1725,
+                    'value': 0,
+                },
+                'internal_resistance_ohm': {
+                    'format': '<f',
+                    'start_byte': 1729,
+                    'value': 0,
+                },
+                'dvdt_vbys': {
+                    'format': '<f',
+                    'start_byte': 1733,
+                    'value': 0,
+                },
+                'acr_ohm': {
+                    'format': '<f',
+                    'start_byte': 1737,
+                    'value': 0,
+                },
+                'aci_ohm': {
+                    'format': '<f',
+                    'start_byte': 1741,
+                    'value': 0,
+                },
+                'aci_phase_degrees': {
+                    'format': '<f',
+                    'start_byte': 1745,
+                    'value': 0,
+                },
+                'aux_voltage_count': {
+                    'format': '<H',
+                    'start_byte': 1749,
+                    'value': 0,
+                },
+                'aux_temperature_count': {
+                    'format': '<H',
+                    'start_byte': 1751,
+                    'value': 0,
+                },
+                'aux_pressure_count': {
+                    'format': '<H',
+                    'start_byte': 1753,
+                    'value': 0,
+                },
+                'aux_external_count': {
+                    'format': '<H',
+                    'start_byte': 1755,
+                    'value': 0,
+                },
+                'aux_flow_count': {
+                    'format': '<H',
+                    'start_byte': 1757,
+                    'value': 0,
+                },
+                'aux_ao_count': {
+                    'format': '<H',
+                    'start_byte': 1759,
+                    'value': 0,
+                },
+                'aux_di_count': {
+                    'format': '<H',
+                    'start_byte': 1761,
+                    'value': 0,
+                },
+                'aux_do_count': {
+                    'format': '<H',
+                    'start_byte': 1763,
+                    'value': 0,
+                },
+                'aux_humidity_count': {
+                    'format': '<H',
+                    'start_byte': 1765,
+                    'value': 0,
+                },
+                'aux_safety_count': {
+                    'format': '<H',
+                    'start_byte': 1767,
+                    'value': 0,
+                },
+                'aux_ph_count': {
+                    'format': '<H',
+                    'start_byte': 1769,
+                    'value': 0,
+                },
+                'aux_density_count': {
+                    'format': '<H',
+                    'start_byte': 1771,
+                    'value': 0,
+                },
+                'bms_count': {
+                    'format': '<H',
+                    'start_byte': 1773,
+                    'value': 0,
+                },
+                'smb_count': {
+                    'format': '<H',
+                    'start_byte': 1775,
+                    'value': 0,
+                },
+            }
