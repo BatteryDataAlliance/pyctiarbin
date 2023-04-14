@@ -105,7 +105,7 @@ class MessageABC(ABC):
         msg : bytearray
             Response message from the server.
         """
-        # Create a template to build messages from.
+        # Create a template to build messages from
         templet = {**deepcopy(cls.base_templet),
                    **deepcopy(cls.msg_specific_templet)}
         
@@ -116,7 +116,7 @@ class MessageABC(ABC):
         # Create a message bytearray that will be loaded with message contents
         msg = bytearray(templet['msg_length']['value'])
 
-        # Update default msg values with those in the msg_values dict
+        # Update default message values with those in the passed msg_values dict
         for key in msg_values.keys():
             if key in templet.keys():
                 templet[key]['value'] = msg_values[key]
@@ -124,18 +124,24 @@ class MessageABC(ABC):
                 logger.warning(
                     f'Key name {key} was not found in msg_encoding!')
 
-        for item_name, item in templet.items():
-            # Pack the msg item
+        # Pack each item in templet. If packing any item fails, then abort the packing the message.
+        for item_name, item in templet.items():  
             logger.debug(f'Packing item {item_name}')
-            if item['format'].endswith('s'):
-                packed_item = struct.pack(
-                    item['format'],
-                    item['value'].encode(item['text_encoding']))
-            else:
-                packed_item = struct.pack(
-                    item['format'], item['value'])
+            try:
+                if item['format'].endswith('s'):
+                    packed_item = struct.pack(
+                        item['format'],
+                        item['value'].encode(item['text_encoding']))
+                else:
+                    packed_item = struct.pack(
+                        item['format'], item['value'])
+            except struct.error as e:
+                logger.error(
+                    f'Error packing {item_name} with fields {item}!')
+                logger.error(e)
+                msg = bytearray([])
+                break
 
-            # Put the packed item into the msg bytearray
             start_idx = item['start_byte']
             end_idx = item['start_byte'] + struct.calcsize(item['format'])
             msg[start_idx:end_idx] = packed_item

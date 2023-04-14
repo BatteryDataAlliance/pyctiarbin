@@ -2,6 +2,7 @@ import pytest
 import struct
 import os
 import json
+import copy
 from pycti import Msg
 
 MSG_DIR = os.path.join(os.path.dirname(__file__), 'example_messages')
@@ -70,13 +71,12 @@ def test_login_server_msg():
     for key in msg_decoded_key.keys():
         assert (msg_decoded_key[key] == parsed_msg[key])
 
-    # Check that we create our own version of the message
-    built_msg = Msg.Login.Server.build_msg(msg_decoded_key)
+    # Check that we can create our own version of the message. Need to re-code the result field.
+    buildable_decoded_key = copy.deepcopy(msg_decoded_key)
+    buildable_decoded_key['result'] = 1
+    built_msg = Msg.Login.Server.build_msg(buildable_decoded_key)
     parsed_built_msg = Msg.Login.Server.parse_msg(built_msg)
 
     # Make sure all items in msg_decoded_key match those in parsed message
     for key in msg_decoded_key.keys():
         assert (msg_decoded_key[key] == parsed_built_msg[key])
-
-
-

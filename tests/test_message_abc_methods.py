@@ -82,6 +82,20 @@ def test_modify_build_msg_bad_key():
     new_abc_built_msg = TestClass.build_msg(update_dict)
     assert (new_abc_built_msg == key_msg)
 
+
+@pytest.mark.messages
+def test_modify_build_bad_pack():
+    '''
+    Test building a message with MessageAbc.build_msg() but with an item that will fail packing
+    '''
+    # We should get back an empty message
+    key_msg =  bytearray([])
+
+    update_dict = {'command_code': 'this should not be a string'}
+    new_abc_built_msg = TestClass.build_msg(update_dict)
+    assert (new_abc_built_msg == key_msg)
+
+
 @pytest.mark.messages
 def test_parse_msg():
     '''
