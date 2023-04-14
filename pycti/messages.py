@@ -492,6 +492,7 @@ class Msg:
                     The message with items decoded into a dictionary
                 """
                 msg_dict = super().parse(msg)
+                msg_dict = cls.aux_readings_parser(msg_dict, msg, starting_aux_idx=1777)
                 return msg_dict
 
             @classmethod
