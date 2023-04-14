@@ -80,11 +80,11 @@ class MessageABC(ABC):
         if decoded_msg_dict['command_code'] != cls.command_code:
             logger.warning(
                 f'Decoded command code {decoded_msg_dict["command_code"]} does not match what was expcected!')
-            
+
         if decoded_msg_dict['msg_length'] != cls.msg_length:
             logger.warning(
                 f'Decoded message length {decoded_msg_dict["msg_length"]} does not match what was expcected!')
-            
+
         return decoded_msg_dict
 
     @classmethod
@@ -108,7 +108,7 @@ class MessageABC(ABC):
         # Create a template to build messages from
         templet = {**deepcopy(cls.base_templet),
                    **deepcopy(cls.msg_specific_templet)}
-        
+
         # Update the templet with message specific length and command code
         templet['msg_length']['value'] = cls.msg_length
         templet['command_code']['value'] = cls.command_code
@@ -125,7 +125,7 @@ class MessageABC(ABC):
                     f'Key name {key} was not found in msg_encoding!')
 
         # Pack each item in templet. If packing any item fails, then abort the packing the message.
-        for item_name, item in templet.items():  
+        for item_name, item in templet.items():
             logger.debug(f'Packing item {item_name}')
             try:
                 if item['format'].endswith('s'):
