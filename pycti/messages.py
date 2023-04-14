@@ -42,7 +42,7 @@ class MessageABC(ABC):
     }
 
     @classmethod
-    def parse_msg(cls, msg: bytearray) -> dict:
+    def parse(cls, msg: bytearray) -> dict:
         """
         Parses the passed message and decodes it with the msg_encoding dict.
         Each key in the output message will have name of the key from the 
@@ -87,7 +87,7 @@ class MessageABC(ABC):
         return decoded_msg_dict
 
     @classmethod
-    def build_msg(cls, msg_values={}) -> bytearray:
+    def pack(cls, msg_values={}) -> bytearray:
         """
         Packs a message based on the message encoding given in the msg_specific_templet
         dictionary. Values can be substituted for default values if they are included 
@@ -199,7 +199,7 @@ class Msg:
                 "should not see this", "success", "fail", "aleady logged in"]
 
             @classmethod
-            def parse_msg(cls, msg: bytearray) -> dict:
+            def parse(cls, msg: bytearray) -> dict:
                 """
                 Same as the parrent method, but converts the result based on the
                 login_result_decoder.
@@ -214,7 +214,7 @@ class Msg:
                 msg_dict : dict
                     The message with items decoded into a dictionary
                 """
-                msg_dict = super().parse_msg(msg)
+                msg_dict = super().parse(msg)
                 msg_dict['result'] = cls.login_result_decoder[msg_dict['result']]
                 return msg_dict
 

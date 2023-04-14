@@ -39,10 +39,10 @@ def test_login_client_msg():
         'username': test_username,
         'password': test_password
     }
-    client_login_msg = Msg.Login.Client.build_msg(test_login_cred_dict)
+    client_login_msg = Msg.Login.Client.pack(test_login_cred_dict)
     assert (client_login_msg == key_msg)
 
-    parsed_client_login_msg = Msg.Login.Client.parse_msg(client_login_msg)
+    parsed_client_login_msg = Msg.Login.Client.parse(client_login_msg)
     assert (parsed_client_login_msg == parsed_msg_ans_key)
 
 
@@ -65,7 +65,7 @@ def test_login_server_msg():
         msg_decoded_key = json.load(file)
 
     # Decode the binary message
-    parsed_msg = Msg.Login.Server.parse_msg(msg_bin)
+    parsed_msg = Msg.Login.Server.parse(msg_bin)
 
     # Make sure all items in msg_decoded_key match those in parsed message
     for key in msg_decoded_key.keys():
@@ -74,8 +74,8 @@ def test_login_server_msg():
     # Check that we can create our own version of the message. Need to re-code the result field.
     buildable_decoded_key = copy.deepcopy(msg_decoded_key)
     buildable_decoded_key['result'] = 1
-    built_msg = Msg.Login.Server.build_msg(buildable_decoded_key)
-    parsed_built_msg = Msg.Login.Server.parse_msg(built_msg)
+    built_msg = Msg.Login.Server.pack(buildable_decoded_key)
+    parsed_built_msg = Msg.Login.Server.parse(built_msg)
 
     # Make sure all items in msg_decoded_key match those in parsed message
     for key in msg_decoded_key.keys():

@@ -61,13 +61,13 @@ class ArbinInterface:
         """
         channel_info_msg_rx_dict = {}
 
-        channel_info_msg_tx = Msg.ChannelInfo.Client.build_msg(
+        channel_info_msg_tx = Msg.ChannelInfo.Client.pack(
             {'channel': self.channel})
         channel_info_msg_rx = self.__send_receive_msg(
             channel_info_msg_tx)
 
         if channel_info_msg_rx:
-            channel_info_msg_rx_dict = Msg.ChannelInfo.Server.parse_msg(
+            channel_info_msg_rx_dict = Msg.ChannelInfo.Server.parse(
                 channel_info_msg_rx)
 
         return channel_info_msg_rx_dict
@@ -113,13 +113,13 @@ class ArbinInterface:
         username = '123'
         password = '123'
 
-        login_msg_tx = Msg.Login.Client.build_msg(
+        login_msg_tx = Msg.Login.Client.pack(
             msg_values={'username': username, 'password': password})
 
         login_msg_rx = self.__send_receive_msg(login_msg_tx)
 
         if login_msg_rx:
-            login_msg_rx_dict = Msg.Login.Server.parse_msg(login_msg_rx)
+            login_msg_rx_dict = Msg.Login.Server.parse(login_msg_rx)
 
             if login_msg_rx_dict['result'] == 'success':
                 success = True

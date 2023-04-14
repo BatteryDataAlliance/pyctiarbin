@@ -50,56 +50,56 @@ def msg_builder(passed_test_value=None) -> bytearray:
 @pytest.mark.messages
 def test_simple_build_msg():
     '''
-    Test building a message with MessageAbc.build_msg()
+    Test building a message with MessageAbc.pack()
     '''
     key_msg = msg_builder()
-    abc_built_msg = TestClass.build_msg()
+    abc_built_msg = TestClass.pack()
     assert (abc_built_msg == key_msg)
 
 
 @pytest.mark.messages
 def test_modify_build_msg():
     '''
-    Test building a message with MessageAbc.build_msg() and modifying an element in the templet
+    Test building a message with MessageAbc.pack() and modifying an element in the templet
     '''
     new_test_value = 2.7182
 
     key_msg = msg_builder(new_test_value)
 
     update_dict = {'test_value': new_test_value}
-    abc_built_msg = TestClass.build_msg(update_dict)
+    abc_built_msg = TestClass.pack(update_dict)
     assert (abc_built_msg == key_msg)
 
 
 @pytest.mark.messages
 def test_modify_build_msg_bad_key():
     '''
-    Test building a message with MessageAbc.build_msg() and modifying it with a bad key
+    Test building a message with MessageAbc.pack() and modifying it with a bad key
     '''
     key_msg = msg_builder()
 
     update_dict = {'bad_value': 15}
-    new_abc_built_msg = TestClass.build_msg(update_dict)
+    new_abc_built_msg = TestClass.pack(update_dict)
     assert (new_abc_built_msg == key_msg)
 
 
 @pytest.mark.messages
 def test_modify_build_bad_pack():
     '''
-    Test building a message with MessageAbc.build_msg() but with an item that will fail packing
+    Test building a message with MessageAbc.pack() but with an item that will fail packing
     '''
     # We should get back an empty message
     key_msg =  bytearray([])
 
     update_dict = {'command_code': 'this should not be a string'}
-    new_abc_built_msg = TestClass.build_msg(update_dict)
+    new_abc_built_msg = TestClass.pack(update_dict)
     assert (new_abc_built_msg == key_msg)
 
 
 @pytest.mark.messages
 def test_parse_msg():
     '''
-    Test pasrsing a message with MessageAbc.parse_msg()
+    Test pasrsing a message with MessageAbc.parse()
     '''
     ans_key_dict = {
         'header': 1287429013477645789, 
@@ -112,7 +112,7 @@ def test_parse_msg():
 
     # Prase the message
     key_msg = msg_builder()
-    prased_msg_dict = TestClass.parse_msg(key_msg)
+    prased_msg_dict = TestClass.parse(key_msg)
 
     for key in ans_key_dict.keys():
         assert(ans_key_dict[key]==prased_msg_dict[key])
