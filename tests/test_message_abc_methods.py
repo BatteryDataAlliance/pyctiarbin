@@ -81,3 +81,26 @@ def test_modify_build_msg_bad_key():
     update_dict = {'bad_value': 15}
     new_abc_built_msg = TestClass.build_msg(update_dict)
     assert (new_abc_built_msg == key_msg)
+
+@pytest.mark.messages
+def test_parse_msg():
+    '''
+    Test pasrsing a message with MessageAbc.parse_msg()
+    '''
+    ans_key_dict = {
+        'header': 1287429013477645789, 
+        'msg_length': 44, 
+        'command_code': 1, 
+        'extended_command_code': 0, 
+        'test_value': 3.141590118408203, 
+        'test_string': 'Test String'
+    }
+
+    # Prase the message
+    key_msg = msg_builder()
+    prased_msg_dict = TestClass.parse_msg(key_msg)
+
+    for key in ans_key_dict.keys():
+        assert(ans_key_dict[key]==prased_msg_dict[key])
+
+
