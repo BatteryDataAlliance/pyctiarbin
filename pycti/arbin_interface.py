@@ -110,11 +110,8 @@ class ArbinInterface:
         """
         success = False
 
-        username = '123'
-        password = '123'
-
         login_msg_tx = Msg.Login.Client.pack(
-            msg_values={'username': username, 'password': password})
+            msg_values={'username':self.config['username'], 'password': self.config['password']})
 
         login_msg_rx = self.__send_receive_msg(login_msg_tx)
 
