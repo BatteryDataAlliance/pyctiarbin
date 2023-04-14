@@ -141,7 +141,8 @@ class MessageABC(ABC):
             msg[start_idx:end_idx] = packed_item
 
         # Append a checksum to the end of the message
-        msg += struct.pack('<H', sum(msg))
+        if msg:
+            msg += struct.pack('<H', sum(msg))
 
         return msg
 
@@ -160,13 +161,13 @@ class Msg:
                     'format': '32s',
                     'start_byte': 20,
                     'text_encoding': 'utf-8',
-                    'value': 123
+                    'value': 'not a username'
                 },
                 'password': {
                     'format': '32s',
                     'start_byte': 52,
                     'text_encoding': 'utf-8',
-                    'value': 123
+                    'value': 'not a password'
                 },
             }
 
