@@ -1,5 +1,4 @@
 import pytest
-import struct
 import os
 import json
 import copy
@@ -8,75 +7,69 @@ from pycti import Msg
 MSG_DIR = os.path.join(os.path.dirname(__file__), 'example_messages')
 
 
-@pytest.mark.messages
-def test_login_client_msg():
+def message_file_loader(msg_file_name: str) -> tuple:
     '''
-    Test building/parsing a client login request messsage
+    Helper fuction to read in example messages from files.
+
+    Parameters
+    ----------
+    msg_file_name : str
+        The file name the binary and JSON message are saved under
+
+    Returns
+    -------
+    tuple(bytearray,dict)
+        The example message as bytearray and decoded as dict.
     '''
-    test_username = 'not a username'
-    test_password = 'not a passowrd'
-
-    parsed_msg_ans_key = {
-        'header': 1287429013477645789,
-        'msg_length': 74,
-        'command_code': 4004184065,
-        'extended_command_code': 0,
-        'username': test_username,
-        'password': test_password
-    }
-
-    # Generate a independent message to check against
-    key_msg = bytearray([])
-    key_msg += struct.pack('<Q', parsed_msg_ans_key['header'])
-    key_msg += struct.pack('<L', parsed_msg_ans_key['msg_length'])
-    key_msg += struct.pack('<L', parsed_msg_ans_key['command_code'])
-    key_msg += struct.pack('<L', parsed_msg_ans_key['extended_command_code'])
-    key_msg += struct.pack('32s', test_username.encode('ascii'))
-    key_msg += struct.pack('32s', test_password.encode('ascii'))
-    key_msg += struct.pack('<H', sum(key_msg))
-
-    test_login_cred_dict = {
-        'username': test_username,
-        'password': test_password
-    }
-    client_login_msg = Msg.Login.Client.pack(test_login_cred_dict)
-    assert (client_login_msg == key_msg)
-
-    parsed_client_login_msg = Msg.Login.Client.parse(client_login_msg)
-    assert (parsed_client_login_msg == parsed_msg_ans_key)
-
-
-@pytest.mark.messages
-def test_login_server_msg():
-    '''
-    Test parsing/building a server login response message
-    '''
-
-    # Read in the example example binary server response message
+    # Read in the example example binary message
     msg_bin_file_path = os.path.join(
-        MSG_DIR, 'server_login_response_msg.bin')
+        MSG_DIR, msg_file_name + '.bin')
     with open(msg_bin_file_path, mode='rb') as file:  # b is important -> binary
         msg_bin = file.read()
 
     # Read in the decoded response message
     msg_decoded_file_path = os.path.join(
-        MSG_DIR, 'server_login_response_msg.json')
-    with open(msg_decoded_file_path, mode='r') as file:  # b is important -> binary
-        msg_decoded_key = json.load(file)
+        MSG_DIR, msg_file_name + '.json')
+    with open(msg_decoded_file_path, mode='r') as file:
+        msg_dict = json.load(file)
 
-    # Decode the binary message
+    return (msg_bin, msg_dict)
+
+
+@pytest.mark.messages
+def test_login_client_msg():
+    '''
+    Test packing/parsing a client login request messsage
+    '''
+
+    example_msg_name = 'client_login_request_msg'
+    (msg_bin, msg_dict) = message_file_loader(example_msg_name)
+
+    # Pack the msg_dict and check if it matches the example binary message
+    packed_msg = Msg.Login.Client.pack(msg_dict)
+    assert (packed_msg == msg_bin)
+
+    # Checking parsing the example message binary and that it matches the msg_dict
+    parsed_msg = Msg.Login.Client.parse(msg_bin)
+    assert (parsed_msg == msg_dict)
+
+
+@pytest.mark.messages
+def test_login_server_msg():
+    '''
+    Test parsing/packing a server login response message
+    '''
+    example_msg_name = 'server_login_response_msg'
+    (msg_bin, msg_dict) = message_file_loader(example_msg_name)
+
+    # Check that the parsed binary message mataches the msg_dict
     parsed_msg = Msg.Login.Server.parse(msg_bin)
+    assert (parsed_msg == msg_dict)
 
-    # Make sure all items in msg_decoded_key match those in parsed message
-    for key in msg_decoded_key.keys():
-        assert (msg_decoded_key[key] == parsed_msg[key])
-
-    # Check that we can create our own version of the message. Need to re-code the result field.
-    buildable_decoded_key = copy.deepcopy(msg_decoded_key)
-    buildable_decoded_key['result'] = 1
-    built_msg = Msg.Login.Server.pack(buildable_decoded_key)
-    parsed_built_msg = Msg.Login.Server.parse(built_msg)
-
-    # Make sure all items in msg_decoded_key match those in parsed message
-    for key in msg_decoded_key.keys():
-        assert (msg_decoded_key[key] == parsed_built_msg[key])
+    # Check packing own version of message from msg_dict
+    buildable_msg_dict = copy.deepcopy(msg_dict)
+    # Need to re-code this from login_result_decoder
+    buildable_msg_dict['result'] = 1
+    packed_msg = Msg.Login.Server.pack(buildable_msg_dict)
+    parsed_msg = Msg.Login.Server.parse(packed_msg)
+    assert (parsed_msg == msg_dict)

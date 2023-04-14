@@ -111,7 +111,8 @@ class ArbinInterface:
         success = False
 
         login_msg_tx = Msg.Login.Client.pack(
-            msg_values={'username':self.config['username'], 'password': self.config['password']})
+            msg_values={'username': self.config['username'], 'password': self.config['password']})
+        print(login_msg_tx)
 
         login_msg_rx = self.__send_receive_msg(login_msg_tx)
 
@@ -125,7 +126,7 @@ class ArbinInterface:
             elif login_msg_rx_dict['result'] == "aleady logged in":
                 success = True
                 logger.info(
-                    "Already logged in to cycler " +str(login_msg_rx_dict['cycler_sn']))
+                    "Already logged in to cycler " + str(login_msg_rx_dict['cycler_sn']))
             elif login_msg_rx_dict['result'] == 'fail':
                 logger.error(
                     "Login failed with provided credentials!")
