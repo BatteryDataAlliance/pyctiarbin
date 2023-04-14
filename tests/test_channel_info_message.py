@@ -48,17 +48,17 @@ def test_aux_readings_parser_voltage_and_temp():
     msg_dict = Msg.ChannelInfo.Server.aux_readings_parser(msg_dict, msg_bin, 0)
 
     # Check that aux readings were assigned correctly
-    assert (abs(msg_dict['aux_voltages'][0] - aux_voltage_1)
+    assert (abs(msg_dict['aux_voltage'][0] - aux_voltage_1)
             < Constants.FLOAT_TOLERANCE)
-    assert (abs(msg_dict['aux_voltages_dt'][0] -
+    assert (abs(msg_dict['aux_voltage_dt'][0] -
             aux_voltage_dt_1) < Constants.FLOAT_TOLERANCE)
-    assert (abs(msg_dict['aux_voltages'][1] - aux_voltage_2)
+    assert (abs(msg_dict['aux_voltage'][1] - aux_voltage_2)
             < Constants.FLOAT_TOLERANCE)
-    assert (abs(msg_dict['aux_voltages_dt'][1] -
+    assert (abs(msg_dict['aux_voltage_dt'][1] -
             aux_voltage_dt_2) < Constants.FLOAT_TOLERANCE)
-    assert (abs(msg_dict['aux_temperatures'][0] -
+    assert (abs(msg_dict['aux_temperature'][0] -
             aux_temperature_1) < Constants.FLOAT_TOLERANCE)
-    assert (abs(msg_dict['aux_temperatures_dt'][0] -
+    assert (abs(msg_dict['aux_temperature_dt'][0] -
             aux_temperature_dt_1) < Constants.FLOAT_TOLERANCE)
 
 
@@ -86,11 +86,11 @@ def test_aux_readings_parser_only_temp():
     msg_dict = Msg.ChannelInfo.Server.aux_readings_parser(msg_dict, msg_bin, 0)
 
     # Check that aux readings were assigned correctly
-    assert (abs(msg_dict['aux_temperatures'][0] -
+    assert (abs(msg_dict['aux_temperature'][0] -
             aux_temperature_1) < Constants.FLOAT_TOLERANCE)
-    assert (abs(msg_dict['aux_temperatures_dt'][0] -
+    assert (abs(msg_dict['aux_temperature_dt'][0] -
             aux_temperature_dt_1) < Constants.FLOAT_TOLERANCE)
-    assert (abs(msg_dict['aux_temperatures'][1] -
+    assert (abs(msg_dict['aux_temperature'][1] -
             aux_temperature_2) < Constants.FLOAT_TOLERANCE)
-    assert (abs(msg_dict['aux_temperatures_dt'][1] -
+    assert (abs(msg_dict['aux_temperature_dt'][1] -
             aux_temperature_dt_2) < Constants.FLOAT_TOLERANCE)

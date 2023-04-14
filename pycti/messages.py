@@ -1,5 +1,6 @@
 import struct
 import logging
+import re
 from copy import deepcopy
 from abc import ABC
 
@@ -494,7 +495,7 @@ class Msg:
                 return msg_dict
 
             @classmethod
-            def aux_readings_parser(cls, msg_dict: dict, msg_bin: bytearray, starting_aux_idx = 1777):
+            def aux_readings_parser(cls, msg_dict: dict, msg_bin: bytearray, starting_aux_idx=1777):
                 """
                 Parses the auxiliary readings in msg_bin based on the aux readings
                 counts in msg_dict. Aux readings are then added as items to the msg_dict. 
@@ -515,50 +516,39 @@ class Msg:
                 """
                 aux_lists = []
 
-                # # Prepare the aux entires. Order of the Aux lists here is important. Don't move them.
-                if msg_dict['aux_voltage_count']:
-                    msg_dict['aux_voltages'] = [0 for x in range(
-                        msg_dict['aux_voltage_count'])]
-                    msg_dict['aux_voltages_dt'] = [0 for x in range(
-                        msg_dict['aux_voltage_count'])]
-                    aux_lists.append(
-                        [msg_dict['aux_voltages'], msg_dict['aux_voltages_dt']])
-                else:
-                    msg_dict['aux_voltages'] = []
-                    msg_dict['aux_voltages_dt'] = []
+                aux_count_name_list = [
+                    'aux_voltage_count',
+                    'aux_temperature_count',
+                    'aux_pressure_count',
+                    'aux_external_count',
+                    'aux_flow_count',
+                    'aux_ao_count',
+                    'aux_di_count',
+                    'aux_do_count',
+                    'aux_humidity_count',
+                    'aux_safety_count',
+                    'aux_ph_count',
+                    'aux_density_count'
+                ]
 
-                if msg_dict['aux_temperature_count']:
-                    msg_dict['aux_temperatures'] = [0 for x in range(
-                        msg_dict['aux_temperature_count'])]
-                    msg_dict['aux_temperatures_dt'] = [0 for x in range(
-                        msg_dict['aux_temperature_count'])]
-                    aux_lists.append(
-                        [msg_dict['aux_temperatures'], msg_dict['aux_temperatures_dt']])
-                else:
-                    msg_dict['aux_temperatures'] = []
-                    msg_dict['aux_temperatures_dt'] = []
+                # Generate a list of readings for each aux reading.
+                # If count is non-zero then genreate a aux_reading and aux_reading_dt list of that length
+                # Else, generate empty lists for the aux_reading and aux_reading_dt
+                for aux_count_name in aux_count_name_list:
+                    aux_reading_name = re.split('_count', aux_count_name)[0]
+                    aux_dt_name = aux_reading_name + '_dt'
+                    if msg_dict[aux_count_name]:
+                        msg_dict[aux_reading_name] = [0 for x in range(
+                            msg_dict[aux_count_name])]
+                        msg_dict[aux_dt_name] = [0 for x in range(
+                            msg_dict[aux_count_name])]
+                        aux_lists.append(
+                            [msg_dict[aux_reading_name], msg_dict[aux_dt_name]])
+                    else:
+                        msg_dict[aux_reading_name] = []
+                        msg_dict[aux_dt_name] = []
 
-                msg_dict['aux_pressures'] = []
-                msg_dict['aux_pressures_dt'] = []
-                msg_dict['aux_externals'] = []
-                msg_dict['aux_externals_dt'] = []
-                msg_dict['aux_flows'] = []
-                msg_dict['aux_flows_dt'] = []
-                msg_dict['aux_aos'] = []
-                msg_dict['aux_aos_dt'] = []
-                msg_dict['aux_dis'] = []
-                msg_dict['aux_dis_dt'] = []
-                msg_dict['aux_dos'] = []
-                msg_dict['aux_dos_dt'] = []
-                msg_dict['aux_humidities'] = []
-                msg_dict['aux_humidities_dt'] = []
-                msg_dict['aux_safeties'] = []
-                msg_dict['aux_safeties_dt'] = []
-                msg_dict['aux_phs'] = []
-                msg_dict['aux_phs_dt'] = []
-                msg_dict['aux_densities'] = []
-                msg_dict['aux_densities_dt'] = []
-
+                # For aux readings that have a measurements, add them to the respective reading list.
                 current_aux_idx = starting_aux_idx
                 for readings_list in aux_lists:
                     for i in range(0, len(readings_list[0])):
