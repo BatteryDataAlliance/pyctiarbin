@@ -140,11 +140,6 @@ class MessageABC(ABC):
                 logger.error(e)
                 msg = bytearray([])
                 break
-        
-            if item_name == "schedule":
-                print('schedule')
-                print(item)
-                print(packed_item)
 
             start_idx = item['start_byte']
             end_idx = item['start_byte'] + struct.calcsize(item['format'])
@@ -294,14 +289,14 @@ class Msg:
                     'format': '400s',
                     'start_byte': 31,
                     'value': 'fake_schedule',
-                    'text_encoding': 'utf-16',
+                    'text_encoding': 'utf-16-le',
                 },
                 'testname': {
                     # Stored as wchar_t[72]
                     'format': '144s',
                     'start_byte': 431,
                     'value': 'fake_testname',
-                    'text_encoding': 'utf-16',
+                    'text_encoding': 'utf-16-le',
                 },
                 'exit_condition': {
                     'format': '100s',
@@ -636,7 +631,7 @@ class Msg:
                     'format': '400s',
                     'start_byte': 25,
                     'value': 'fake_schedule',
-                    'text_encoding': 'utf-16',
+                    'text_encoding': 'utf-16-le',
                 },
                 'test_capacity_ah': {
                     'format': '<f',
@@ -647,7 +642,7 @@ class Msg:
                     'format': '144s',
                     'start_byte': 429,
                     'value': '',
-                    'text_encoding': 'utf-16',
+                    'text_encoding': 'utf-16-le',
                 },
                 'user_variable_1': {
                     'format': '<f',
