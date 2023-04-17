@@ -6,12 +6,12 @@ from helper_test_utils import message_file_loader
 
 MSG_DIR = os.path.join(os.path.dirname(__file__), 'example_messages')
 
+
 @pytest.mark.messages
 def test_assign_schedule_client_msg():
     '''
     Test packing/parsing a client assign schedule messsage
     '''
-
     example_msg_name = 'client_assign_schedule_msg'
     (msg_bin, msg_dict) = message_file_loader(MSG_DIR, example_msg_name)
 
@@ -22,6 +22,7 @@ def test_assign_schedule_client_msg():
     # Checking parsing the example message binary and that it matches the msg_dict
     parsed_msg = Msg.AssignSchedule.Client.parse(msg_bin)
     assert (parsed_msg == msg_dict)
+
 
 @pytest.mark.messages
 def test_assign_schedule_server_msg():

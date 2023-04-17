@@ -12,7 +12,7 @@ def test_login_client_msg():
     Test packing/parsing a client login request messsage
     '''
 
-    example_msg_name = 'client_login_request_msg'
+    example_msg_name = 'client_login_msg'
     (msg_bin, msg_dict) = message_file_loader(MSG_DIR, example_msg_name)
 
     # Pack the msg_dict and check if it matches the example binary message
@@ -29,7 +29,7 @@ def test_login_server_msg():
     '''
     Test parsing/packing a server login response message
     '''
-    example_msg_name = 'server_login_response_msg'
+    example_msg_name = 'server_login_msg'
     (msg_bin, msg_dict) = message_file_loader(MSG_DIR, example_msg_name)
 
     # Check that the parsed binary message mataches the msg_dict

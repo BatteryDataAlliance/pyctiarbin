@@ -94,3 +94,36 @@ def test_aux_readings_parser_only_temp():
             aux_temperature_2) < Constants.FLOAT_TOLERANCE)
     assert (abs(msg_dict['aux_temperature_dt'][1] -
             aux_temperature_dt_2) < Constants.FLOAT_TOLERANCE)
+
+
+@pytest.mark.messages
+def test_channel_info_client_msg():
+    '''
+    Test packing/parsing a client channel info messsage
+    '''
+    example_msg_name = 'client_channel_info_msg'
+    (msg_bin, msg_dict) = message_file_loader(MSG_DIR, example_msg_name)
+
+    # Pack the msg_dict and check if it matches the example binary message
+    packed_msg = Msg.ChannelInfo.Client.pack(msg_dict)
+    assert (packed_msg == msg_bin)
+
+    # Checking parsing the example message binary and that it matches the msg_dict
+    parsed_msg = Msg.ChannelInfo.Client.parse(msg_bin)
+    assert (parsed_msg == msg_dict)
+
+
+@pytest.mark.messages
+def test_channel_info_server_msg():
+    '''
+    Test packing/parsing a server channel info messsage
+    '''
+    example_msg_name = 'server_channel_info_msg'
+    (msg_bin, msg_dict) = message_file_loader(MSG_DIR, example_msg_name)
+
+    # Check that the parsed binary message mataches the msg_dict
+    parsed_msg = Msg.ChannelInfo.Server.parse(msg_bin)
+    assert (parsed_msg == msg_dict)
+
+    # Check packing own version of message from msg_dict
+    # TODO: Add check for packing our own server message.
