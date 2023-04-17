@@ -196,9 +196,12 @@ class Msg:
                 },
             }
 
-            # Used to decode the login result
-            login_result_decoder = [
-                "should not see this", "success", "fail", "aleady logged in"]
+            login_result_dict = {
+                0: "should not see this",
+                1: "success",
+                2: "fail",
+                3: "aleady logged in"
+            }
 
             @classmethod
             def parse(cls, msg: bytearray) -> dict:
@@ -217,7 +220,7 @@ class Msg:
                     The message with items decoded into a dictionary
                 """
                 msg_dict = super().parse(msg)
-                msg_dict['result'] = cls.login_result_decoder[msg_dict['result']]
+                msg_dict['result'] = cls.login_result_dict[msg_dict['result']]
                 return msg_dict
 
     class ChannelInfo:
@@ -476,41 +479,41 @@ class Msg:
                 },
             }
 
-            # List of staus codes. Each index in the corresponding status code. 
-            status_code_list = [
-                'Idle',
-                'Transition',
-                'Charge',
-                'Disharge',
-                'Rest',
-                'Wait',
-                'External Charge',
-                'Calibration',
-                'Unsafe',
-                'Pulse',
-                'Internal Resistance',
-                'AC Impedance',
-                'AC Cell',
-                'ACI Cell',
-                'Test Settings',
-                'Error',
-                'Finished',
-                'Volt Meter',
-                'Waiting for ACS',
-                'Pause',
-                'Empty',
-                'Idle from MCU',
-                'Start',
-                'Running',
-                'Step Transfer',
-                'Resume',
-                'Go Pause',
-                'Go Stop',
-                'Go Next Step',
-                'Online Update',
-                'DAQ Memory Unsafe',
-                'ACR'
-            ]
+            # List of staus codes. Each index in the corresponding status code.
+            status_code_dict = {
+                0: 'Idle',
+                1: 'Transition',
+                2: 'Charge',
+                3: 'Disharge',
+                4: 'Rest',
+                5: 'Wait',
+                6: 'External Charge',
+                7: 'Calibration',
+                8: 'Unsafe',
+                9: 'Pulse',
+                10: 'Internal Resistance',
+                11: 'AC Impedance',
+                12: 'AC Cell',
+                13: 'ACI Cell',
+                14: 'Test Settings',
+                15: 'Error',
+                16: 'Finished',
+                17: 'Volt Meter',
+                18: 'Waiting for ACS',
+                19: 'Pause',
+                20: 'Empty',
+                21: 'Idle from MCU',
+                22: 'Start',
+                23: 'Running',
+                24: 'Step Transfer',
+                25: 'Resume',
+                26: 'Go Pause',
+                27: 'Go Stop',
+                28: 'Go Next Step',
+                29: 'Online Update',
+                30: 'DAQ Memory Unsafe',
+                31: 'ACR'
+            }
 
             @classmethod
             def parse(cls, msg: bytearray) -> dict:
@@ -528,8 +531,9 @@ class Msg:
                     The message with items decoded into a dictionary
                 """
                 msg_dict = super().parse(msg)
-                msg_dict = cls.aux_readings_parser(msg_dict, msg, starting_aux_idx=1777)
-                msg_dict['status'] = cls.status_code_list[msg_dict['status']]
+                msg_dict = cls.aux_readings_parser(
+                    msg_dict, msg, starting_aux_idx=1777)
+                msg_dict['status'] = cls.status_code_dict[msg_dict['status']]
                 return msg_dict
 
             @classmethod
@@ -603,24 +607,163 @@ class Msg:
     class AssignSchedule:
         '''
         Message for assiging a schedule to a specific channel. See
-        CTI_REQUEST_LOGIN/CTI_REQUEST_LOGIN_FEEDBACK 
+        THIRD_PARTY_ASSIGN_SCHEDULE/THIRD_PARTY_ASSIGN_SCHEDULE_FEEDBACK 
         in Arbin docs for more info.
         '''
         class Client(MessageABC):
-            msg_length = 74
-            command_code = 0xEEAB0001
+            msg_length = 647
+            command_code = 0xBB210001
 
             msg_specific_templet = {
-                'username': {
-                    'format': '32s',
+                'channel': {
+                    'format': 'i',
                     'start_byte': 20,
-                    'text_encoding': 'utf-8',
-                    'value': 'not a username'
+                    'value': 0
                 },
-                'password': {
+                # Always 0x00 for PyCTI since we only work with single channels
+                'assign_all_channels': {
+                    'format': 'c',
+                    'start_byte': 24,
+                    'value': '\0',
+                    'text_encoding': 'utf-8',
+                },
+                'schedule_name': {
+                    # Stored as wchar_t[200]. Each wchar_t is 2 bytes, twice as big as standard char in Python
+                    'format': '400s',
+                    'start_byte': 25,
+                    'value': 'fake_schedule',
+                    'text_encoding': 'utf-16',
+                },
+                'test_capacity_ah': {
+                    'format': '<f',
+                    'start_byte': 425,
+                    'value': 1.0,
+                },
+                'barcode': {
+                    'format': '144s',
+                    'start_byte': 429,
+                    'value': '',
+                    'text_encoding': 'utf-16',
+                },
+                'user_variable_1': {
+                    'format': '<f',
+                    'start_byte': 573,
+                    'value': 1.0,
+                },
+                'user_variable_2': {
+                    'format': '<f',
+                    'start_byte': 577,
+                    'value': 1.0,
+                },
+                'user_variable_3': {
+                    'format': '<f',
+                    'start_byte': 581,
+                    'value': 1.0,
+                },
+                'user_variable_4': {
+                    'format': '<f',
+                    'start_byte': 585,
+                    'value': 1.0,
+                },
+                'user_variable_5': {
+                    'format': '<f',
+                    'start_byte': 589,
+                    'value': 1.0,
+                },
+                'user_variable_6': {
+                    'format': '<f',
+                    'start_byte': 593,
+                    'value': 1.0,
+                },
+                'user_variable_7': {
+                    'format': '<f',
+                    'start_byte': 597,
+                    'value': 1.0,
+                },
+                'user_variable_8': {
+                    'format': '<f',
+                    'start_byte': 601,
+                    'value': 1.0,
+                },
+                'user_variable_9': {
+                    'format': '<f',
+                    'start_byte': 605,
+                    'value': 1.0,
+                },
+                'user_variable_10': {
+                    'format': '<f',
+                    'start_byte': 609,
+                    'value': 1.0,
+                },
+                'user_variable_11': {
+                    'format': '<f',
+                    'start_byte': 613,
+                    'value': 1.0,
+                },
+                'user_variable_12': {
+                    'format': '<f',
+                    'start_byte': 617,
+                    'value': 1.0,
+                },
+                'user_variable_13': {
+                    'format': '<f',
+                    'start_byte': 621,
+                    'value': 1.0,
+                },
+                'user_variable_14': {
+                    'format': '<f',
+                    'start_byte': 625,
+                    'value': 1.0,
+                },
+                'user_variable_15': {
+                    'format': '<f',
+                    'start_byte': 629,
+                    'value': 1.0,
+                },
+                'user_variable_16': {
+                    'format': '<f',
+                    'start_byte': 633,
+                    'value': 1.0,
+                },
+                'reseved': {
                     'format': '32s',
-                    'start_byte': 52,
+                    'start_byte': 637,
+                    'value': ''.join(['\0' for i in range(32)]),
                     'text_encoding': 'utf-8',
-                    'value': 'not a password'
                 },
+            }
+
+        class Server(MessageABC):
+            msg_length = 136
+            command_code = 0xBB120001
+
+            msg_specific_templet = {
+                'channel': {
+                    'format': 'i',
+                    'start_byte': 20,
+                    'value': 0
+                },
+                'result': {
+                    'format': 'c',
+                    'start_byte': 24,
+                    'value': '\0',
+                    'text_encoding': 'utf-8',
+                },
+                'reseved': {
+                    'format': '101s',
+                    'start_byte': 25,
+                    'value': ''.join(['\0' for i in range(101)]),
+                    'text_encoding': 'utf-8',
+                },
+            }
+
+            assign_schedule_feedback_codes = {
+                16: 'channel does not exist',
+                17: 'Monitor window in use at the moment',
+                19: 'Schedule name cannot be empty',
+                20: 'Schedule name not found',
+                21: 'Channel is running',
+                22: 'Channel is downloading another schedule currently',
+                23: 'Cannot assign schedule when batch file is open',
+                24: 'Assign failed'
             }
