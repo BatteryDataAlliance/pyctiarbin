@@ -126,4 +126,9 @@ def test_channel_info_server_msg():
     assert (parsed_msg == msg_dict)
 
     # Check packing own version of message from msg_dict
-    # TODO: Add check for packing our own server message.
+    buildable_msg_dict = copy.deepcopy(msg_dict)
+    # Need to re-code this from login_result_decoder
+    buildable_msg_dict['status'] = 4
+    packed_msg = Msg.ChannelInfo.Server.pack(buildable_msg_dict)
+    parsed_msg = Msg.ChannelInfo.Server.parse(packed_msg)
+    assert (parsed_msg == msg_dict)

@@ -101,7 +101,7 @@ class MessageABC(ABC):
 
         Returns
         -------
-        msg : bytearray
+        msg_bin : bytearray
             Packed response message.
         """
         # Create a template to build messages from
@@ -113,7 +113,7 @@ class MessageABC(ABC):
         templet['command_code']['value'] = cls.command_code
 
         # Create a message bytearray that will be loaded with message contents
-        msg = bytearray(templet['msg_length']['value'])
+        msg_bin = bytearray(templet['msg_length']['value'])
 
         # Update default message values with those in the passed msg_values dict
         for key in msg_values.keys():
@@ -138,18 +138,18 @@ class MessageABC(ABC):
                 logger.error(
                     f'Error packing {item_name} with fields {item}!')
                 logger.error(e)
-                msg = bytearray([])
+                msg_bin = bytearray([])
                 break
 
             start_idx = item['start_byte']
             end_idx = item['start_byte'] + struct.calcsize(item['format'])
-            msg[start_idx:end_idx] = packed_item
+            msg_bin[start_idx:end_idx] = packed_item
 
         # Append a checksum to the end of the message
-        if msg:
-            msg += struct.pack('<H', sum(msg))
+        if msg_bin:
+            msg_bin += struct.pack('<H', sum(msg_bin))
 
-        return msg
+        return msg_bin
 
 
 class Msg:
@@ -534,6 +534,26 @@ class Msg:
                     msg_dict, msg_bin, starting_aux_idx=1777)
                 msg_dict['status'] = cls.status_code_dict[msg_dict['status']]
                 return msg_dict
+
+            @classmethod
+            def pack(cls, msg_values={}) -> bytearray:
+                """
+                Same as parrent method, but handles packing aux measurements.
+
+                Parameters
+                ----------
+                msg_values : dict
+                    A dictionary detailing which default values in the messtage temple should be 
+                    updated.
+
+                Returns
+                -------
+                msg : bytearray
+                    Packed response message.
+                """
+                # TODO : Modify so that we can aux values can be packed.
+                msg_bin = super().pack(msg_values)
+                return msg_bin
 
             @classmethod
             def aux_readings_parser(cls, msg_dict: dict, msg_bin: bytearray, starting_aux_idx=1777):
