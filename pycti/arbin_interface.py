@@ -63,12 +63,12 @@ class ArbinInterface:
 
         channel_info_msg_tx = Msg.ChannelInfo.Client.pack(
             {'channel': self.channel})
-        channel_info_msg_rx = self.__send_receive_msg(
+        resposne_msg_bin = self.__send_receive_msg(
             channel_info_msg_tx)
 
-        if channel_info_msg_rx:
+        if resposne_msg_bin:
             channel_info_msg_rx_dict = Msg.ChannelInfo.Server.parse(
-                channel_info_msg_rx)
+                resposne_msg_bin)
 
         return channel_info_msg_rx_dict
 
@@ -85,12 +85,12 @@ class ArbinInterface:
 
         assign_schedule_msg_tx_bin = Msg.AssignSchedule.Client.pack(
             {'channel': self.channel, 'schedule': self.config['schedule']})
-        channel_info_msg_rx_bin = self.__send_receive_msg(
+        resposne_msg_bin = self.__send_receive_msg(
             assign_schedule_msg_tx_bin)
 
-        if channel_info_msg_rx_bin:
+        if resposne_msg_bin:
             assign_schedule_msg_rx_dict = Msg.AssignSchedule.Server.parse(
-                channel_info_msg_rx_bin)
+                resposne_msg_bin)
             if assign_schedule_msg_rx_dict['result'] == 'success':
                 success = True
                 logger.info(
@@ -143,10 +143,10 @@ class ArbinInterface:
         login_msg_tx = Msg.Login.Client.pack(
             msg_values={'username': self.config['username'], 'password': self.config['password']})
 
-        login_msg_rx = self.__send_receive_msg(login_msg_tx)
+        response_msg_bin = self.__send_receive_msg(login_msg_tx)
 
-        if login_msg_rx:
-            login_msg_rx_dict = Msg.Login.Server.parse(login_msg_rx)
+        if response_msg_bin:
+            login_msg_rx_dict = Msg.Login.Server.parse(response_msg_bin)
 
             if login_msg_rx_dict['result'] == 'success':
                 success = True

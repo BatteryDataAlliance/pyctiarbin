@@ -127,7 +127,7 @@ class MessageABC(ABC):
         for item_name, item in templet.items():
             logger.debug(f'Packing item {item_name}')
             try:
-                if item['format'].endswith('s'):
+                if item['format'].endswith('s') or item['format'].endswith('c'):
                     packed_item = struct.pack(
                         item['format'],
                         item['value'].encode(item['text_encoding']))
@@ -760,12 +760,12 @@ class Msg:
                 0: 'success',
                 16: 'channel does not exist',
                 17: 'Monitor window in use at the moment',
-                19: 'Schedule name cannot be empty',
-                20: 'Schedule name not found',
-                21: 'Channel is running',
-                22: 'Channel is downloading another schedule currently',
-                23: 'Cannot assign schedule when batch file is open',
-                24: 'Assign failed'
+                18: 'Schedule name cannot be empty',
+                19: 'Schedule name not found',
+                20: 'Channel is running',
+                21: 'Channel is downloading another schedule currently',
+                22: 'Cannot assign schedule when batch file is open',
+                23: 'Assign failed'
             }
 
             @classmethod
