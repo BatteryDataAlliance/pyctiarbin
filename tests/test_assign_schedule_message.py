@@ -1,0 +1,44 @@
+import pytest
+import os
+import copy
+from pycti import Msg
+from helper_test_utils import message_file_loader
+
+MSG_DIR = os.path.join(os.path.dirname(__file__), 'example_messages')
+
+@pytest.mark.messages
+def test_assign_schedule_client_msg():
+    '''
+    Test packing/parsing a client assign schedule messsage
+    '''
+
+    example_msg_name = 'client_assign_schedule_msg'
+    (msg_bin, msg_dict) = message_file_loader(MSG_DIR, example_msg_name)
+
+    # Pack the msg_dict and check if it matches the example binary message
+    packed_msg = Msg.AssignSchedule.Client.pack(msg_dict)
+    assert (packed_msg == msg_bin)
+
+    # Checking parsing the example message binary and that it matches the msg_dict
+    parsed_msg = Msg.AssignSchedule.Client.parse(msg_bin)
+    assert (parsed_msg == msg_dict)
+
+@pytest.mark.messages
+def test_assign_schedule_server_msg():
+    '''
+    Test parsing/packing a server assign schedule messsage response
+    '''
+    example_msg_name = 'server_assign_schedule_msg'
+    (msg_bin, msg_dict) = message_file_loader(MSG_DIR, example_msg_name)
+
+    # Check that the parsed binary message mataches the msg_dict
+    parsed_msg = Msg.AssignSchedule.Server.parse(msg_bin)
+    assert (parsed_msg == msg_dict)
+
+    # Check packing own version of message from msg_dict
+    buildable_msg_dict = copy.deepcopy(msg_dict)
+    # Need to re-code this from assign schedule error code
+    buildable_msg_dict['result'] = '\0'
+    packed_msg = Msg.AssignSchedule.Server.pack(buildable_msg_dict)
+    parsed_msg = Msg.AssignSchedule.Server.parse(packed_msg)
+    assert (parsed_msg == msg_dict)
