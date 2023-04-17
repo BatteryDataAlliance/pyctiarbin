@@ -20,7 +20,7 @@ def test_assign_schedule_client_msg():
     assert (packed_msg == msg_bin)
 
     # Checking parsing the example message binary and that it matches the msg_dict
-    parsed_msg = Msg.AssignSchedule.Client.parse(msg_bin)
+    parsed_msg = Msg.AssignSchedule.Client.unpack(msg_bin)
     assert (parsed_msg == msg_dict)
 
 
@@ -33,7 +33,7 @@ def test_assign_schedule_server_msg():
     (msg_bin, msg_dict) = message_file_loader(MSG_DIR, example_msg_name)
 
     # Check that the parsed binary message mataches the msg_dict
-    parsed_msg = Msg.AssignSchedule.Server.parse(msg_bin)
+    parsed_msg = Msg.AssignSchedule.Server.unpack(msg_bin)
     assert (parsed_msg == msg_dict)
 
     # Check packing own version of message from msg_dict
@@ -41,5 +41,5 @@ def test_assign_schedule_server_msg():
     # Need to re-code this from assign schedule error code
     buildable_msg_dict['result'] = '\0'
     packed_msg = Msg.AssignSchedule.Server.pack(buildable_msg_dict)
-    parsed_msg = Msg.AssignSchedule.Server.parse(packed_msg)
+    parsed_msg = Msg.AssignSchedule.Server.unpack(packed_msg)
     assert (parsed_msg == msg_dict)

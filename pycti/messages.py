@@ -43,7 +43,7 @@ class MessageABC(ABC):
     }
 
     @classmethod
-    def parse(cls, msg_bin: bytearray) -> dict:
+    def unpack(cls, msg_bin: bytearray) -> dict:
         """
         Parses the passed message and decodes it with the msg_encoding dict.
         Each key in the output message will have name of the key from the 
@@ -52,7 +52,7 @@ class MessageABC(ABC):
         Parameters
         ----------
         msg_bin : bytearry
-            The message to parse.
+            The message to unpack.
 
         Returns
         -------
@@ -61,7 +61,7 @@ class MessageABC(ABC):
         """
         decoded_msg_dict = {}
 
-        # Create a templet to parse message with
+        # Create a templet to unpack message with
         templet = {**deepcopy(cls.base_templet),
                    **deepcopy(cls.msg_specific_templet)}
 
@@ -204,7 +204,7 @@ class Msg:
             }
 
             @classmethod
-            def parse(cls, msg_bin: bytearray) -> dict:
+            def unpack(cls, msg_bin: bytearray) -> dict:
                 """
                 Same as the parrent method, but converts the result based on the
                 login_result_dict.
@@ -212,14 +212,14 @@ class Msg:
                 Parameters
                 ----------
                 msg_bin : bytearry
-                    The message to parse.
+                    The message to unpack.
 
                 Returns
                 -------
                 msg_dict : dict
                     The message with items decoded into a dictionary
                 """
-                msg_dict = super().parse(msg_bin)
+                msg_dict = super().unpack(msg_bin)
                 msg_dict['result'] = cls.login_result_dict[msg_dict['result']]
                 return msg_dict
 
@@ -515,21 +515,21 @@ class Msg:
             }
 
             @classmethod
-            def parse(cls, msg_bin: bytearray) -> dict:
+            def unpack(cls, msg_bin: bytearray) -> dict:
                 """
-                Same as the parent method, but uses aux counts to parse aux readings
+                Same as the parent method, but uses aux counts to unpack aux readings
 
                 Parameters
                 ----------
                 msg_bin : bytearry
-                    The message to parse.
+                    The message to unpack.
 
                 Returns
                 -------
                 msg_dict : dict
                     The message with items decoded into a dictionary
                 """
-                msg_dict = super().parse(msg_bin)
+                msg_dict = super().unpack(msg_bin)
                 msg_dict = cls.aux_readings_parser(
                     msg_dict, msg_bin, starting_aux_idx=1777)
                 msg_dict['status'] = cls.status_code_dict[msg_dict['status']]
@@ -566,7 +566,7 @@ class Msg:
                 msg_dict : dict
                     A dictionary containing the aux readings counts (aux_voltage_count, aux_voltage_count, etc)
                 msg_bin : bytearray
-                    The message to parse as a byte array.
+                    The message to unpack as a byte array.
                 starting_aux_idx : int
                     The starting index in the msg_bin for aux readings. 1777 in single channel messages
 
@@ -789,7 +789,7 @@ class Msg:
             }
 
             @classmethod
-            def parse(cls, msg_bin: bytearray) -> dict:
+            def unpack(cls, msg_bin: bytearray) -> dict:
                 """
                 Same as the parent method, but converts the result based on the
                 assign_schedule_feedback_codes.
@@ -797,14 +797,14 @@ class Msg:
                 Parameters
                 ----------
                 msg_bin : bytearry
-                    The message to parse.
+                    The message to unpack.
 
                 Returns
                 -------
                 msg_dict : dict
                     The message with items decoded into a dictionary
                 """
-                msg_dict = super().parse(msg_bin)
+                msg_dict = super().unpack(msg_bin)
                 msg_dict['result'] = cls.assign_schedule_feedback_codes[
                     ord(msg_dict['result'])]
                 return msg_dict

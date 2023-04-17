@@ -67,7 +67,7 @@ class ArbinInterface:
             channel_info_msg_tx)
 
         if response_msg_bin:
-            channel_info_msg_rx_dict = Msg.ChannelInfo.Server.parse(
+            channel_info_msg_rx_dict = Msg.ChannelInfo.Server.unpack(
                 response_msg_bin)
 
         return channel_info_msg_rx_dict
@@ -89,7 +89,7 @@ class ArbinInterface:
             assign_schedule_msg_tx_bin)
 
         if response_msg_bin:
-            assign_schedule_msg_rx_dict = Msg.AssignSchedule.Server.parse(
+            assign_schedule_msg_rx_dict = Msg.AssignSchedule.Server.unpack(
                 response_msg_bin)
             if assign_schedule_msg_rx_dict['result'] == 'success':
                 success = True
@@ -146,7 +146,7 @@ class ArbinInterface:
         response_msg_bin = self.__send_receive_msg(login_msg_tx)
 
         if response_msg_bin:
-            login_msg_rx_dict = Msg.Login.Server.parse(response_msg_bin)
+            login_msg_rx_dict = Msg.Login.Server.unpack(response_msg_bin)
 
             if login_msg_rx_dict['result'] == 'success':
                 success = True

@@ -109,7 +109,7 @@ def test_channel_info_client_msg():
     assert (packed_msg == msg_bin)
 
     # Checking parsing the example message binary and that it matches the msg_dict
-    parsed_msg = Msg.ChannelInfo.Client.parse(msg_bin)
+    parsed_msg = Msg.ChannelInfo.Client.unpack(msg_bin)
     assert (parsed_msg == msg_dict)
 
 
@@ -122,7 +122,7 @@ def test_channel_info_server_msg():
     (msg_bin, msg_dict) = message_file_loader(MSG_DIR, example_msg_name)
 
     # Check that the parsed binary message mataches the msg_dict
-    parsed_msg = Msg.ChannelInfo.Server.parse(msg_bin)
+    parsed_msg = Msg.ChannelInfo.Server.unpack(msg_bin)
     assert (parsed_msg == msg_dict)
 
     # Check packing own version of message from msg_dict
@@ -130,5 +130,5 @@ def test_channel_info_server_msg():
     # Need to re-code this from login_result_decoder
     buildable_msg_dict['status'] = 4
     packed_msg = Msg.ChannelInfo.Server.pack(buildable_msg_dict)
-    parsed_msg = Msg.ChannelInfo.Server.parse(packed_msg)
+    parsed_msg = Msg.ChannelInfo.Server.unpack(packed_msg)
     assert (parsed_msg == msg_dict)

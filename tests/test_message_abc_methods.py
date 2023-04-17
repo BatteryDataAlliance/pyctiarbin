@@ -99,7 +99,7 @@ def test_modify_build_bad_pack():
 @pytest.mark.messages
 def test_parse_msg():
     '''
-    Test pasrsing a message with MessageAbc.parse()
+    Test pasrsing a message with MessageAbc.unpack()
     '''
     ans_key_dict = {
         'header': 1287429013477645789,
@@ -112,7 +112,7 @@ def test_parse_msg():
 
     # Prase the message
     key_msg = TestMessageClass.msg_packer()
-    prased_msg_dict = TestMessageClass.parse(key_msg)
+    prased_msg_dict = TestMessageClass.unpack(key_msg)
 
     for key in ans_key_dict.keys():
         assert (ans_key_dict[key] == prased_msg_dict[key])
