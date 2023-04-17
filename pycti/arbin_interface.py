@@ -71,7 +71,7 @@ class ArbinInterface:
                 channel_info_msg_rx)
 
         return channel_info_msg_rx_dict
-    
+
     def assign_schedule(self) -> dict:
         """
         Method to assign a schedule to the channel defined in the config.
@@ -85,8 +85,6 @@ class ArbinInterface:
 
         assign_schedule_msg_tx_bin = Msg.AssignSchedule.Client.pack(
             {'channel': self.channel, 'schedule': self.config['schedule']})
-        print( self.channel)
-        print(self.config['schedule'])
         channel_info_msg_rx_bin = self.__send_receive_msg(
             assign_schedule_msg_tx_bin)
 
@@ -103,7 +101,6 @@ class ArbinInterface:
             self.assign_schedule_feedback = assign_schedule_msg_rx_dict
 
         return success
-
 
     def __verify_config(self) -> bool:
         """
