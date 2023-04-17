@@ -476,6 +476,42 @@ class Msg:
                 },
             }
 
+            # List of staus codes. Each index in the corresponding status code. 
+            status_code_list = [
+                'Idle',
+                'Transition',
+                'Charge',
+                'Disharge',
+                'Rest',
+                'Wait',
+                'External Charge',
+                'Calibration',
+                'Unsafe',
+                'Pulse',
+                'Internal Resistance',
+                'AC Impedance',
+                'AC Cell',
+                'ACI Cell',
+                'Test Settings',
+                'Error',
+                'Finished',
+                'Volt Meter',
+                'Waiting for ACS',
+                'Pause',
+                'Empty',
+                'Idle from MCU',
+                'Start',
+                'Running',
+                'Step Transfer',
+                'Resume',
+                'Go Pause',
+                'Go Stop',
+                'Go Next Step',
+                'Online Update',
+                'DAQ Memory Unsafe',
+                'ACR'
+            ]
+
             @classmethod
             def parse(cls, msg: bytearray) -> dict:
                 """
@@ -493,6 +529,7 @@ class Msg:
                 """
                 msg_dict = super().parse(msg)
                 msg_dict = cls.aux_readings_parser(msg_dict, msg, starting_aux_idx=1777)
+                msg_dict['status'] = cls.status_code_list[msg_dict['status']]
                 return msg_dict
 
             @classmethod
@@ -562,3 +599,28 @@ class Msg:
                         current_aux_idx += 8
 
                 return msg_dict
+
+    class AssignSchedule:
+        '''
+        Message for assiging a schedule to a specific channel. See
+        CTI_REQUEST_LOGIN/CTI_REQUEST_LOGIN_FEEDBACK 
+        in Arbin docs for more info.
+        '''
+        class Client(MessageABC):
+            msg_length = 74
+            command_code = 0xEEAB0001
+
+            msg_specific_templet = {
+                'username': {
+                    'format': '32s',
+                    'start_byte': 20,
+                    'text_encoding': 'utf-8',
+                    'value': 'not a username'
+                },
+                'password': {
+                    'format': '32s',
+                    'start_byte': 52,
+                    'text_encoding': 'utf-8',
+                    'value': 'not a password'
+                },
+            }
