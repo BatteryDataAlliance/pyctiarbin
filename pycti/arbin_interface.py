@@ -12,8 +12,8 @@ class ArbinInterface:
     Class for controlling Maccor Cycler using MacNet.
     """
 
-    # The messages respoanse from login
-    login_response_dict = {}
+    login_feedback = {}
+    assign_schedule_feedback = {}
 
     def __init__(self, config: dict):
         """
@@ -71,6 +71,39 @@ class ArbinInterface:
                 channel_info_msg_rx)
 
         return channel_info_msg_rx_dict
+    
+    def assign_schedule(self) -> dict:
+        """
+        Method to assign a schedule to the channel defined in the config.
+
+        Returns
+        -------
+        success : bool
+            True/False based on whether the schedule was assigned without issue.
+        """
+        success = False
+
+        assign_schedule_msg_tx_bin = Msg.AssignSchedule.Client.pack(
+            {'channel': self.channel, 'schedule': self.config['schedule']})
+        print( self.channel)
+        print(self.config['schedule'])
+        channel_info_msg_rx_bin = self.__send_receive_msg(
+            assign_schedule_msg_tx_bin)
+
+        if channel_info_msg_rx_bin:
+            assign_schedule_msg_rx_dict = Msg.AssignSchedule.Server.parse(
+                channel_info_msg_rx_bin)
+            if assign_schedule_msg_rx_dict['result'] == 'success':
+                success = True
+                logger.info(
+                    f'Successfully assigned schedule {self.config["schedule"]} to channel {self.config["channel"]}')
+            else:
+                logger.error(
+                    f'Failed to assign schedule {self.config["schedule"]}! Issue: {assign_schedule_msg_rx_dict["result"]}')
+            self.assign_schedule_feedback = assign_schedule_msg_rx_dict
+
+        return success
+
 
     def __verify_config(self) -> bool:
         """
@@ -133,7 +166,7 @@ class ArbinInterface:
                 logger.error(
                     f'Unknown login result {login_msg_rx_dict["result"]}')
 
-            self.login_result = login_msg_rx_dict
+            self.login_feedback = login_msg_rx_dict
 
         return success
 

@@ -43,7 +43,7 @@ class MessageABC(ABC):
     }
 
     @classmethod
-    def parse(cls, msg: bytearray) -> dict:
+    def parse(cls, msg_bin: bytearray) -> dict:
         """
         Parses the passed message and decodes it with the msg_encoding dict.
         Each key in the output message will have name of the key from the 
@@ -51,7 +51,7 @@ class MessageABC(ABC):
 
         Parameters
         ----------
-        msg : bytearry
+        msg_bin : bytearry
             The message to parse.
 
         Returns
@@ -69,7 +69,7 @@ class MessageABC(ABC):
             start_idx = item['start_byte']
             end_idx = item['start_byte'] + struct.calcsize(item['format'])
             decoded_msg_dict[item_name] = struct.unpack(
-                item['format'], msg[start_idx:end_idx])[0]
+                item['format'], msg_bin[start_idx:end_idx])[0]
 
             # Decode and strip trailing 0x00s from strings.
             if item['format'].endswith('s'):
@@ -123,7 +123,7 @@ class MessageABC(ABC):
                 logger.warning(
                     f'Key name {key} was not found in msg_encoding!')
 
-        # Pack each item in templet. If packing any item fails, then abort the packing the message.
+        # Pack each item in templet. If packing any item fails then abort packing.
         for item_name, item in templet.items():
             logger.debug(f'Packing item {item_name}')
             try:
@@ -140,6 +140,11 @@ class MessageABC(ABC):
                 logger.error(e)
                 msg = bytearray([])
                 break
+        
+            if item_name == "schedule":
+                print('schedule')
+                print(item)
+                print(packed_item)
 
             start_idx = item['start_byte']
             end_idx = item['start_byte'] + struct.calcsize(item['format'])
@@ -204,14 +209,14 @@ class Msg:
             }
 
             @classmethod
-            def parse(cls, msg: bytearray) -> dict:
+            def parse(cls, msg_bin: bytearray) -> dict:
                 """
                 Same as the parrent method, but converts the result based on the
-                login_result_decoder.
+                login_result_dict.
 
                 Parameters
                 ----------
-                msg : bytearry
+                msg_bin : bytearry
                     The message to parse.
 
                 Returns
@@ -219,7 +224,7 @@ class Msg:
                 msg_dict : dict
                     The message with items decoded into a dictionary
                 """
-                msg_dict = super().parse(msg)
+                msg_dict = super().parse(msg_bin)
                 msg_dict['result'] = cls.login_result_dict[msg_dict['result']]
                 return msg_dict
 
@@ -249,7 +254,7 @@ class Msg:
                     'start_byte': 24,
                     'value': 0x00
                 },
-                'reseved': {
+                'reserved': {
                     'format': '32s',
                     'start_byte': 28,
                     'value': ''.join(['\0' for i in range(32)]),
@@ -261,7 +266,6 @@ class Msg:
 
             # Default message length for 1 channel with no aux readings. Will be larger as those grow.
             msg_length = 1779
-
             command_code = 0xEEBA0003
 
             msg_specific_templet = {
@@ -516,13 +520,13 @@ class Msg:
             }
 
             @classmethod
-            def parse(cls, msg: bytearray) -> dict:
+            def parse(cls, msg_bin: bytearray) -> dict:
                 """
                 Same as the parent method, but uses aux counts to parse aux readings
 
                 Parameters
                 ----------
-                msg : bytearry
+                msg_bin : bytearry
                     The message to parse.
 
                 Returns
@@ -530,9 +534,9 @@ class Msg:
                 msg_dict : dict
                     The message with items decoded into a dictionary
                 """
-                msg_dict = super().parse(msg)
+                msg_dict = super().parse(msg_bin)
                 msg_dict = cls.aux_readings_parser(
-                    msg_dict, msg, starting_aux_idx=1777)
+                    msg_dict, msg_bin, starting_aux_idx=1777)
                 msg_dict['status'] = cls.status_code_dict[msg_dict['status']]
                 return msg_dict
 
@@ -611,7 +615,7 @@ class Msg:
         in Arbin docs for more info.
         '''
         class Client(MessageABC):
-            msg_length = 647
+            msg_length = 659
             command_code = 0xBB210001
 
             msg_specific_templet = {
@@ -622,12 +626,12 @@ class Msg:
                 },
                 # Always 0x00 for PyCTI since we only work with single channels
                 'assign_all_channels': {
-                    'format': 'c',
+                    'format': '1s',
                     'start_byte': 24,
                     'value': '\0',
                     'text_encoding': 'utf-8',
                 },
-                'schedule_name': {
+                'schedule': {
                     # Stored as wchar_t[200]. Each wchar_t is 2 bytes, twice as big as standard char in Python
                     'format': '400s',
                     'start_byte': 25,
@@ -725,7 +729,7 @@ class Msg:
                     'start_byte': 633,
                     'value': 1.0,
                 },
-                'reseved': {
+                'reserved': {
                     'format': '32s',
                     'start_byte': 637,
                     'value': ''.join(['\0' for i in range(32)]),
@@ -734,7 +738,7 @@ class Msg:
             }
 
         class Server(MessageABC):
-            msg_length = 136
+            msg_length = 128
             command_code = 0xBB120001
 
             msg_specific_templet = {
@@ -749,7 +753,7 @@ class Msg:
                     'value': '\0',
                     'text_encoding': 'utf-8',
                 },
-                'reseved': {
+                'reserved': {
                     'format': '101s',
                     'start_byte': 25,
                     'value': ''.join(['\0' for i in range(101)]),
@@ -758,6 +762,7 @@ class Msg:
             }
 
             assign_schedule_feedback_codes = {
+                0: 'success',
                 16: 'channel does not exist',
                 17: 'Monitor window in use at the moment',
                 19: 'Schedule name cannot be empty',
@@ -767,3 +772,24 @@ class Msg:
                 23: 'Cannot assign schedule when batch file is open',
                 24: 'Assign failed'
             }
+
+            @classmethod
+            def parse(cls, msg_bin: bytearray) -> dict:
+                """
+                Same as the parent method, but converts the result based on the
+                assign_schedule_feedback_codes.
+
+                Parameters
+                ----------
+                msg_bin : bytearry
+                    The message to parse.
+
+                Returns
+                -------
+                msg_dict : dict
+                    The message with items decoded into a dictionary
+                """
+                msg_dict = super().parse(msg_bin)
+                msg_dict['result'] = cls.assign_schedule_feedback_codes[
+                    ord(msg_dict['result'])]
+                return msg_dict
