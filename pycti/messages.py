@@ -808,3 +808,101 @@ class Msg:
                 msg_dict['result'] = cls.assign_schedule_feedback_codes[
                     ord(msg_dict['result'])]
                 return msg_dict
+            
+    class StartSchedule:
+        '''
+        Message for assiging a schedule to a specific channel. See
+        THIRD_PARTY_START_SCHEDULE/THIRD_PARTY_START_SCHEDULE_FEEDBACK 
+        in Arbin docs for more info.
+        '''
+        class Client(MessageABC):
+            msg_length = 86
+            command_code = 0xBB320004
+
+            msg_specific_templet = {
+                'test_name': {
+                    'format': '72s',
+                    'start_byte': 20,
+                    'value': 'pycti test name',
+                    'text_encoding': 'utf-8',
+                },
+                'channel': {
+                    'format': 'I',
+                    'start_byte': 92,
+                    'value': 0
+                },
+            }
+
+        class Server(MessageABC):
+            msg_length = 128
+            command_code = 0XBB230004
+
+            msg_specific_templet = {
+                'channel': {
+                    'format': 'I',
+                    'start_byte': 20,
+                    'value': 0
+                },
+                'result': {
+                    'format': 'c',
+                    'start_byte': 24,
+                    'value': '\0',
+                    'text_encoding': 'utf-8',
+                },
+                'reserved': {
+                    'format': '101s',
+                    'start_byte': 25,
+                    'value': ''.join(['\0' for i in range(101)]),
+                    'text_encoding': 'utf-8',
+                },
+            }
+
+            start_test_feedback_codes = {
+                0: 'success',
+                16: 'Invalid channel index',
+                17: 'There is a user controlling the monitor window (Start/Resume channel window is open)',
+                18: 'Requested channel is running or unsafe',
+                19: 'Channel not connected to DAQ',
+                20: 'Schedule not compatible with current system configuration',
+                21: 'No schedule assigned to channel',
+                22: 'Schedule version does not match current version of MITS',
+                23: 'Not used: User should never see this',
+                24: 'Not used: User should never see this',
+                25: 'Invalid step number',
+                26: 'Not used: User should never see this',
+                27: 'Invalid auxiliary count in schedule',
+                28: 'Invalid build in auxiliary count',
+                29: 'Not used: User should never see this',
+                30: 'Check Aux Test Setting tab',
+                31: 'No selected channels',
+                32: 'Not used: User should never see this',
+                33: 'DAQ still downloading schedule',
+                34: 'Error querying database (database connection closed most likely)',
+                35: 'Testname cannot be empty',
+                36: 'Invalid step number',
+                37: 'Invalid parallel channel number',
+                38: 'Schedule safety precheck failed',
+                39: 'Not used: User should never see this',
+                40: 'Battery simulation error',
+            }
+
+            @classmethod
+            def unpack(cls, msg_bin: bytearray) -> dict:
+                """
+                Same as the parent method, but converts the result based on the
+                start_test_feedback_codes.
+
+                Parameters
+                ----------
+                msg_bin : bytearry
+                    The message to unpack.
+
+                Returns
+                -------
+                msg_dict : dict
+                    The message with items decoded into a dictionary
+                """
+                msg_dict = super().unpack(msg_bin)
+                msg_dict['result'] = cls.start_test_feedback_codes[
+                    ord(msg_dict['result'])]
+                return msg_dict

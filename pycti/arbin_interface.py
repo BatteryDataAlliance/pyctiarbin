@@ -1,6 +1,7 @@
 import socket
 import logging
 import struct
+import time
 from .messages import Msg
 from .messages import MessageABC
 
@@ -14,6 +15,7 @@ class ArbinInterface:
 
     login_feedback = {}
     assign_schedule_feedback = {}
+    start_test_feedback = {}
 
     def __init__(self, config: dict):
         """
@@ -99,6 +101,38 @@ class ArbinInterface:
                 logger.error(
                     f'Failed to assign schedule {self.config["schedule"]}! Issue: {assign_schedule_msg_rx_dict["result"]}')
             self.assign_schedule_feedback = assign_schedule_msg_rx_dict
+
+        return success
+
+    def start_test(self) -> dict:
+        """
+        Method to start a test on channel on specific channel. 
+
+        Returns
+        -------
+        success : bool
+            True/False based on whether the schedule was assigned without issue.
+        """
+        success = False
+
+        # Make sure the schedule is assigned before starting the test to avoid any funny business
+        if self.assign_schedule():
+            start_tese_msg_tx_bin = Msg.StartSchedule.Client.pack(
+                {'channel': self.channel, 'test_name': self.config['test_name']})
+            response_msg_bin = self.__send_receive_msg(
+                start_tese_msg_tx_bin)
+
+            if response_msg_bin:
+                start_test_msg_rx_dict = Msg.StartSchedule.Server.unpack(
+                    response_msg_bin)
+                if start_test_msg_rx_dict['result'] == 'success':
+                    success = True
+                    logger.info(
+                        f'Successfully started test {self.config["test_name"]} with schedule {self.config["schedule"]} on channel {self.config["channel"]}')
+                else:
+                    logger.error(
+                        f'Failed to start test {self.config["test_name"]} with schedule {self.config["schedule"]} on channel {self.config["channel"]}. Issue: {start_test_msg_rx_dict["result"]}')
+                self.start_test_feedback = start_test_msg_rx_dict
 
         return success
 
