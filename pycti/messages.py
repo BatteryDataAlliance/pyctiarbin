@@ -785,7 +785,8 @@ class Msg:
                 20: 'Channel is running',
                 21: 'Channel is downloading another schedule currently',
                 22: 'Cannot assign schedule when batch file is open',
-                23: 'Assign failed'
+                23: 'Assign failed',
+                24: 'Not used: User should never see this',
             }
 
             @classmethod
@@ -808,7 +809,7 @@ class Msg:
                 msg_dict['result'] = cls.assign_schedule_feedback_codes[
                     ord(msg_dict['result'])]
                 return msg_dict
-            
+
     class StartSchedule:
         '''
         Message for assiging a schedule to a specific channel. See
@@ -904,5 +905,89 @@ class Msg:
                 """
                 msg_dict = super().unpack(msg_bin)
                 msg_dict['result'] = cls.start_test_feedback_codes[
+                    ord(msg_dict['result'])]
+                return msg_dict
+
+    class StopSchedule:
+        '''
+        Message for stopping a test on a specific channel. See
+        THIRD_PARTY_STOP_SCHEDULE/THIRD_PARTY_STOP_SCHEDULE_FEEDBACK 
+        in Arbin docs for more info.
+        '''
+        class Client(MessageABC):
+            msg_length = 116
+            command_code = 0XBB310001
+
+            msg_specific_templet = {
+                'channel': {
+                    'format': 'I',
+                    'start_byte': 20,
+                    'value': 0
+                },
+                # Always 0x00, others all channels are stopped.
+                'stop_all_channels': {
+                    'format': 'c',
+                    'start_byte': 24,
+                    'value': '\0',
+                    'text_encoding': 'utf-8',
+                },
+                'reserved': {
+                    'format': '101s',
+                    'start_byte': 25,
+                    'value': ''.join(['\0' for i in range(101)]),
+                    'text_encoding': 'utf-8',
+                },
+            }
+
+        class Server(MessageABC):
+            msg_length = 128
+            command_code = 0XBB130001
+
+            msg_specific_templet = {
+                'channel': {
+                    'format': 'I',
+                    'start_byte': 20,
+                    'value': 0
+                },
+                'result': {
+                    'format': 'c',
+                    'start_byte': 24,
+                    'value': '\0',
+                    'text_encoding': 'utf-8',
+                },
+                'reserved': {
+                    'format': '101s',
+                    'start_byte': 25,
+                    'value': ''.join(['\0' for i in range(101)]),
+                    'text_encoding': 'utf-8',
+                },
+            }
+
+            stop_test_feedback_codes = {
+                0: 'success',
+                16: 'Channel index does not exist',
+                17: 'Someone else is controlling monitor window at the moment',
+                18: 'Not used: User should never see this',
+                19: 'Not used: User should never see this',
+            }
+
+            @classmethod
+            def unpack(cls, msg_bin: bytearray) -> dict:
+                """
+                Same as the parent method, but converts the result based on the
+                stop_test_feedback_codes.
+
+                Parameters
+                ----------
+                msg_bin : bytearry
+                    The message to unpack.
+
+                Returns
+                -------
+                msg_dict : dict
+                    The message with items decoded into a dictionary
+                """
+                msg_dict = super().unpack(msg_bin)
+                msg_dict['result'] = cls.stop_test_feedback_codes[
                     ord(msg_dict['result'])]
                 return msg_dict

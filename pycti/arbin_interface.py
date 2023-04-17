@@ -16,6 +16,7 @@ class ArbinInterface:
     login_feedback = {}
     assign_schedule_feedback = {}
     start_test_feedback = {}
+    stop_test_feedback = {}
 
     def __init__(self, config: dict):
         """
@@ -133,6 +134,36 @@ class ArbinInterface:
                     logger.error(
                         f'Failed to start test {self.config["test_name"]} with schedule {self.config["schedule"]} on channel {self.config["channel"]}. Issue: {start_test_msg_rx_dict["result"]}')
                 self.start_test_feedback = start_test_msg_rx_dict
+
+        return success
+
+    def stop_test(self) -> dict:
+        """
+        Method to stop a test running on the channel specified in the config.
+
+        Returns
+        -------
+        success : bool
+            True/False based on whether the stopped without issue.
+        """
+        success = False
+
+        stop_test_msg_tx_bin = Msg.StopSchedule.Client.pack(
+            {'channel': self.channel, 'schedule': self.config['schedule']})
+        response_msg_bin = self.__send_receive_msg(
+            stop_test_msg_tx_bin)
+
+        if response_msg_bin:
+            stop_test_msg_rx_dict = Msg.stop_test_msg_tx_bin.Server.unpack(
+                response_msg_bin)
+            if stop_test_msg_rx_dict['result'] == 'success':
+                success = True
+                logger.info(
+                    f'Successfully stopped test on channel {self.config["channel"]}')
+            else:
+                logger.error(
+                    f'Failed to stop test on channel {self.config["channel"]}! Issue: {stop_test_msg_rx_dict["result"]}')
+            self.stop_test_feedback = stop_test_msg_rx_dict
 
         return success
 
