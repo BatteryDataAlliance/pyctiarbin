@@ -909,7 +909,6 @@ class Msg:
                 msg_dict : dict
                     The message with items decoded into a dictionary
                 """
-                print(msg_bin)
                 msg_dict = super().unpack(msg_bin)
                 msg_dict['result'] = cls.start_test_feedback_codes[
                     ord(msg_dict['result'])]
