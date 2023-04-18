@@ -148,13 +148,12 @@ class ArbinInterface:
         """
         success = False
 
-        stop_test_msg_tx_bin = Msg.StopSchedule.Client.pack(
-            {'channel': self.channel, 'schedule': self.config['schedule']})
+        stop_test_msg_tx_bin = Msg.StopSchedule.Client.pack({'channel': self.channel})
         response_msg_bin = self.__send_receive_msg(
             stop_test_msg_tx_bin)
 
         if response_msg_bin:
-            stop_test_msg_rx_dict = Msg.stop_test_msg_tx_bin.Server.unpack(
+            stop_test_msg_rx_dict = Msg.StopSchedule.Server.unpack(
                 response_msg_bin)
             if stop_test_msg_rx_dict['result'] == 'success':
                 success = True
