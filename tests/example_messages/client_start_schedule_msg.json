@@ -1,0 +1,9 @@
+{
+    "header": 1287429013477645789,
+    "msg_length": 160,
+    "command_code": 3140616196,
+    "extended_command_code": 0,
+    "test_name": "sample_test_name",
+    "num_channels_to_start": 1,
+    "channel": 13
+}

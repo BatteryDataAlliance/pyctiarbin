@@ -817,19 +817,25 @@ class Msg:
         in Arbin docs for more info.
         '''
         class Client(MessageABC):
-            msg_length = 86
+            msg_length = 160
             command_code = 0xBB320004
 
             msg_specific_templet = {
                 'test_name': {
-                    'format': '72s',
+                    # Read as wchar_t which has lenght of 2 bytes each.
+                    'format': '144s',
                     'start_byte': 20,
                     'value': 'pycti test name',
-                    'text_encoding': 'utf-8',
+                    'text_encoding': 'utf-16-le',
+                },
+                'num_channels_to_start': {
+                    'format': '<I',
+                    'start_byte': 164,
+                    'value': 1
                 },
                 'channel': {
-                    'format': 'I',
-                    'start_byte': 92,
+                    'format': '<H',
+                    'start_byte': 168,
                     'value': 0
                 },
             }
@@ -903,6 +909,7 @@ class Msg:
                 msg_dict : dict
                     The message with items decoded into a dictionary
                 """
+                print(msg_bin)
                 msg_dict = super().unpack(msg_bin)
                 msg_dict['result'] = cls.start_test_feedback_codes[
                     ord(msg_dict['result'])]

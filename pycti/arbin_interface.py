@@ -118,10 +118,10 @@ class ArbinInterface:
 
         # Make sure the schedule is assigned before starting the test to avoid any funny business
         if self.assign_schedule():
-            start_tese_msg_tx_bin = Msg.StartSchedule.Client.pack(
+            start_test_msg_tx_bin = Msg.StartSchedule.Client.pack(
                 {'channel': self.channel, 'test_name': self.config['test_name']})
             response_msg_bin = self.__send_receive_msg(
-                start_tese_msg_tx_bin)
+                start_test_msg_tx_bin)
 
             if response_msg_bin:
                 start_test_msg_rx_dict = Msg.StartSchedule.Server.unpack(
