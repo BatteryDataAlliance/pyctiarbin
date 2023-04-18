@@ -167,7 +167,7 @@ class ArbinInterface:
 
         return success
 
-    def set_meta_variable(mv_num: int, mv_value) -> bool:
+    def set_meta_variable(self, mv_num: int, mv_value) -> bool:
         """
         Sets the passed meta variable number `mv_num` to the passed value `mv_value`
         on the channel specified in the config. Note the test must be running.

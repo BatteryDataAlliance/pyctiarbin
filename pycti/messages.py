@@ -1014,7 +1014,7 @@ class Msg:
                     'start_byte': 24,
                     'value': 1
                 },
-                # This determines which meta variable is set. Defualts to MV 1. 
+                # This determines which meta variable is set. Defualts to MV 1.
                 'mv_meta_code': {
                     'format': '<i',
                     'start_byte': 28,
@@ -1086,18 +1086,21 @@ class Msg:
                 """
                 msg_bin = bytearray([])
 
-                if isinstance(mv_num, int):
-                    if 0 < mv_num <= 16:
-                        msg_values['mv_meta_code'] = cls.mv_codes[mv_num]
+                if isinstance(mv_number, int):
+                    if 0 < mv_number <= 16:
+                        msg_values['mv_meta_code'] = cls.mv_codes[mv_number]
                         if isinstance(mv_set_value, float):
                             msg_values['mv_data'] = mv_set_value
                             msg_bin = super().pack(msg_values)
                         else:
-                            logger.error(f'Passed value for mv_value {mv_set_value} is not a float!')
+                            logger.error(
+                                f'Passed value for mv_value {mv_set_value} is not a float!')
                     else:
-                        logger.error(f'Passed value for mv_number {mv_number} must be between 1 and 16!')
+                        logger.error(
+                            f'Passed value for mv_number {mv_number} must be between 1 and 16!')
                 else:
-                    logger.error(f'Passed value for mv_number {mv_number} is not an int!')
+                    logger.error(
+                        f'Passed value for mv_number {mv_number} is not an int!')
 
                 return msg_bin
 
