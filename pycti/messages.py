@@ -239,7 +239,7 @@ class Msg:
                     'start_byte': 20,
                     'value': 0
                 },
-                'channe_selection': {
+                'channel_selection': {
                     'format': '<h',
                     'start_byte': 22,
                     'value': 1
@@ -922,7 +922,6 @@ class Msg:
         class Client(MessageABC):
             msg_length = 116
             command_code = 0xBB310001
-                           
 
             msg_specific_templet = {
                 'channel': {
@@ -1007,7 +1006,6 @@ class Msg:
         class Client(MessageABC):
             msg_length = 62
             command_code = 0xBB150001
-            
 
             msg_specific_templet = {
                 'channel': {
@@ -1072,49 +1070,6 @@ class Msg:
                 16: 116,
             }
 
-            @classmethod
-            def pack(cls, msg_values={}) -> bytearray:
-            #def pack(cls, mv_number: int, mv_set_value: float, msg_values={}) -> bytearray:
-                """
-                Same as parrent method, but handles setting meta variable.
-
-                Parameters
-                ----------
-                mv_num : int
-                    Which meta variable to assign the `mv_set_value` to. Must be between 1 and 16.
-                mv_set_value : float
-                    The value to set for the meta variable. 
-                msg_values : dict
-                    A dictionary detailing which default values in the messtage temple should be 
-                    updated.
-                Returns
-                -------
-                msg : bytearray
-                    Packed message. Empty if there was an issue packing them message.
-                """
-                
-                '''
-                msg_bin = bytearray([])
-                if isinstance(mv_number, int):
-                    if 0 < mv_number <= 16:
-                        msg_values['mv_meta_code'] = cls.mv_codes[mv_number]
-                        if isinstance(mv_set_value, float):
-                            msg_values['mv_data'] = mv_set_value
-                            msg_bin = super().pack(msg_values)
-                        else:
-                            logger.error(
-                                f'Passed value for mv_value {mv_set_value} is not a float!')
-                    else:
-                        logger.error(
-                            f'Passed value for mv_number {mv_number} must be between 1 and 16!')
-                else:
-                    logger.error(
-                        f'Passed value for mv_number {mv_number} is not an int!')
-                '''
-
-                msg_bin = super().pack(msg_values)
-                return msg_bin
-
         class Server(MessageABC):
             msg_length = 128
             command_code = 0XBB510001
@@ -1166,5 +1121,5 @@ class Msg:
 
                 msg_dict['result'] = cls.mv_result_decoder[
                     ord(msg_dict['result'])]
-                
+
                 return msg_dict
