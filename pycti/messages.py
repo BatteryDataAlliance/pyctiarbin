@@ -991,3 +991,164 @@ class Msg:
                 msg_dict['result'] = cls.stop_test_feedback_codes[
                     ord(msg_dict['result'])]
                 return msg_dict
+
+    class SetMetaVariable:
+        '''
+        Message for setting meta variables. 
+        TTHIRD_PARTY_SET_MV_VALUE/THIRD_PARTY_SET_MV_VALUE_FEEDBACK 
+        in Arbin docs for more info.
+        '''
+        class Client(MessageABC):
+            msg_length = 62
+            command_code = 0xCD130004
+
+            msg_specific_templet = {
+                'channel': {
+                    'format': '<I',
+                    'start_byte': 20,
+                    'value': 0
+                },
+                # The only mv_type allowed for CTI is 1
+                'mv_type': {
+                    'format': '<i',
+                    'start_byte': 24,
+                    'value': 1
+                },
+                # This determines which meta variable is set. Defualts to MV 1. 
+                'mv_meta_code': {
+                    'format': '<i',
+                    'start_byte': 28,
+                    'value': 52,
+                },
+                'reserved_1': {
+                    'format': '16s',
+                    'start_byte': 32,
+                    'value': ''.join(['\0' for i in range(16)]),
+                    'text_encoding': 'utf-8',
+                },
+                # The only value type allowed for CTI is 1, float.
+                'mv_value_type': {
+                    'format': '<i',
+                    'start_byte': 48,
+                    'value': 1
+                },
+                'mv_data': {
+                    'format': '<f',
+                    'start_byte': 52,
+                    'value': 1
+                },
+                'reserved_2': {
+                    'format': '16s',
+                    'start_byte': 56,
+                    'value': ''.join(['\0' for i in range(16)]),
+                    'text_encoding': 'utf-8',
+                },
+            }
+
+            # Specifies the code for each variable. E.g. MV_UD1 has a code of 52
+            mv_codes = {
+                1: 52,
+                2: 53,
+                3: 54,
+                4: 55,
+                5: 105,
+                6: 106,
+                7: 107,
+                8: 108,
+                9: 109,
+                10: 110,
+                11: 111,
+                12: 112,
+                13: 113,
+                14: 114,
+                15: 115,
+                16: 116,
+            }
+
+            @classmethod
+            def pack(cls, mv_number: int, mv_set_value: float, msg_values={}) -> bytearray:
+                """
+                Same as parrent method, but handles setting meta variable.
+
+                Parameters
+                ----------
+                mv_num : int
+                    Which meta variable to assign the `mv_set_value` to. Must be between 1 and 16.
+                mv_set_value : float
+                    The value to set for the meta variable. 
+                msg_values : dict
+                    A dictionary detailing which default values in the messtage temple should be 
+                    updated.
+                Returns
+                -------
+                msg : bytearray
+                    Packed message. Empty if there was an issue packing them message.
+                """
+                msg_bin = bytearray([])
+
+                if isinstance(mv_num, int):
+                    if 0 < mv_num <= 16:
+                        msg_values['mv_meta_code'] = cls.mv_codes[mv_num]
+                        if isinstance(mv_set_value, float):
+                            msg_values['mv_data'] = mv_set_value
+                            msg_bin = super().pack(msg_values)
+                        else:
+                            logger.error(f'Passed value for mv_value {mv_set_value} is not a float!')
+                    else:
+                        logger.error(f'Passed value for mv_number {mv_number} must be between 1 and 16!')
+                else:
+                    logger.error(f'Passed value for mv_number {mv_number} is not an int!')
+
+                return msg_bin
+
+        class Server(MessageABC):
+            msg_length = 1
+            command_code = 0xBB130002
+
+            msg_specific_templet = {
+                'channel': {
+                    'format': '<I',
+                    'start_byte': 20,
+                    'value': 0
+                },
+                'result': {
+                    'format': 'c',
+                    'start_byte': 24,
+                    'value': '\0',
+                    'text_encoding': 'utf-8',
+                },
+                'reserved': {
+                    'format': '101s',
+                    'start_byte': 25,
+                    'value': ''.join(['\0' for i in range(101)]),
+                    'text_encoding': 'utf-8',
+                },
+            }
+
+            mv_result_decoder = {
+                0: 'success',
+                16: 'Set MV Failure',
+                17: 'Channel is not running',
+                18: 'Meta code does not exist'
+            }
+
+            @classmethod
+            def unpack(cls, msg_bin: bytearray) -> dict:
+                """
+                Same as the parent method, but converts the result based on the
+                stop_test_feedback_codes.
+
+                Parameters
+                ----------
+                msg_bin : bytearry
+                    The message to unpack.
+
+                Returns
+                -------
+                msg_dict : dict
+                    The message with items decoded into a dictionary
+                """
+                msg_dict = super().unpack(msg_bin)
+                msg_dict['result'] = cls.mv_result_decoder[
+                    ord(msg_dict['result'])]
+                return msg_dict

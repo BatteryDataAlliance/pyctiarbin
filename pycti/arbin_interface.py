@@ -75,7 +75,7 @@ class ArbinInterface:
 
         return channel_info_msg_rx_dict
 
-    def assign_schedule(self) -> dict:
+    def assign_schedule(self) -> bool:
         """
         Method to assign a schedule to the channel defined in the config.
 
@@ -105,7 +105,7 @@ class ArbinInterface:
 
         return success
 
-    def start_test(self) -> dict:
+    def start_test(self) -> bool:
         """
         Method to start a test on channel on specific channel. 
 
@@ -137,7 +137,7 @@ class ArbinInterface:
 
         return success
 
-    def stop_test(self) -> dict:
+    def stop_test(self) -> bool:
         """
         Method to stop a test running on the channel specified in the config.
 
@@ -164,6 +164,43 @@ class ArbinInterface:
                 logger.error(
                     f'Failed to stop test on channel {self.config["channel"]}! Issue: {stop_test_msg_rx_dict["result"]}')
             self.stop_test_feedback = stop_test_msg_rx_dict
+
+        return success
+
+    def set_meta_variable(mv_num: int, mv_value) -> bool:
+        """
+        Sets the passed meta variable number `mv_num` to the passed value `mv_value`
+        on the channel specified in the config. Note the test must be running.
+
+        Parameters
+        ----------
+        mv_num : int
+            The meta variable number to set. Must be between 1 and 16 (inclusive)
+        mv_value : float
+            The meta variable value to set.
+        Returns
+        -------
+        rx_msg : bytearray
+            Response message from the server.
+        """
+        success = False
+
+        set_mv_msg_tx_bin = Msg.SetMetaVariable.Client.pack(
+            mv_number=mv_num, mv_set_value=mv_value)
+        response_msg_bin = self.__send_receive_msg(
+            set_mv_msg_tx_bin)
+
+        if response_msg_bin:
+            set_mv_msg_rx_dict = Msg.SetMetaVariable.Server.unpack(
+                response_msg_bin)
+            if set_mv_msg_rx_dict['result'] == 'success':
+                success = True
+                logger.info(
+                    f'Successfully set meta variable {mv_num} to a value of {mv_value}')
+            else:
+                logger.error(
+                    f'Failed to set meta variable {mv_num} to a value of {mv_value}! Issue: {set_mv_msg_rx_dict["result"]}')
+            self.set_mv_feedback = set_mv_msg_rx_dict
 
         return success
 
