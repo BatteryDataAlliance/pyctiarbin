@@ -1,0 +1,13 @@
+{
+    "header": 1287429013477645789,
+    "msg_length": 62,
+    "command_code": 3138715649,
+    "extended_command_code": 0,
+    "channel": 13,
+    "mv_type": 1,
+    "mv_meta_code": 52,
+    "reserved_1": "",
+    "mv_value_type": 1,
+    "mv_data": 0.20000000298023224,
+    "reserved_2": ""
+}

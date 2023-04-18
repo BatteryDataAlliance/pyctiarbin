@@ -148,7 +148,8 @@ class ArbinInterface:
         """
         success = False
 
-        stop_test_msg_tx_bin = Msg.StopSchedule.Client.pack({'channel': self.channel})
+        stop_test_msg_tx_bin = Msg.StopSchedule.Client.pack(
+            {'channel': self.channel})
         response_msg_bin = self.__send_receive_msg(
             stop_test_msg_tx_bin)
 
@@ -185,7 +186,7 @@ class ArbinInterface:
         success = False
 
         set_mv_msg_tx_bin = Msg.SetMetaVariable.Client.pack(
-            mv_number=mv_num, mv_set_value=mv_value)
+            mv_number=mv_num, mv_set_value=mv_value, msg_values={'channel': self.channel})
         response_msg_bin = self.__send_receive_msg(
             set_mv_msg_tx_bin)
 
@@ -338,10 +339,5 @@ class ArbinInterface:
                         self.config['msg_buffer_size'])
             except:
                 logger.error("Error receiving message!!", exc_info=True)
-
-        print("Tx_msg")
-        print(tx_msg)
-        print("Rx_msg")
-        print(rx_msg)
 
         return rx_msg

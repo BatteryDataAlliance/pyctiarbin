@@ -1006,7 +1006,8 @@ class Msg:
         '''
         class Client(MessageABC):
             msg_length = 62
-            command_code = 0xCD130004
+            command_code = 0xBB150001
+            
 
             msg_specific_templet = {
                 'channel': {
@@ -1111,8 +1112,8 @@ class Msg:
                 return msg_bin
 
         class Server(MessageABC):
-            msg_length = 1
-            command_code = 0xBB130002
+            msg_length = 128
+            command_code = 0XBB510001
 
             msg_specific_templet = {
                 'channel': {
@@ -1158,6 +1159,8 @@ class Msg:
                     The message with items decoded into a dictionary
                 """
                 msg_dict = super().unpack(msg_bin)
+
                 msg_dict['result'] = cls.mv_result_decoder[
                     ord(msg_dict['result'])]
+                
                 return msg_dict
