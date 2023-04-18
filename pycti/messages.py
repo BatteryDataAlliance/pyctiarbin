@@ -921,7 +921,8 @@ class Msg:
         '''
         class Client(MessageABC):
             msg_length = 116
-            command_code = 0XBB310001
+            command_code = 0xBB310001
+                           
 
             msg_specific_templet = {
                 'channel': {
@@ -931,7 +932,7 @@ class Msg:
                 },
                 # Always 0x00, others all channels are stopped.
                 'stop_all_channels': {
-                    'format': 'c',
+                    'format': '1s',
                     'start_byte': 24,
                     'value': '\0',
                     'text_encoding': 'utf-8',

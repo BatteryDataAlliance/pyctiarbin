@@ -339,4 +339,9 @@ class ArbinInterface:
             except:
                 logger.error("Error receiving message!!", exc_info=True)
 
+        print("Tx_msg")
+        print(tx_msg)
+        print("Rx_msg")
+        print(rx_msg)
+
         return rx_msg
