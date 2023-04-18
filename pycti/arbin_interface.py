@@ -167,7 +167,7 @@ class ArbinInterface:
 
         return success
 
-    def set_meta_variable(self, mv_num: int, mv_value) -> bool:
+    def set_meta_variable(self, mv_num: int, mv_value: float) -> bool:
         """
         Sets the passed meta variable number `mv_num` to the passed value `mv_value`
         on the channel specified in the config. Note the test must be running.
@@ -185,8 +185,12 @@ class ArbinInterface:
         """
         success = False
 
-        set_mv_msg_tx_bin = Msg.SetMetaVariable.Client.pack(
-            mv_number=mv_num, mv_set_value=mv_value, msg_values={'channel': self.channel})
+        updated_msg_vals = {}
+        updated_msg_vals['channel'] = self.channel
+        updated_msg_vals['mv_meta_code'] = Msg.SetMetaVariable.Client.mv_channel_codes[mv_num]
+        updated_msg_vals['mv_data'] = mv_value
+
+        set_mv_msg_tx_bin = Msg.SetMetaVariable.Client.pack(updated_msg_vals)
         response_msg_bin = self.__send_receive_msg(
             set_mv_msg_tx_bin)
 

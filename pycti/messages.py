@@ -1053,7 +1053,7 @@ class Msg:
             }
 
             # Specifies the code for each variable. E.g. MV_UD1 has a code of 52
-            mv_codes = {
+            mv_channel_codes = {
                 1: 52,
                 2: 53,
                 3: 54,
@@ -1073,7 +1073,8 @@ class Msg:
             }
 
             @classmethod
-            def pack(cls, mv_number: int, mv_set_value: float, msg_values={}) -> bytearray:
+            def pack(cls, msg_values={}) -> bytearray:
+            #def pack(cls, mv_number: int, mv_set_value: float, msg_values={}) -> bytearray:
                 """
                 Same as parrent method, but handles setting meta variable.
 
@@ -1091,8 +1092,9 @@ class Msg:
                 msg : bytearray
                     Packed message. Empty if there was an issue packing them message.
                 """
+                
+                '''
                 msg_bin = bytearray([])
-
                 if isinstance(mv_number, int):
                     if 0 < mv_number <= 16:
                         msg_values['mv_meta_code'] = cls.mv_codes[mv_number]
@@ -1108,7 +1110,9 @@ class Msg:
                 else:
                     logger.error(
                         f'Passed value for mv_number {mv_number} is not an int!')
+                '''
 
+                msg_bin = super().pack(msg_values)
                 return msg_bin
 
         class Server(MessageABC):
