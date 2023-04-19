@@ -326,7 +326,7 @@ class ArbinInterface:
         try:
             self.__sock.send(tx_msg)
             send_msg_success = True
-        except:
+        except socket.error:
             logger.error(
                 "Failed to send message to Arbin server!", exc_info=True)
 
@@ -341,7 +341,7 @@ class ArbinInterface:
                 while len(rx_msg) < expected_rx_msg_len:
                     rx_msg += self.__sock.recv(
                         self.config['msg_buffer_size'])
-            except:
+            except socket.error:
                 logger.error("Error receiving message!!", exc_info=True)
 
         return rx_msg
