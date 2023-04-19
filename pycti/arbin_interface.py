@@ -323,7 +323,7 @@ class ArbinInterface:
             struct.calcsize(msg_length_format)
 
         try:
-            self.__sock.send(tx_msg)
+            self.__sock.sendall(tx_msg)
             send_msg_success = True
         except socket.error:
             logger.error(
@@ -337,7 +337,7 @@ class ArbinInterface:
                     msg_length_format,
                     rx_msg[msg_length_start_byte_idx:msg_length_end_byte_idx])[0]
                 
-                # Keep reading message in pieces until rx_msg is as long as expected_rx_msg_len
+                # Keep reading message in pieces until rx_msg is as long as expected_rx_msg_len.
                 # Note message length field does not include size of header (8 bytes) or the 
                 # size of the message length command itself (4 bytes) so we must add it
                 while len(rx_msg) < (expected_rx_msg_len+12):

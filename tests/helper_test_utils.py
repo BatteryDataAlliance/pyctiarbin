@@ -1,8 +1,54 @@
 import os
+import socket
 import json
+import struct
+from pycti import MessageABC
 
 class Constants:
     FLOAT_TOLERANCE = 0.0001
+
+class TcpClient():
+
+    msg_buffer_size = 2**12
+
+    def __init__(self, config):
+        self.__s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.__s.connect((config["ip"], config["port"])) 
+
+    def send_recv_msg(self, tx_msg) -> bytearray:
+        """
+        Helper function for sending and receiving messages.
+
+        Parameters
+        ----------
+        s : socket.socket
+            Socket to send and receive with.
+        tx_msg : bytearray
+            The message to send.
+
+        Returns
+        -------
+        rx_msg : dict
+            The response msg.
+        """
+        rx_msg_length_format = MessageABC.base_template['msg_length']['format']
+        rx_msg_length_start_byte = MessageABC.base_template['msg_length']['start_byte']
+        rx_msg_length_end_byte = MessageABC.base_template['msg_length']['start_byte'] + struct.calcsize(rx_msg_length_format)
+
+        self.__s.sendall(tx_msg)
+
+        rx_msg = b''
+        rx_msg += self.__s.recv(self.msg_buffer_size)
+        expected_rx_msg_len = struct.unpack(
+            rx_msg_length_format, rx_msg[rx_msg_length_start_byte:rx_msg_length_end_byte])[0]
+        # Keep reading message in pieces until rx_msg is as long as expected_rx_msg_len
+        while len(rx_msg) < expected_rx_msg_len:
+            rx_msg += self.__s.recv(self.msg_buffer_size)
+
+        return rx_msg
+    
+    def __delete__(self):
+        self.__s.close()
 
 def message_file_loader(msg_dir, msg_file_name: str) -> tuple:
     '''
