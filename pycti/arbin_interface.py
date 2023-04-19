@@ -1,7 +1,6 @@
 import socket
 import logging
 import struct
-import time
 from .messages import Msg
 from .messages import MessageABC
 
