@@ -336,8 +336,11 @@ class ArbinInterface:
                 expected_rx_msg_len = struct.unpack(
                     msg_length_format,
                     rx_msg[msg_length_start_byte_idx:msg_length_end_byte_idx])[0]
+                
                 # Keep reading message in pieces until rx_msg is as long as expected_rx_msg_len
-                while len(rx_msg) < expected_rx_msg_len:
+                # Note message length field does not include size of header (8 bytes) or the 
+                # size of the message length command itself (4 bytes) so we must add it
+                while len(rx_msg) < (expected_rx_msg_len+12):
                     rx_msg += self.__sock.recv(
                         self.config['msg_buffer_size'])
             except socket.error:

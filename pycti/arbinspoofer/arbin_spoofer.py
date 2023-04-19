@@ -4,110 +4,6 @@ import struct
 import copy
 from pycti.messages import Msg, MessageABC
 
-
-class SocketWorker:
-    """
-    Generic worker class that will respond to client socket requests.
-    Default setup as an echo server. Child classes should overwrite the
-    the `_process_client_msg()` method with their own responses.
-    """
-    __receive_msg_timeout_s = 1
-    __msg_buffer_size_bytes = 2**12
-    __stop_lock = threading.Lock()
-    __stop = False
-
-    def __init__(self, s: socket.socket):
-        """
-        Creates the thread to service client requests.
-
-        Parameters
-        ----------
-        s : socket.socket
-            Socket connection to client.
-        """
-        self.stop = False
-        self.__client_thread = threading.Thread(
-            target=self.___service_loop,
-            args=(s,),
-            daemon=True
-        )
-        self.__client_thread.start()
-
-    def ___service_loop(self, s: socket.socket):
-        """
-        Forever loop to service client requests. Wait to receive a message. If no messages is
-        received before the timeout then check to see if stop command has been issued. Loop is
-        also broken if client breaks connection by sending b''.
-
-        Parameters
-        ----------
-        s : socket.socket
-            Socket connection to client.
-        """
-        s.settimeout(self.__receive_msg_timeout_s)
-
-        rx_msg_length_format = MessageABC.base_template['msg_length']['format']
-        rx_msg_length_start_byte = MessageABC.base_template['msg_length']['start_byte']
-        rx_msg_length_end_byte = MessageABC.base_template['msg_length']['start_byte'] + struct.calcsize(rx_msg_length_format)
-
-        while True:
-            try:
-                rx_msg = s.recv(self.__msg_buffer_size_bytes)
-
-               # Receive first part of message and determine length of entire message.
-                rx_msg += s.recv(self.__msg_buffer_size_bytes)
-                expected_rx_msg_len = struct.unpack(
-                    rx_msg_length_format, rx_msg[rx_msg_length_start_byte:rx_msg_length_end_byte])[0]
-                # Keep reading message in pieces until rx_msg is as long as expected_rx_msg_len
-                while len(rx_msg) < expected_rx_msg_len:
-                    rx_msg += s.recv(self.__msg_buffer_size_bytes)
-                if not rx_msg:
-                    break
-                tx_msg= self.__process_client_msg(rx_msg)
-                s.sendall(tx_msg)
-            except socket.timeout:
-                with self.__stop_lock:
-                    if self.__stop:
-                        break
-        s.close()
-
-    def __process_client_msg(self, rx_msg):
-        """
-        Takes the incoming client message and generates a response.
-
-        Parameters
-        ----------
-        rx_msg : bytearray
-            The message received from the client.
-
-        Returns
-        -------
-        tx_msg : bytearray
-            The response message to the client message.
-        """
-        return rx_msg
-
-    def is_alive(self):
-        """
-        Method to call to see if the client service thread is still running.
-
-        Returns
-        -------
-        running : bool
-            True of False based on whether or not the client thread is running.
-        """
-        return self.__client_thread.is_alive()
-
-    def kill_worker(self):
-        """
-        Method to stop client service loop.
-        """
-        if self.__client_thread.is_alive():
-            with self.__stop_lock:
-                self.__stop= True
-            self.__client_thread.join()
-
-
 class ChannelData:
 
     __chan_readings_list= []
@@ -127,7 +23,7 @@ class ChannelData:
         # Create channel_readings for all of the channels.
         for i in range(0, self.num_channels):
             channel_readings= {}
-            for key, item in Msg.ChannelInfo.Server.msg_specific_template:
+            for key, item in Msg.ChannelInfo.Server.msg_specific_template.items():
                 channel_readings[key]= copy.deepcopy(item['value'])
             channel_readings['channel']= i
             with self.__chan_readings_lock:
@@ -182,9 +78,147 @@ class ChannelData:
                     self.__chan_readings_list[channel][key]= updated_readings[key]
 
 
+class SocketWorker:
+    """
+    Generic worker class that will respond to client socket requests.
+    Default setup as an echo server. Child classes should overwrite the
+    the `_process_client_msg()` method with their own responses.
+    """
+    __receive_msg_timeout_s = 0.5
+    __msg_buffer_size_bytes = 2**12
+    __stop_lock = threading.Lock()
+    __stop = False
+
+    def __init__(self, s: socket.socket, channel_data: ChannelData):
+        """
+        Creates the thread to service client requests.
+
+        Parameters
+        ----------
+        s : socket.socket
+            Socket connection to client.
+        """
+        print("created worker!!!")
+        self.__channel_data = channel_data
+
+        self.stop = False
+        self.__client_thread = threading.Thread(
+            target=self.__service_loop,
+            args=(s,),
+            daemon=True
+        )
+        self.__client_thread.start()
+
+    def __service_loop(self, s: socket.socket):
+        """
+        Forever loop to service client requests. Wait to receive a message. If no messages is
+        received before the timeout then check to see if stop command has been issued. Loop is
+        also broken if client breaks connection by sending b''.
+
+        Parameters
+        ----------
+        s : socket.socket
+            Socket connection to client.
+        """
+        s.settimeout(self.__receive_msg_timeout_s)
+
+        rx_msg_length_format = MessageABC.base_template['msg_length']['format']
+        rx_msg_length_start_byte = MessageABC.base_template['msg_length']['start_byte']
+        rx_msg_length_end_byte = MessageABC.base_template['msg_length']['start_byte'] + struct.calcsize(rx_msg_length_format)
+
+        while True:
+            try:
+                rx_msg = s.recv(self.__msg_buffer_size_bytes)
+                if not rx_msg:
+                    break
+
+                # Keep reading message in pieces until rx_msg is as long as expected_rx_msg_len
+                expected_rx_msg_len = struct.unpack(
+                    rx_msg_length_format, rx_msg[rx_msg_length_start_byte:rx_msg_length_end_byte])[0]
+                while len(rx_msg) < expected_rx_msg_len:
+                    rx_msg += s.recv(self.__msg_buffer_size_bytes)
+                
+                tx_msg = self.__process_client_msg(rx_msg)
+                
+                s.sendall(tx_msg)
+            except socket.timeout:
+                with self.__stop_lock:
+                    if self.__stop:
+                        break
+        s.close()
+
+    def __process_client_msg(self, rx_msg):
+        """
+        Takes the incoming client message and generates a response.
+
+        Parameters
+        ----------
+        rx_msg : bytearray
+            The client message received.
+
+        Returns
+        -------
+        tx_msg : PyBytesObject
+            The client response.
+        """
+
+        # Determine command code to sort message
+        cmd_code_format = MessageABC.base_template['command_code']['format']
+        cmd_code_start_byte = MessageABC.base_template['command_code']['start_byte']
+        cmd_code_end_byte = MessageABC.base_template['command_code']['start_byte'] + + struct.calcsize(cmd_code_format)
+        cmd_code = struct.unpack(cmd_code_format, rx_msg[cmd_code_start_byte:cmd_code_end_byte])[0]
+
+        print("cmd code")
+        print(cmd_code)
+        if cmd_code == Msg.Login.Client.command_code:
+            rx_msg_dict = Msg.Login.Client.unpack(rx_msg)
+            tx_msg = Msg.Login.Server.pack()
+        elif cmd_code == Msg.ChannelInfo.Client.command_code:
+            rx_msg_dict = Msg.ChannelInfo.Client.unpack(rx_msg)
+            channel_values = self.__channel_data.fetch_channel_readings(rx_msg_dict['channel'])
+            tx_msg = Msg.ChannelInfo.Server.pack(channel_values)
+        elif cmd_code == Msg.AssignSchedule.Client.command_code:
+            rx_msg_dict = Msg.AssignSchedule.Client.unpack(rx_msg)
+            tx_msg = Msg.AssignSchedule.Server.pack({'channel':rx_msg_dict['channel']})
+        elif cmd_code == Msg.StartSchedule.Client.command_code:
+            rx_msg_dict = Msg.StartSchedule.Client.unpack(rx_msg)
+            tx_msg = Msg.StartSchedule.Server.pack({'channel':rx_msg_dict['channel']})
+        elif cmd_code == Msg.StopSchedule.Client.command_code:
+            rx_msg_dict = Msg.StopSchedule.Client.unpack(rx_msg)
+            tx_msg = Msg.StopSchedule.Server.pack({'channel':rx_msg_dict['channel']})
+        elif cmd_code == Msg.SetMetaVariable.Client.command_code:
+            rx_msg_dict = Msg.SetMetaVariable.Client.unpack(rx_msg)
+            tx_msg = Msg.SetMetaVariable.Server.pack({'channel':rx_msg_dict['channel']})
+        else:
+            tx_msg = bytearray([])
+
+        return tx_msg
+
+    def is_alive(self):
+        """
+        Method to call to see if the client service thread is still running.
+
+        Returns
+        -------
+        running : bool
+            True of False based on whether or not the client thread is running.
+        """
+        return self.__client_thread.is_alive()
+
+    def kill_worker(self):
+        """
+        Method to stop client service loop.
+        """
+        if self.__client_thread.is_alive():
+            with self.__stop_lock:
+                self.__stop= True
+            self.__client_thread.join()
+
+
+
 class ArbinSpoofer:
 
-    __client_connect_timeout_s= 1
+    __client_connect_timeout_s= 0.5
     __stop_servers_lock= threading.Lock()
     __stop_servers= False
 
@@ -205,12 +239,11 @@ class ArbinSpoofer:
 
             `num_channels`: The number of channel our fictitious cycler has.
         """
-
         self.__channel_data= ChannelData(config['num_channels'])
 
         self.__server_thread= threading.Thread(
             target=self.__server_loop,
-            args=(config, TcpWorker,),
+            args=(config, SocketWorker,),
             daemon=True
         )
 
@@ -286,63 +319,3 @@ class ArbinSpoofer:
 
     def __del__(self):
         self.stop()
-
-
-class TcpWorker(SocketWorker):
-
-    def __init__(self, s: socket.socket, channel_data: ChannelData):
-        """
-        Class to handle requests from MacNet TCP socket clients. Currently just echos back client
-        message. Should be expanded in future.
-
-        Parameters
-        ----------
-        s : socket.socket
-            Socket to communicate with.
-        channel_data : ChannelData
-            Container class of channel data
-        """
-
-        self.__channel_data = channel_data
-        super().__init__(s)
-
-    def __process_client_msg(self, rx_msg):
-            """
-            Takes the incoming JSON client message and generates a response.
-
-            Parameters
-            ----------
-            rx_msg : PyBytesObject
-                The client message received.
-
-            Returns
-            -------
-            tx_msg : PyBytesObject
-                The client response.
-            """
-
-            # Determine command code to sort message
-            cmd_code_format = MessageABC.base_template['msg_length']['format']
-            cmd_code_start_byte = MessageABC.base_template['msg_length']['start_byte']
-            cmd_code_end_byte = MessageABC.base_template['msg_length']['start_byte'] + + struct.calcsize(cmd_code_format)
-            cmd_code = struct.unpack(cmd_code_format, rx_msg[cmd_code_start_byte:cmd_code_end_byte])[0]
-
-            if cmd_code == Msg.Login.Client.command_code:
-                rx_msg_dict = Msg.Login.Client.unpack(rx_msg)
-                tx_msg = Msg.Login.Server.pack()
-            elif cmd_code == Msg.ChannelInfo.Client.command_code:
-                rx_msg_dict = Msg.ChannelInfo.Client.unpack(rx_msg)
-                channel_values = self.__channel_data.fetch_channel_readings(rx_msg_dict['channel'])
-                tx_msg = Msg.ChannelInfo.Server.pack(channel_values)
-            elif cmd_code == Msg.AssignSchedule.Client.command_code:
-                rx_msg_dict = Msg.AssignSchedule.Client.unpack(rx_msg)
-                tx_msg = Msg.AssignSchedule.Server.pack({'channel':rx_msg_dict['channel']})
-            elif cmd_code == Msg.StartSchedule.Client.command_code:
-                rx_msg_dict = Msg.StartSchedule.Client.unpack(rx_msg)
-                tx_msg = Msg.StartSchedule.Server.pack({'channel':rx_msg_dict['channel']})
-            elif cmd_code == Msg.StopSchedule.Client.command_code:
-                rx_msg_dict = Msg.StopSchedule.Client.unpack(rx_msg)
-                tx_msg = Msg.StopSchedule.Server.pack({'channel':rx_msg_dict['channel']})
-            elif cmd_code == Msg.SetMetaVariable.Client.command_code:
-                rx_msg_dict = Msg.SetMetaVariable.Client.unpack(rx_msg)
-                tx_msg = Msg.SetMetaVariable.Server.pack({'channel':rx_msg_dict['channel']})
