@@ -15,11 +15,11 @@ class MessageABC(ABC):
     # The message command code. Should be overwritten in child class
     command_code = 0x00
 
-    # Templet that is specific to each message type. Should be overwritten in child class
-    msg_specific_templet = {}
+    # Template that is specific to each message type. Should be overwritten in child class
+    msg_specific_template = {}
 
-    # Base message templet that is common for all messasges
-    base_templet = {
+    # Base message template that is common for all messages
+    base_template = {
         'header': {
             'format': '<Q',
             'start_byte': 0,
@@ -61,11 +61,11 @@ class MessageABC(ABC):
         """
         decoded_msg_dict = {}
 
-        # Create a templet to unpack message with
-        templet = {**deepcopy(cls.base_templet),
-                   **deepcopy(cls.msg_specific_templet)}
+        # Create a template to unpack message with
+        template = {**deepcopy(cls.base_template),
+                   **deepcopy(cls.msg_specific_template)}
 
-        for item_name, item in templet.items():
+        for item_name, item in template.items():
             start_idx = item['start_byte']
             end_idx = item['start_byte'] + struct.calcsize(item['format'])
             decoded_msg_dict[item_name] = struct.unpack(
@@ -78,25 +78,25 @@ class MessageABC(ABC):
 
         if decoded_msg_dict['command_code'] != cls.command_code:
             logger.warning(
-                f'Decoded command code {decoded_msg_dict["command_code"]} does not match what was expcected!')
+                f'Decoded command code {decoded_msg_dict["command_code"]} does not match what was expected!')
 
         if decoded_msg_dict['msg_length'] != cls.msg_length:
             logger.warning(
-                f'Decoded message length {decoded_msg_dict["msg_length"]} does not match what was expcected!')
+                f'Decoded message length {decoded_msg_dict["msg_length"]} does not match what was expected!')
 
         return decoded_msg_dict
 
     @classmethod
     def pack(cls, msg_values={}) -> bytearray:
         """
-        Packs a message based on the message encoding given in the msg_specific_templet
+        Packs a message based on the message encoding given in the msg_specific_template
         dictionary. Values can be substituted for default values if they are included 
         in the `msg_values` argument.
 
         Parameters
         ----------
         msg_values : dict
-            A dictionary detailing which default values in the messtage temple should be 
+            A dictionary detailing which default values in the message temple should be 
             updated.
 
         Returns
@@ -105,26 +105,26 @@ class MessageABC(ABC):
             Packed response message.
         """
         # Create a template to build messages from
-        templet = {**deepcopy(cls.base_templet),
-                   **deepcopy(cls.msg_specific_templet)}
+        template = {**deepcopy(cls.base_template),
+                   **deepcopy(cls.msg_specific_template)}
 
-        # Update the templet with message specific length and command code
-        templet['msg_length']['value'] = cls.msg_length
-        templet['command_code']['value'] = cls.command_code
+        # Update the template with message specific length and command code
+        template['msg_length']['value'] = cls.msg_length
+        template['command_code']['value'] = cls.command_code
 
         # Create a message bytearray that will be loaded with message contents
-        msg_bin = bytearray(templet['msg_length']['value'])
+        msg_bin = bytearray(template['msg_length']['value'])
 
         # Update default message values with those in the passed msg_values dict
         for key in msg_values.keys():
-            if key in templet.keys():
-                templet[key]['value'] = msg_values[key]
+            if key in template.keys():
+                template[key]['value'] = msg_values[key]
             else:
                 logger.warning(
                     f'Key name {key} was not found in msg_encoding!')
 
-        # Pack each item in templet. If packing any item fails then abort packing.
-        for item_name, item in templet.items():
+        # Pack each item in template. If packing any item fails then abort packing.
+        for item_name, item in template.items():
             logger.debug(f'Packing item {item_name}')
             try:
                 if item['format'].endswith('s') or item['format'].endswith('c'):
@@ -163,7 +163,7 @@ class Msg:
             msg_length = 74
             command_code = 0xEEAB0001
 
-            msg_specific_templet = {
+            msg_specific_template = {
                 'username': {
                     'format': '32s',
                     'start_byte': 20,
@@ -182,7 +182,7 @@ class Msg:
             msg_length = 8678
             command_code = 0xEEBA0001
 
-            msg_specific_templet = {
+            msg_specific_template = {
                 'result': {
                     'format': 'I',
                     'start_byte': 20,
@@ -200,18 +200,18 @@ class Msg:
                 0: "should not see this",
                 1: "success",
                 2: "fail",
-                3: "aleady logged in"
+                3: "already logged in"
             }
 
             @classmethod
             def unpack(cls, msg_bin: bytearray) -> dict:
                 """
-                Same as the parrent method, but converts the result based on the
+                Same as the parent method, but converts the result based on the
                 login_result_dict.
 
                 Parameters
                 ----------
-                msg_bin : bytearry
+                msg_bin : bytearray
                     The message to unpack.
 
                 Returns
@@ -233,7 +233,7 @@ class Msg:
             msg_length = 50
             command_code = 0xEEAB0003
 
-            msg_specific_templet = {
+            msg_specific_template = {
                 'channel': {
                     'format': '<h',
                     'start_byte': 20,
@@ -263,7 +263,7 @@ class Msg:
             msg_length = 1779
             command_code = 0xEEBA0003
 
-            msg_specific_templet = {
+            msg_specific_template = {
                 'number_of_channels': {
                     'format': '<I',
                     'start_byte': 20,
@@ -537,12 +537,12 @@ class Msg:
             @classmethod
             def pack(cls, msg_values={}) -> bytearray:
                 """
-                Same as parrent method, but handles packing aux measurements.
+                Same as parent method, but handles packing aux measurements.
 
                 Parameters
                 ----------
                 msg_values : dict
-                    A dictionary detailing which default values in the messtage temple should be 
+                    A dictionary detailing which default values in the message temple should be 
                     updated.
 
                 Returns
@@ -632,7 +632,7 @@ class Msg:
             msg_length = 659
             command_code = 0xBB210001
 
-            msg_specific_templet = {
+            msg_specific_template = {
                 'channel': {
                     'format': 'i',
                     'start_byte': 20,
@@ -755,7 +755,7 @@ class Msg:
             msg_length = 128
             command_code = 0xBB120001
 
-            msg_specific_templet = {
+            msg_specific_template = {
                 'channel': {
                     'format': 'i',
                     'start_byte': 20,
@@ -796,7 +796,7 @@ class Msg:
 
                 Parameters
                 ----------
-                msg_bin : bytearry
+                msg_bin : bytearray
                     The message to unpack.
 
                 Returns
@@ -811,7 +811,7 @@ class Msg:
 
     class StartSchedule:
         '''
-        Message for assiging a schedule to a specific channel. See
+        Message for assigning a schedule to a specific channel. See
         THIRD_PARTY_START_SCHEDULE/THIRD_PARTY_START_SCHEDULE_FEEDBACK 
         in Arbin docs for more info.
         '''
@@ -819,9 +819,9 @@ class Msg:
             msg_length = 160
             command_code = 0xBB320004
 
-            msg_specific_templet = {
+            msg_specific_template = {
                 'test_name': {
-                    # Read as wchar_t which has lenght of 2 bytes each.
+                    # Read as wchar_t which has length of 2 bytes each.
                     'format': '144s',
                     'start_byte': 20,
                     'value': 'pycti test name',
@@ -843,7 +843,7 @@ class Msg:
             msg_length = 128
             command_code = 0XBB230004
 
-            msg_specific_templet = {
+            msg_specific_template = {
                 'channel': {
                     'format': 'I',
                     'start_byte': 20,
@@ -900,7 +900,7 @@ class Msg:
 
                 Parameters
                 ----------
-                msg_bin : bytearry
+                msg_bin : bytearray
                     The message to unpack.
 
                 Returns
@@ -923,7 +923,7 @@ class Msg:
             msg_length = 116
             command_code = 0xBB310001
 
-            msg_specific_templet = {
+            msg_specific_template = {
                 'channel': {
                     'format': 'I',
                     'start_byte': 20,
@@ -948,7 +948,7 @@ class Msg:
             msg_length = 128
             command_code = 0XBB130001
 
-            msg_specific_templet = {
+            msg_specific_template = {
                 'channel': {
                     'format': 'I',
                     'start_byte': 20,
@@ -984,7 +984,7 @@ class Msg:
 
                 Parameters
                 ----------
-                msg_bin : bytearry
+                msg_bin : bytearray
                     The message to unpack.
 
                 Returns
@@ -1000,14 +1000,14 @@ class Msg:
     class SetMetaVariable:
         '''
         Message for setting meta variables. 
-        TTHIRD_PARTY_SET_MV_VALUE/THIRD_PARTY_SET_MV_VALUE_FEEDBACK 
+        THIRD_PARTY_SET_MV_VALUE/THIRD_PARTY_SET_MV_VALUE_FEEDBACK 
         in Arbin docs for more info.
         '''
         class Client(MessageABC):
             msg_length = 62
             command_code = 0xBB150001
 
-            msg_specific_templet = {
+            msg_specific_template = {
                 'channel': {
                     'format': '<I',
                     'start_byte': 20,
@@ -1019,7 +1019,7 @@ class Msg:
                     'start_byte': 24,
                     'value': 1
                 },
-                # This determines which meta variable is set. Defualts to MV 1.
+                # This determines which meta variable is set. Defaults to MV 1.
                 'mv_meta_code': {
                     'format': '<i',
                     'start_byte': 28,
@@ -1074,7 +1074,7 @@ class Msg:
             msg_length = 128
             command_code = 0XBB510001
 
-            msg_specific_templet = {
+            msg_specific_template = {
                 'channel': {
                     'format': '<I',
                     'start_byte': 20,

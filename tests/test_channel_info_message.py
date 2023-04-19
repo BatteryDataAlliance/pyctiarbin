@@ -99,7 +99,7 @@ def test_aux_readings_parser_only_temp():
 @pytest.mark.messages
 def test_channel_info_client_msg():
     '''
-    Test packing/parsing a client channel info messsage
+    Test packing/parsing a client channel info message
     '''
     example_msg_name = 'client_channel_info_msg'
     (msg_bin, msg_dict) = message_file_loader(MSG_DIR, example_msg_name)

@@ -7,7 +7,7 @@ class TestMessageClass(MessageABC):
     msg_length = 44
     command_code = 0x01
 
-    msg_specific_templet = {
+    msg_specific_template = {
         'test_value': {
             'format': '<f',
             'start_byte': 20,
@@ -30,10 +30,10 @@ class TestMessageClass(MessageABC):
         if passed_test_value:
             test_value = passed_test_value
         else:
-            test_value = cls.msg_specific_templet['test_value']['value']
+            test_value = cls.msg_specific_template['test_value']['value']
 
-        test_string = cls.msg_specific_templet['test_string']['value']
-        test_string_encoding = cls.msg_specific_templet['test_string']['text_encoding']
+        test_string = cls.msg_specific_template['test_string']['value']
+        test_string_encoding = cls.msg_specific_template['test_string']['text_encoding']
 
         key_msg = bytearray([])
         key_msg += struct.pack('<Q', 0x11DDDDDDDDDDDDDD)
@@ -60,7 +60,7 @@ def test_simple_build_msg():
 @pytest.mark.messages
 def test_modify_build_msg():
     '''
-    Test packing a message with MessageAbc.pack() and modifying an element in the templet
+    Test packing a message with MessageAbc.pack() and modifying an element in the template
     '''
     new_test_value = 2.7182
 
@@ -99,7 +99,7 @@ def test_modify_build_bad_pack():
 @pytest.mark.messages
 def test_parse_msg():
     '''
-    Test pasrsing a message with MessageAbc.unpack()
+    Test passing a message with MessageAbc.unpack()
     '''
     ans_key_dict = {
         'header': 1287429013477645789,
@@ -112,7 +112,7 @@ def test_parse_msg():
 
     # Prase the message
     key_msg = TestMessageClass.msg_packer()
-    prased_msg_dict = TestMessageClass.unpack(key_msg)
+    parsed_msg_dict = TestMessageClass.unpack(key_msg)
 
     for key in ans_key_dict.keys():
-        assert (ans_key_dict[key] == prased_msg_dict[key])
+        assert (ans_key_dict[key] == parsed_msg_dict[key])

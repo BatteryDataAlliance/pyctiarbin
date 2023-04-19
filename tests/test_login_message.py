@@ -9,7 +9,7 @@ MSG_DIR = os.path.join(os.path.dirname(__file__), 'example_messages')
 @pytest.mark.messages
 def test_login_client_msg():
     '''
-    Test packing/parsing a client login request messsage
+    Test packing/parsing a client login request message
     '''
 
     example_msg_name = 'client_login_msg'
@@ -32,7 +32,7 @@ def test_login_server_msg():
     example_msg_name = 'server_login_msg'
     (msg_bin, msg_dict) = message_file_loader(MSG_DIR, example_msg_name)
 
-    # Check that the parsed binary message mataches the msg_dict
+    # Check that the parsed binary message matches the msg_dict
     parsed_msg = Msg.Login.Server.unpack(msg_bin)
     assert (parsed_msg == msg_dict)
 

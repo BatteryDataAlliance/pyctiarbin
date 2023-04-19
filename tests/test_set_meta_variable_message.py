@@ -9,7 +9,7 @@ MSG_DIR = os.path.join(os.path.dirname(__file__), 'example_messages')
 @pytest.mark.messages
 def test_start_schedule_client_msg():
     '''
-    Test packing/parsing a client start schedule request messsage
+    Test packing/parsing a client start schedule request message
     '''
 
     example_msg_name = 'client_set_meta_variable_msg'

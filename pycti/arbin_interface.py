@@ -20,8 +20,7 @@ class ArbinInterface:
 
     def __init__(self, config: dict):
         """
-        Creates a class instance. The `start()` method still needs to be run to create the connection
-        and to check the validity of the config.
+        A class for interfacing with the Arbin cycler.
 
         Parameters
         ----------
@@ -107,12 +106,12 @@ class ArbinInterface:
 
     def start_test(self) -> bool:
         """
-        Method to start a test on channel on specific channel. 
+        Starts channel on method specified in config.  
 
         Returns
         -------
         success : bool
-            True/False based on whether the schedule was assigned without issue.
+            True/False based on whether the test was started without issue.
         """
         success = False
 
@@ -139,12 +138,13 @@ class ArbinInterface:
 
     def stop_test(self) -> bool:
         """
-        Method to stop a test running on the channel specified in the config.
+        Stops the test running on the channel specified in the config.
 
         Returns
         -------
         success : bool
-            True/False based on whether the stopped without issue.
+            True/False based on whether the test stopped without issue.
+            Also returns True if no test was running on the channel. 
         """
         success = False
 
@@ -180,8 +180,8 @@ class ArbinInterface:
             The meta variable value to set.
         Returns
         -------
-        rx_msg : bytearray
-            Response message from the server.
+        success : bool
+            True/False based on whether the meta variable was set. 
         """
         success = False
 
@@ -215,7 +215,7 @@ class ArbinInterface:
         Returns
         --------------------------
         success : bool
-            True or False based on whether the config passed at construction is valid.
+            True/False based on whether the config passed at construction is valid.
         """
         required_config_keys = ['username',
                                 'password',
@@ -242,7 +242,7 @@ class ArbinInterface:
         Returns
         -------
         success : bool
-            True or False based on whether the login was successful
+            True/False based on whether the login was successful
         """
         success = False
 
@@ -280,7 +280,7 @@ class ArbinInterface:
         Returns
        ----------
         success : bool
-            True or False based on whether or not the connection was created.
+            True/False based on whether or not the Arbin server connection was created.
         """
         success = False
 
@@ -307,12 +307,12 @@ class ArbinInterface:
         Parameters
         ----------
         tx_msg : bytearray
-            Message to send to the server.
+            Message to send.
 
         Returns
         -------
         rx_msg : bytearray
-            Response message from the server.
+            Response message..
         """
 
         rx_msg = b''

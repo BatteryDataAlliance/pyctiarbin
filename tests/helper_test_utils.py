@@ -6,7 +6,7 @@ class Constants:
 
 def message_file_loader(msg_dir, msg_file_name: str) -> tuple:
     '''
-    Helper fuction to read in example messages from files.
+    Helper function to read in example messages from files.
 
     Parameters
     ----------

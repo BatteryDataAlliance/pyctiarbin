@@ -9,7 +9,7 @@ MSG_DIR = os.path.join(os.path.dirname(__file__), 'example_messages')
 @pytest.mark.messages
 def test_start_schedule_client_msg():
     '''
-    Test packing/parsing a client start schedule request messsage
+    Test packing/parsing a client start schedule request message
     '''
 
     example_msg_name = 'client_start_schedule_msg'
@@ -32,7 +32,7 @@ def test_start_schedule_server_msg():
     example_msg_name = 'server_start_schedule_msg'
     (msg_bin, msg_dict) = message_file_loader(MSG_DIR, example_msg_name)
 
-    # Check that the parsed binary message mataches the msg_dict
+    # Check that the parsed binary message matches the msg_dict
     parsed_msg = Msg.StartSchedule.Server.unpack(msg_bin)
     assert (parsed_msg == msg_dict)
 

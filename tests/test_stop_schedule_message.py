@@ -9,7 +9,7 @@ MSG_DIR = os.path.join(os.path.dirname(__file__), 'example_messages')
 @pytest.mark.messages
 def test_stop_schedule_client_msg():
     '''
-    Test packing/parsing a stop schedule request messsage
+    Test packing/parsing a stop schedule request message
     '''
 
     example_msg_name = 'client_stop_schedule_msg'
