@@ -1,3 +1,4 @@
+import pytest
 from helper_test_utils import Constants, TcpClient
 from pycti.arbinspoofer import ArbinSpoofer
 from pycti.messages import Msg
@@ -10,7 +11,7 @@ CONFIG_DICT = {"ip": "127.0.0.1",
                "num_channels": 16}
 CHANNEL = 5  # The channel we will use to associated tests messages.
 
-
+@pytest.mark.arbinspoofer
 def test_messages():
     """
     Test that the spoofer replies correctly to all messages.
@@ -41,7 +42,7 @@ def test_messages():
 
     arbin_spoofer.stop()
 
-
+@pytest.mark.arbinspoofer
 def test_update_status():
     """
     Check that updating channel status info works.

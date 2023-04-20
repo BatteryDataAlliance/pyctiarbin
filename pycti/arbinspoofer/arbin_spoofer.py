@@ -171,6 +171,7 @@ class SocketWorker:
         print("cmd code")
         print(cmd_code)
         if cmd_code == Msg.Login.Client.command_code:
+            print("made it here")
             rx_msg_dict = Msg.Login.Client.unpack(rx_msg)
             tx_msg = Msg.Login.Server.pack()
         elif cmd_code == Msg.ChannelInfo.Client.command_code:
