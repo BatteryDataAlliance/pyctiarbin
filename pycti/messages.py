@@ -188,11 +188,92 @@ class Msg:
                     'start_byte': 20,
                     'value': 0
                 },
+                'ip_address': {
+                    'format': '4s',
+                    'start_byte': 24,
+                    'value': "0000",
+                    'text_encoding': 'utf-8',
+                },
                 'cycler_sn': {
                     'format': '16s',
                     'start_byte': 28,
+                    'value': '00000000',
                     'text_encoding': 'ascii',
-                    'value': '00000000'
+                },
+                'note': {
+                    'format': '256s',
+                    'start_byte': 44,
+                    'value': '00000000',
+                    'text_encoding': 'ascii',
+                },
+                'nick_name': {
+                    # Stored as wchar_t[1024]. Each wchar_t is 2 bytes, twice as big as standard char in Python
+                    'format': '2048s',
+                    'start_byte': 300,
+                    'value': 'our nickname',
+                    'text_encoding': 'utf-16-le',
+                },
+                'location': {
+                    'format': '2048s',
+                    'start_byte': 2348,
+                    'value': 'our location',
+                    'text_encoding': 'utf-16-le',
+                },
+                'emergency_contact': {
+                    'format': '2048s',
+                    'start_byte': 4396,
+                    'value': 'our location',
+                    'text_encoding': 'utf-16-le',
+                },
+                'other_comments': {
+                    'format': '2048s',
+                    'start_byte': 6444,
+                    'value': 'our location',
+                    'text_encoding': 'utf-16-le',
+                },
+                'email': {
+                    'format': '128s',
+                    'start_byte': 8492,
+                    'value': 'our location',
+                    'text_encoding': 'utf-16-le',
+                },
+                'call': {
+                    'format': '32s',
+                    'start_byte': 8620,
+                    'value': 'our location',
+                    'text_encoding': 'utf-16-le',
+                },
+                'itac': {
+                    'format': '<I',
+                    'start_byte': 8652,
+                    'value': 0
+                },
+                'version': {
+                    'format': '<I',
+                    'start_byte': 8656,
+                    'value': 0
+                },
+                'allow_control': {
+                    'format': '<I',
+                    'start_byte': 8660,
+                    'value': 0
+                },
+                'num_channels': {
+                    'format': '<I',
+                    'start_byte': 8664,
+                    'value': 0
+                },
+                'user_type': {
+                    'format': '<I',
+                    'start_byte': 8668,
+                    'value': 1,
+                    'text_encoding': 'utf-16-le',
+                },
+                'picture_length': {
+                    'format': '<I',
+                    'start_byte': 8672,
+                    'value': 0,
+                    'text_encoding': 'utf-8',
                 },
             }
 

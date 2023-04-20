@@ -1,8 +1,22 @@
 {
-    "header": 1287429013477645789, 
-    "msg_length": 8678, 
-    "command_code": 4005167105, 
-    "extended_command_code": 0, 
-    "result": "success", 
-    "cycler_sn": "207855"
+    "header": 1287429013477645789,
+    "msg_length": 8678,
+    "command_code": 4005167105,
+    "extended_command_code": 0,
+    "result": "success",
+    "ip_address": "\u0003\u0003\u001fQ",
+    "cycler_sn": "207855",
+    "note": "LBT21084  16 Channels\r\n\r\nCurrent: 60A,5A,500mA,20mA\r\nVolrage: 0V to 5V \r\n\r\n16 Ch Aux T-Couple Type T\r\n\r\n16 Ch Aux Voltage -5V to 5V\r\n\r\nTCP/IP\r\n\r\nUpgrade to MITS8",
+    "nick_name": "",
+    "location": "",
+    "emergency_contact": "",
+    "other_comments": "",
+    "email": "",
+    "call": "",
+    "itac": 7918320,
+    "version": 1,
+    "allow_control": 1,
+    "num_channels": 16,
+    "user_type": 0,
+    "picture_length": 0
 }

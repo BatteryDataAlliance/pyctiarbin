@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="pycti",
-    version="0.0.1",
+    version="0.0.3",
     author="Zander Nevitt",
     author_email="zandern@battgenie.life",
     description="A class based Python interface for communication and control of Arbin cyclers over CTI.",

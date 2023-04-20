@@ -252,7 +252,6 @@ class ArbinInterface:
 
         if response_msg_bin:
             login_msg_rx_dict = Msg.Login.Server.unpack(response_msg_bin)
-            print(login_msg_rx_dict)
 
             if login_msg_rx_dict['result'] == 'success':
                 success = True
@@ -345,4 +344,5 @@ class ArbinInterface:
             except socket.error:
                 logger.error("Error receiving message!!", exc_info=True)
 
+        print(rx_msg)
         return rx_msg
