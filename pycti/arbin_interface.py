@@ -344,5 +344,4 @@ class ArbinInterface:
             except socket.error:
                 logger.error("Error receiving message!!", exc_info=True)
 
-        print(rx_msg)
         return rx_msg
