@@ -322,26 +322,30 @@ class ArbinInterface:
         msg_length_end_byte_idx = msg_length_start_byte_idx + \
             struct.calcsize(msg_length_format)
 
-        try:
-            self.__sock.sendall(tx_msg)
-            send_msg_success = True
-        except socket.error:
-            logger.error(
-                "Failed to send message to Arbin server!", exc_info=True)
-
-        if send_msg_success:
+        if self.__sock:
             try:
-                # Receive first part of message and determine length of entire message.
-                rx_msg += self.__sock.recv(self.config['msg_buffer_size'])
-                expected_rx_msg_len = struct.unpack(
-                    msg_length_format,
-                    rx_msg[msg_length_start_byte_idx:msg_length_end_byte_idx])[0]
-                
-                # Keep reading message in pieces until rx_msg is as long as expected_rx_msg_len.
-                while len(rx_msg) < (expected_rx_msg_len):
-                    rx_msg += self.__sock.recv(
-                        self.config['msg_buffer_size'])
+                self.__sock.sendall(tx_msg)
+                send_msg_success = True
             except socket.error:
-                logger.error("Error receiving message!!", exc_info=True)
+                logger.error(
+                    "Failed to send message to Arbin server!", exc_info=True)
+
+            if send_msg_success:
+                try:
+                    # Receive first part of message and determine length of entire message.
+                    rx_msg += self.__sock.recv(self.config['msg_buffer_size'])
+                    expected_rx_msg_len = struct.unpack(
+                        msg_length_format,
+                        rx_msg[msg_length_start_byte_idx:msg_length_end_byte_idx])[0]
+                    
+                    # Keep reading message in pieces until rx_msg is as long as expected_rx_msg_len.
+                    while len(rx_msg) < (expected_rx_msg_len):
+                        rx_msg += self.__sock.recv(
+                            self.config['msg_buffer_size'])
+                except socket.error:
+                    logger.error("Error receiving message!!", exc_info=True)
+        else:
+            logger.error(
+                "Cannot send message! Socket does not exist!")
 
         return rx_msg

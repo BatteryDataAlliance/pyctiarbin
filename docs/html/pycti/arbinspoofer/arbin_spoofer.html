@@ -1,0 +1,989 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.10.0" />
+<title>pycti.arbinspoofer.arbin_spoofer API documentation</title>
+<meta name="description" content="" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>pycti.arbinspoofer.arbin_spoofer</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">import socket
+import threading
+import struct
+import copy
+from pycti.messages import Msg, MessageABC
+
+class ChannelData:
+
+    __chan_readings_list= []
+    __chan_readings_lock= threading.Lock()
+
+    def __init__(self, num_channels):
+        &#34;&#34;&#34;
+        Container class that will hold all of the specific channel data for MaccorSpoofer.
+
+        Parameters
+        ----------
+            num_channels : int
+                Number of channels in our hypothetical Maccor cycler.
+        &#34;&#34;&#34;
+        self.num_channels= num_channels
+
+        # Create channel_readings for all of the channels.
+        for i in range(0, self.num_channels):
+            channel_readings= {}
+            for key, item in Msg.ChannelInfo.Server.msg_specific_template.items():
+                channel_readings[key]= copy.deepcopy(item[&#39;value&#39;])
+            channel_readings[&#39;channel&#39;]= i
+            with self.__chan_readings_lock:
+                self.__chan_readings_list.append(
+                    copy.deepcopy(channel_readings))
+
+    def fetch_channel_readings(self, channel) -&gt; dict:
+        &#34;&#34;&#34;
+        Returns the status message for a specified channel.
+
+        Parameters
+        ----------
+        channel : int
+            The channel to return the status for.
+
+        Returns
+        -------
+        status : dict
+            The status message for the requested channel. Empty if channel larger than number of channel
+        &#34;&#34;&#34;
+        if channel &gt; self.num_channels:
+            return {}
+        else:
+            with self.__chan_readings_lock:
+                return copy.deepcopy(self.__chan_readings_list[channel])
+
+    def update_channel_readings(self, channel, updated_readings):
+        &#34;&#34;&#34;
+        Updates the stored channel readings for the specified channel.
+
+        Parameters
+        ----------
+        channel : int
+            The channel to update the readings for.
+        updated_status : dict
+            Complete or partial dictionary of status values to update.
+
+        Returns
+        -------
+        success : bool
+            Returns True if all values in the updated_status were used to update the channel_status_array.
+        &#34;&#34;&#34;
+        if channel &gt; self.num_channels:
+            return False
+        else:
+            for key in updated_readings.keys():
+                if key not in Msg.ChannelInfo.Server.msg_specific_template.keys():
+                    return False
+
+            with self.__chan_readings_lock:
+                for key in updated_readings.keys():
+                    self.__chan_readings_list[channel][key]= updated_readings[key]
+
+
+class SocketWorker:
+    &#34;&#34;&#34;
+    Generic worker class that will respond to client socket requests.
+    Default setup as an echo server. Child classes should overwrite the
+    the `_process_client_msg()` method with their own responses.
+    &#34;&#34;&#34;
+    __receive_msg_timeout_s = 0.5
+    __msg_buffer_size_bytes = 2**12
+    __stop_lock = threading.Lock()
+    __stop = False
+
+    def __init__(self, s: socket.socket, channel_data: ChannelData):
+        &#34;&#34;&#34;
+        Creates the thread to service client requests.
+
+        Parameters
+        ----------
+        s : socket.socket
+            Socket connection to client.
+        &#34;&#34;&#34;
+        self.__channel_data = channel_data
+
+        self.stop = False
+        self.__client_thread = threading.Thread(
+            target=self.__service_loop,
+            args=(s,),
+            daemon=True
+        )
+        self.__client_thread.start()
+
+    def __service_loop(self, s: socket.socket):
+        &#34;&#34;&#34;
+        Forever loop to service client requests. Wait to receive a message. If no messages is
+        received before the timeout then check to see if stop command has been issued. Loop is
+        also broken if client breaks connection by sending b&#39;&#39;.
+
+        Parameters
+        ----------
+        s : socket.socket
+            Socket connection to client.
+        &#34;&#34;&#34;
+        s.settimeout(self.__receive_msg_timeout_s)
+
+        rx_msg_length_format = MessageABC.base_template[&#39;msg_length&#39;][&#39;format&#39;]
+        rx_msg_length_start_byte = MessageABC.base_template[&#39;msg_length&#39;][&#39;start_byte&#39;]
+        rx_msg_length_end_byte = MessageABC.base_template[&#39;msg_length&#39;][&#39;start_byte&#39;] + struct.calcsize(rx_msg_length_format)
+
+        while True:
+            try:
+                rx_msg = s.recv(self.__msg_buffer_size_bytes)
+                if not rx_msg:
+                    break
+
+                # Keep reading message in pieces until rx_msg is as long as expected_rx_msg_len
+                expected_rx_msg_len = struct.unpack(
+                    rx_msg_length_format, rx_msg[rx_msg_length_start_byte:rx_msg_length_end_byte])[0]
+                while len(rx_msg) &lt; expected_rx_msg_len:
+                    rx_msg += s.recv(self.__msg_buffer_size_bytes)
+                
+                tx_msg = self.__process_client_msg(rx_msg)
+                
+                s.sendall(tx_msg)
+            except socket.timeout:
+                with self.__stop_lock:
+                    if self.__stop:
+                        break
+        s.close()
+
+    def __process_client_msg(self, rx_msg):
+        &#34;&#34;&#34;
+        Takes the incoming client message and generates a response.
+
+        Parameters
+        ----------
+        rx_msg : bytearray
+            The client message received.
+
+        Returns
+        -------
+        tx_msg : PyBytesObject
+            The client response.
+        &#34;&#34;&#34;
+
+        # Determine command code to sort message
+        cmd_code_format = MessageABC.base_template[&#39;command_code&#39;][&#39;format&#39;]
+        cmd_code_start_byte = MessageABC.base_template[&#39;command_code&#39;][&#39;start_byte&#39;]
+        cmd_code_end_byte = MessageABC.base_template[&#39;command_code&#39;][&#39;start_byte&#39;] + + struct.calcsize(cmd_code_format)
+        cmd_code = struct.unpack(cmd_code_format, rx_msg[cmd_code_start_byte:cmd_code_end_byte])[0]
+
+        if cmd_code == Msg.Login.Client.command_code:
+            rx_msg_dict = Msg.Login.Client.unpack(rx_msg)
+            tx_msg = Msg.Login.Server.pack()
+        elif cmd_code == Msg.ChannelInfo.Client.command_code:
+            rx_msg_dict = Msg.ChannelInfo.Client.unpack(rx_msg)
+            channel_values = self.__channel_data.fetch_channel_readings(rx_msg_dict[&#39;channel&#39;])
+            tx_msg = Msg.ChannelInfo.Server.pack(channel_values)
+        elif cmd_code == Msg.AssignSchedule.Client.command_code:
+            rx_msg_dict = Msg.AssignSchedule.Client.unpack(rx_msg)
+            tx_msg = Msg.AssignSchedule.Server.pack({&#39;channel&#39;:rx_msg_dict[&#39;channel&#39;]})
+        elif cmd_code == Msg.StartSchedule.Client.command_code:
+            rx_msg_dict = Msg.StartSchedule.Client.unpack(rx_msg)
+            tx_msg = Msg.StartSchedule.Server.pack({&#39;channel&#39;:rx_msg_dict[&#39;channel&#39;]})
+        elif cmd_code == Msg.StopSchedule.Client.command_code:
+            rx_msg_dict = Msg.StopSchedule.Client.unpack(rx_msg)
+            tx_msg = Msg.StopSchedule.Server.pack({&#39;channel&#39;:rx_msg_dict[&#39;channel&#39;]})
+        elif cmd_code == Msg.SetMetaVariable.Client.command_code:
+            rx_msg_dict = Msg.SetMetaVariable.Client.unpack(rx_msg)
+            tx_msg = Msg.SetMetaVariable.Server.pack({&#39;channel&#39;:rx_msg_dict[&#39;channel&#39;]})
+        else:
+            tx_msg = bytearray([])
+
+        return tx_msg
+
+    def is_alive(self):
+        &#34;&#34;&#34;
+        Method to call to see if the client service thread is still running.
+
+        Returns
+        -------
+        running : bool
+            True of False based on whether or not the client thread is running.
+        &#34;&#34;&#34;
+        return self.__client_thread.is_alive()
+
+    def kill_worker(self):
+        &#34;&#34;&#34;
+        Method to stop client service loop.
+        &#34;&#34;&#34;
+        if self.__client_thread.is_alive():
+            with self.__stop_lock:
+                self.__stop= True
+            self.__client_thread.join()
+
+
+
+class ArbinSpoofer:
+
+    __client_connect_timeout_s= 0.5
+    __stop_servers_lock= threading.Lock()
+    __stop_servers= False
+
+    def __init__(self, config: dict):
+        &#34;&#34;&#34;
+        Class to mimic behavior of Arbin cycler MITSPro control server. The class is currently dumb
+        and just sends back basic channel messages without any notion of channel status.
+        It could be expanded in future.
+
+        Parameters
+        ----------
+        config : dict
+            A configuration dictionary containing the following fields:
+
+            `ip`: The server IP address to host from. Most often will be &#39;localhost&#39; for testing.
+
+            `port`: The port to use for the server.
+
+            `num_channels`: The number of channel our fictitious cycler has.
+        &#34;&#34;&#34;
+        self.__channel_data= ChannelData(config[&#39;num_channels&#39;])
+
+        self.__server_thread= threading.Thread(
+            target=self.__server_loop,
+            args=(config, SocketWorker,),
+            daemon=True
+        )
+
+    def start(self):
+        &#34;&#34;&#34;
+        Starts the server loops.
+        &#34;&#34;&#34;
+        self.__server_thread.start()
+
+    def update_channel_status(self, channel, updated_readings):
+        &#34;&#34;&#34;
+        Updates the stored channel status for the specified channel.
+
+        Parameters
+        ----------
+        channel : int
+            The channel to update the status for.
+        updated_readings : dict
+            Complete or partial dictionary of status values to update.
+
+        Returns
+        -------
+        success : bool
+            Returns True if all values in the updated_status were used to update the channel_status_array.
+        &#34;&#34;&#34;
+        return self.__channel_data.update_channel_readings(channel, updated_readings)
+
+    def __server_loop(self, sock_config: dict, Worker: SocketWorker):
+        &#34;&#34;&#34;
+        Creates a server and forever loop to service client socket requests.
+
+        Parameters
+        ----------
+        sock_config : dict
+            A configuration for the socket containing the IP and port number.
+        Worker : SocketWorker
+            A reference to the worker class that will service individual client connections.
+        &#34;&#34;&#34;
+        # List that will hold all the workers to service client connections.
+        client_workers= []
+
+        sock= socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        sock.bind((sock_config[&#34;ip&#34;], sock_config[&#34;port&#34;]))
+        sock.settimeout(self.__client_connect_timeout_s)
+        sock.listen()
+
+        while True:
+            try:
+                client_connection= sock.accept()[0]
+                client_workers.append(
+                    Worker(client_connection, self.__channel_data))
+            except socket.timeout:
+                with self.__stop_servers_lock:
+                    # If stop command is issued then kill all workers.
+                    if self.__stop_servers:
+                        for worker in client_workers:
+                            if worker.is_alive():
+                                worker.kill_worker()
+                        break
+                # Remove any workers that made have died from disconnecting clients.
+                client_workers[:]= [
+                    worker for worker in client_workers if worker.is_alive()
+                ]
+
+    def stop(self):
+        &#34;&#34;&#34;
+        Stop the server loops.
+        &#34;&#34;&#34;
+        with self.__stop_servers_lock:
+            self.__stop_servers= True
+        self.__server_thread.join()
+
+    def __del__(self):
+        self.stop()</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="pycti.arbinspoofer.arbin_spoofer.ArbinSpoofer"><code class="flex name class">
+<span>class <span class="ident">ArbinSpoofer</span></span>
+<span>(</span><span>config: dict)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Class to mimic behavior of Arbin cycler MITSPro control server. The class is currently dumb
+and just sends back basic channel messages without any notion of channel status.
+It could be expanded in future.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>config</code></strong> :&ensp;<code>dict</code></dt>
+<dd>
+<p>A configuration dictionary containing the following fields:</p>
+<p><code>ip</code>: The server IP address to host from. Most often will be 'localhost' for testing.</p>
+<p><code>port</code>: The port to use for the server.</p>
+<p><code>num_channels</code>: The number of channel our fictitious cycler has.</p>
+</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class ArbinSpoofer:
+
+    __client_connect_timeout_s= 0.5
+    __stop_servers_lock= threading.Lock()
+    __stop_servers= False
+
+    def __init__(self, config: dict):
+        &#34;&#34;&#34;
+        Class to mimic behavior of Arbin cycler MITSPro control server. The class is currently dumb
+        and just sends back basic channel messages without any notion of channel status.
+        It could be expanded in future.
+
+        Parameters
+        ----------
+        config : dict
+            A configuration dictionary containing the following fields:
+
+            `ip`: The server IP address to host from. Most often will be &#39;localhost&#39; for testing.
+
+            `port`: The port to use for the server.
+
+            `num_channels`: The number of channel our fictitious cycler has.
+        &#34;&#34;&#34;
+        self.__channel_data= ChannelData(config[&#39;num_channels&#39;])
+
+        self.__server_thread= threading.Thread(
+            target=self.__server_loop,
+            args=(config, SocketWorker,),
+            daemon=True
+        )
+
+    def start(self):
+        &#34;&#34;&#34;
+        Starts the server loops.
+        &#34;&#34;&#34;
+        self.__server_thread.start()
+
+    def update_channel_status(self, channel, updated_readings):
+        &#34;&#34;&#34;
+        Updates the stored channel status for the specified channel.
+
+        Parameters
+        ----------
+        channel : int
+            The channel to update the status for.
+        updated_readings : dict
+            Complete or partial dictionary of status values to update.
+
+        Returns
+        -------
+        success : bool
+            Returns True if all values in the updated_status were used to update the channel_status_array.
+        &#34;&#34;&#34;
+        return self.__channel_data.update_channel_readings(channel, updated_readings)
+
+    def __server_loop(self, sock_config: dict, Worker: SocketWorker):
+        &#34;&#34;&#34;
+        Creates a server and forever loop to service client socket requests.
+
+        Parameters
+        ----------
+        sock_config : dict
+            A configuration for the socket containing the IP and port number.
+        Worker : SocketWorker
+            A reference to the worker class that will service individual client connections.
+        &#34;&#34;&#34;
+        # List that will hold all the workers to service client connections.
+        client_workers= []
+
+        sock= socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        sock.bind((sock_config[&#34;ip&#34;], sock_config[&#34;port&#34;]))
+        sock.settimeout(self.__client_connect_timeout_s)
+        sock.listen()
+
+        while True:
+            try:
+                client_connection= sock.accept()[0]
+                client_workers.append(
+                    Worker(client_connection, self.__channel_data))
+            except socket.timeout:
+                with self.__stop_servers_lock:
+                    # If stop command is issued then kill all workers.
+                    if self.__stop_servers:
+                        for worker in client_workers:
+                            if worker.is_alive():
+                                worker.kill_worker()
+                        break
+                # Remove any workers that made have died from disconnecting clients.
+                client_workers[:]= [
+                    worker for worker in client_workers if worker.is_alive()
+                ]
+
+    def stop(self):
+        &#34;&#34;&#34;
+        Stop the server loops.
+        &#34;&#34;&#34;
+        with self.__stop_servers_lock:
+            self.__stop_servers= True
+        self.__server_thread.join()
+
+    def __del__(self):
+        self.stop()</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="pycti.arbinspoofer.arbin_spoofer.ArbinSpoofer.start"><code class="name flex">
+<span>def <span class="ident">start</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Starts the server loops.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def start(self):
+    &#34;&#34;&#34;
+    Starts the server loops.
+    &#34;&#34;&#34;
+    self.__server_thread.start()</code></pre>
+</details>
+</dd>
+<dt id="pycti.arbinspoofer.arbin_spoofer.ArbinSpoofer.stop"><code class="name flex">
+<span>def <span class="ident">stop</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Stop the server loops.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def stop(self):
+    &#34;&#34;&#34;
+    Stop the server loops.
+    &#34;&#34;&#34;
+    with self.__stop_servers_lock:
+        self.__stop_servers= True
+    self.__server_thread.join()</code></pre>
+</details>
+</dd>
+<dt id="pycti.arbinspoofer.arbin_spoofer.ArbinSpoofer.update_channel_status"><code class="name flex">
+<span>def <span class="ident">update_channel_status</span></span>(<span>self, channel, updated_readings)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Updates the stored channel status for the specified channel.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>channel</code></strong> :&ensp;<code>int</code></dt>
+<dd>The channel to update the status for.</dd>
+<dt><strong><code>updated_readings</code></strong> :&ensp;<code>dict</code></dt>
+<dd>Complete or partial dictionary of status values to update.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>success</code></strong> :&ensp;<code>bool</code></dt>
+<dd>Returns True if all values in the updated_status were used to update the channel_status_array.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def update_channel_status(self, channel, updated_readings):
+    &#34;&#34;&#34;
+    Updates the stored channel status for the specified channel.
+
+    Parameters
+    ----------
+    channel : int
+        The channel to update the status for.
+    updated_readings : dict
+        Complete or partial dictionary of status values to update.
+
+    Returns
+    -------
+    success : bool
+        Returns True if all values in the updated_status were used to update the channel_status_array.
+    &#34;&#34;&#34;
+    return self.__channel_data.update_channel_readings(channel, updated_readings)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="pycti.arbinspoofer.arbin_spoofer.ChannelData"><code class="flex name class">
+<span>class <span class="ident">ChannelData</span></span>
+<span>(</span><span>num_channels)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Container class that will hold all of the specific channel data for MaccorSpoofer.</p>
+<h2 id="parameters">Parameters</h2>
+<pre><code>num_channels : int
+    Number of channels in our hypothetical Maccor cycler.
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class ChannelData:
+
+    __chan_readings_list= []
+    __chan_readings_lock= threading.Lock()
+
+    def __init__(self, num_channels):
+        &#34;&#34;&#34;
+        Container class that will hold all of the specific channel data for MaccorSpoofer.
+
+        Parameters
+        ----------
+            num_channels : int
+                Number of channels in our hypothetical Maccor cycler.
+        &#34;&#34;&#34;
+        self.num_channels= num_channels
+
+        # Create channel_readings for all of the channels.
+        for i in range(0, self.num_channels):
+            channel_readings= {}
+            for key, item in Msg.ChannelInfo.Server.msg_specific_template.items():
+                channel_readings[key]= copy.deepcopy(item[&#39;value&#39;])
+            channel_readings[&#39;channel&#39;]= i
+            with self.__chan_readings_lock:
+                self.__chan_readings_list.append(
+                    copy.deepcopy(channel_readings))
+
+    def fetch_channel_readings(self, channel) -&gt; dict:
+        &#34;&#34;&#34;
+        Returns the status message for a specified channel.
+
+        Parameters
+        ----------
+        channel : int
+            The channel to return the status for.
+
+        Returns
+        -------
+        status : dict
+            The status message for the requested channel. Empty if channel larger than number of channel
+        &#34;&#34;&#34;
+        if channel &gt; self.num_channels:
+            return {}
+        else:
+            with self.__chan_readings_lock:
+                return copy.deepcopy(self.__chan_readings_list[channel])
+
+    def update_channel_readings(self, channel, updated_readings):
+        &#34;&#34;&#34;
+        Updates the stored channel readings for the specified channel.
+
+        Parameters
+        ----------
+        channel : int
+            The channel to update the readings for.
+        updated_status : dict
+            Complete or partial dictionary of status values to update.
+
+        Returns
+        -------
+        success : bool
+            Returns True if all values in the updated_status were used to update the channel_status_array.
+        &#34;&#34;&#34;
+        if channel &gt; self.num_channels:
+            return False
+        else:
+            for key in updated_readings.keys():
+                if key not in Msg.ChannelInfo.Server.msg_specific_template.keys():
+                    return False
+
+            with self.__chan_readings_lock:
+                for key in updated_readings.keys():
+                    self.__chan_readings_list[channel][key]= updated_readings[key]</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="pycti.arbinspoofer.arbin_spoofer.ChannelData.fetch_channel_readings"><code class="name flex">
+<span>def <span class="ident">fetch_channel_readings</span></span>(<span>self, channel) ‑> dict</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the status message for a specified channel.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>channel</code></strong> :&ensp;<code>int</code></dt>
+<dd>The channel to return the status for.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>status</code></strong> :&ensp;<code>dict</code></dt>
+<dd>The status message for the requested channel. Empty if channel larger than number of channel</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def fetch_channel_readings(self, channel) -&gt; dict:
+    &#34;&#34;&#34;
+    Returns the status message for a specified channel.
+
+    Parameters
+    ----------
+    channel : int
+        The channel to return the status for.
+
+    Returns
+    -------
+    status : dict
+        The status message for the requested channel. Empty if channel larger than number of channel
+    &#34;&#34;&#34;
+    if channel &gt; self.num_channels:
+        return {}
+    else:
+        with self.__chan_readings_lock:
+            return copy.deepcopy(self.__chan_readings_list[channel])</code></pre>
+</details>
+</dd>
+<dt id="pycti.arbinspoofer.arbin_spoofer.ChannelData.update_channel_readings"><code class="name flex">
+<span>def <span class="ident">update_channel_readings</span></span>(<span>self, channel, updated_readings)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Updates the stored channel readings for the specified channel.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>channel</code></strong> :&ensp;<code>int</code></dt>
+<dd>The channel to update the readings for.</dd>
+<dt><strong><code>updated_status</code></strong> :&ensp;<code>dict</code></dt>
+<dd>Complete or partial dictionary of status values to update.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>success</code></strong> :&ensp;<code>bool</code></dt>
+<dd>Returns True if all values in the updated_status were used to update the channel_status_array.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def update_channel_readings(self, channel, updated_readings):
+    &#34;&#34;&#34;
+    Updates the stored channel readings for the specified channel.
+
+    Parameters
+    ----------
+    channel : int
+        The channel to update the readings for.
+    updated_status : dict
+        Complete or partial dictionary of status values to update.
+
+    Returns
+    -------
+    success : bool
+        Returns True if all values in the updated_status were used to update the channel_status_array.
+    &#34;&#34;&#34;
+    if channel &gt; self.num_channels:
+        return False
+    else:
+        for key in updated_readings.keys():
+            if key not in Msg.ChannelInfo.Server.msg_specific_template.keys():
+                return False
+
+        with self.__chan_readings_lock:
+            for key in updated_readings.keys():
+                self.__chan_readings_list[channel][key]= updated_readings[key]</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="pycti.arbinspoofer.arbin_spoofer.SocketWorker"><code class="flex name class">
+<span>class <span class="ident">SocketWorker</span></span>
+<span>(</span><span>s: socket.socket, channel_data: <a title="pycti.arbinspoofer.arbin_spoofer.ChannelData" href="#pycti.arbinspoofer.arbin_spoofer.ChannelData">ChannelData</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Generic worker class that will respond to client socket requests.
+Default setup as an echo server. Child classes should overwrite the
+the <code>_process_client_msg()</code> method with their own responses.</p>
+<p>Creates the thread to service client requests.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>s</code></strong> :&ensp;<code>socket.socket</code></dt>
+<dd>Socket connection to client.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class SocketWorker:
+    &#34;&#34;&#34;
+    Generic worker class that will respond to client socket requests.
+    Default setup as an echo server. Child classes should overwrite the
+    the `_process_client_msg()` method with their own responses.
+    &#34;&#34;&#34;
+    __receive_msg_timeout_s = 0.5
+    __msg_buffer_size_bytes = 2**12
+    __stop_lock = threading.Lock()
+    __stop = False
+
+    def __init__(self, s: socket.socket, channel_data: ChannelData):
+        &#34;&#34;&#34;
+        Creates the thread to service client requests.
+
+        Parameters
+        ----------
+        s : socket.socket
+            Socket connection to client.
+        &#34;&#34;&#34;
+        self.__channel_data = channel_data
+
+        self.stop = False
+        self.__client_thread = threading.Thread(
+            target=self.__service_loop,
+            args=(s,),
+            daemon=True
+        )
+        self.__client_thread.start()
+
+    def __service_loop(self, s: socket.socket):
+        &#34;&#34;&#34;
+        Forever loop to service client requests. Wait to receive a message. If no messages is
+        received before the timeout then check to see if stop command has been issued. Loop is
+        also broken if client breaks connection by sending b&#39;&#39;.
+
+        Parameters
+        ----------
+        s : socket.socket
+            Socket connection to client.
+        &#34;&#34;&#34;
+        s.settimeout(self.__receive_msg_timeout_s)
+
+        rx_msg_length_format = MessageABC.base_template[&#39;msg_length&#39;][&#39;format&#39;]
+        rx_msg_length_start_byte = MessageABC.base_template[&#39;msg_length&#39;][&#39;start_byte&#39;]
+        rx_msg_length_end_byte = MessageABC.base_template[&#39;msg_length&#39;][&#39;start_byte&#39;] + struct.calcsize(rx_msg_length_format)
+
+        while True:
+            try:
+                rx_msg = s.recv(self.__msg_buffer_size_bytes)
+                if not rx_msg:
+                    break
+
+                # Keep reading message in pieces until rx_msg is as long as expected_rx_msg_len
+                expected_rx_msg_len = struct.unpack(
+                    rx_msg_length_format, rx_msg[rx_msg_length_start_byte:rx_msg_length_end_byte])[0]
+                while len(rx_msg) &lt; expected_rx_msg_len:
+                    rx_msg += s.recv(self.__msg_buffer_size_bytes)
+                
+                tx_msg = self.__process_client_msg(rx_msg)
+                
+                s.sendall(tx_msg)
+            except socket.timeout:
+                with self.__stop_lock:
+                    if self.__stop:
+                        break
+        s.close()
+
+    def __process_client_msg(self, rx_msg):
+        &#34;&#34;&#34;
+        Takes the incoming client message and generates a response.
+
+        Parameters
+        ----------
+        rx_msg : bytearray
+            The client message received.
+
+        Returns
+        -------
+        tx_msg : PyBytesObject
+            The client response.
+        &#34;&#34;&#34;
+
+        # Determine command code to sort message
+        cmd_code_format = MessageABC.base_template[&#39;command_code&#39;][&#39;format&#39;]
+        cmd_code_start_byte = MessageABC.base_template[&#39;command_code&#39;][&#39;start_byte&#39;]
+        cmd_code_end_byte = MessageABC.base_template[&#39;command_code&#39;][&#39;start_byte&#39;] + + struct.calcsize(cmd_code_format)
+        cmd_code = struct.unpack(cmd_code_format, rx_msg[cmd_code_start_byte:cmd_code_end_byte])[0]
+
+        if cmd_code == Msg.Login.Client.command_code:
+            rx_msg_dict = Msg.Login.Client.unpack(rx_msg)
+            tx_msg = Msg.Login.Server.pack()
+        elif cmd_code == Msg.ChannelInfo.Client.command_code:
+            rx_msg_dict = Msg.ChannelInfo.Client.unpack(rx_msg)
+            channel_values = self.__channel_data.fetch_channel_readings(rx_msg_dict[&#39;channel&#39;])
+            tx_msg = Msg.ChannelInfo.Server.pack(channel_values)
+        elif cmd_code == Msg.AssignSchedule.Client.command_code:
+            rx_msg_dict = Msg.AssignSchedule.Client.unpack(rx_msg)
+            tx_msg = Msg.AssignSchedule.Server.pack({&#39;channel&#39;:rx_msg_dict[&#39;channel&#39;]})
+        elif cmd_code == Msg.StartSchedule.Client.command_code:
+            rx_msg_dict = Msg.StartSchedule.Client.unpack(rx_msg)
+            tx_msg = Msg.StartSchedule.Server.pack({&#39;channel&#39;:rx_msg_dict[&#39;channel&#39;]})
+        elif cmd_code == Msg.StopSchedule.Client.command_code:
+            rx_msg_dict = Msg.StopSchedule.Client.unpack(rx_msg)
+            tx_msg = Msg.StopSchedule.Server.pack({&#39;channel&#39;:rx_msg_dict[&#39;channel&#39;]})
+        elif cmd_code == Msg.SetMetaVariable.Client.command_code:
+            rx_msg_dict = Msg.SetMetaVariable.Client.unpack(rx_msg)
+            tx_msg = Msg.SetMetaVariable.Server.pack({&#39;channel&#39;:rx_msg_dict[&#39;channel&#39;]})
+        else:
+            tx_msg = bytearray([])
+
+        return tx_msg
+
+    def is_alive(self):
+        &#34;&#34;&#34;
+        Method to call to see if the client service thread is still running.
+
+        Returns
+        -------
+        running : bool
+            True of False based on whether or not the client thread is running.
+        &#34;&#34;&#34;
+        return self.__client_thread.is_alive()
+
+    def kill_worker(self):
+        &#34;&#34;&#34;
+        Method to stop client service loop.
+        &#34;&#34;&#34;
+        if self.__client_thread.is_alive():
+            with self.__stop_lock:
+                self.__stop= True
+            self.__client_thread.join()</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="pycti.arbinspoofer.arbin_spoofer.SocketWorker.is_alive"><code class="name flex">
+<span>def <span class="ident">is_alive</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Method to call to see if the client service thread is still running.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>running</code></strong> :&ensp;<code>bool</code></dt>
+<dd>True of False based on whether or not the client thread is running.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def is_alive(self):
+    &#34;&#34;&#34;
+    Method to call to see if the client service thread is still running.
+
+    Returns
+    -------
+    running : bool
+        True of False based on whether or not the client thread is running.
+    &#34;&#34;&#34;
+    return self.__client_thread.is_alive()</code></pre>
+</details>
+</dd>
+<dt id="pycti.arbinspoofer.arbin_spoofer.SocketWorker.kill_worker"><code class="name flex">
+<span>def <span class="ident">kill_worker</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Method to stop client service loop.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def kill_worker(self):
+    &#34;&#34;&#34;
+    Method to stop client service loop.
+    &#34;&#34;&#34;
+    if self.__client_thread.is_alive():
+        with self.__stop_lock:
+            self.__stop= True
+        self.__client_thread.join()</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="pycti.arbinspoofer" href="index.html">pycti.arbinspoofer</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="pycti.arbinspoofer.arbin_spoofer.ArbinSpoofer" href="#pycti.arbinspoofer.arbin_spoofer.ArbinSpoofer">ArbinSpoofer</a></code></h4>
+<ul class="">
+<li><code><a title="pycti.arbinspoofer.arbin_spoofer.ArbinSpoofer.start" href="#pycti.arbinspoofer.arbin_spoofer.ArbinSpoofer.start">start</a></code></li>
+<li><code><a title="pycti.arbinspoofer.arbin_spoofer.ArbinSpoofer.stop" href="#pycti.arbinspoofer.arbin_spoofer.ArbinSpoofer.stop">stop</a></code></li>
+<li><code><a title="pycti.arbinspoofer.arbin_spoofer.ArbinSpoofer.update_channel_status" href="#pycti.arbinspoofer.arbin_spoofer.ArbinSpoofer.update_channel_status">update_channel_status</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="pycti.arbinspoofer.arbin_spoofer.ChannelData" href="#pycti.arbinspoofer.arbin_spoofer.ChannelData">ChannelData</a></code></h4>
+<ul class="">
+<li><code><a title="pycti.arbinspoofer.arbin_spoofer.ChannelData.fetch_channel_readings" href="#pycti.arbinspoofer.arbin_spoofer.ChannelData.fetch_channel_readings">fetch_channel_readings</a></code></li>
+<li><code><a title="pycti.arbinspoofer.arbin_spoofer.ChannelData.update_channel_readings" href="#pycti.arbinspoofer.arbin_spoofer.ChannelData.update_channel_readings">update_channel_readings</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="pycti.arbinspoofer.arbin_spoofer.SocketWorker" href="#pycti.arbinspoofer.arbin_spoofer.SocketWorker">SocketWorker</a></code></h4>
+<ul class="">
+<li><code><a title="pycti.arbinspoofer.arbin_spoofer.SocketWorker.is_alive" href="#pycti.arbinspoofer.arbin_spoofer.SocketWorker.is_alive">is_alive</a></code></li>
+<li><code><a title="pycti.arbinspoofer.arbin_spoofer.SocketWorker.kill_worker" href="#pycti.arbinspoofer.arbin_spoofer.SocketWorker.kill_worker">kill_worker</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+</footer>
+</body>
+</html>

@@ -121,7 +121,7 @@ def test_channel_info_server_msg():
     example_msg_name = 'server_channel_info_msg'
     (msg_bin, msg_dict) = message_file_loader(MSG_DIR, example_msg_name)
 
-    # Check that the parsed binary message mataches the msg_dict
+    # Check that the parsed binary message matches the msg_dict
     parsed_msg = Msg.ChannelInfo.Server.unpack(msg_bin)
     assert (parsed_msg == msg_dict)
 

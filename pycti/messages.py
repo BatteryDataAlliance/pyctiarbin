@@ -186,7 +186,7 @@ class Msg:
                 'result': {
                     'format': 'I',
                     'start_byte': 20,
-                    'value': 0
+                    'value': 1
                 },
                 'ip_address': {
                     'format': '4s',

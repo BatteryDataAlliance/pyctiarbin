@@ -1,6 +1,6 @@
 # pycti
 
-`pytcti` is a Python module that provides a channel level interface for communication and control of [Arbin cyclers](https://arbin.com/ via their Console TCP/IP Interface (CTI). `pycti` provides a hassle-free way to utilize CTI with a simple python class.
+`pytcti` is a Python module that provides a channel level interface for communication and control of [Arbin cyclers](https://arbin.com/ via the Console TCP/IP Interface (CTI). `pycti` provides a hassle-free way to utilize CTI with a simple Python class.
 
 ### Overview
 
@@ -56,20 +56,6 @@ To install from source clone [this repository](https://github.com/BattGenie/pyct
 pip install .
 ```
 
-# CTI Message Anatomy
-
-CTI messages have the following anatomy 
-
-- Header
-  - Token : len = 8 bytes : Always contains 0x11dddddddddddddd
-  - dwLen : len = 4 bytes : Length of combined command, command arguments, and checksum
-- Command code
-  - dwCmd : len = 4 bytes : The command code. Varies on command sent.
-  - dwCmd_Extend : len = 4 bytes : Always equals 0x00000000.
-- Command Arguments : len = variables : Depends on command type.
-Checksum
-  - Checksum : len = 2 bytes : Sum of bytes in  header + command arguments
-  
 # <a name="Examples"></a>Examples
 
 ## <a name="Getting Started"></a>Getting Started
@@ -82,9 +68,23 @@ Checksum
 - `password` - The password to login to the Arbin server.
 - `channel` - The channel to be targeted for all operations.
 - `test_name` - The test name to be used for any tests started. If left blank, Arbin will generate a unique random name for any started tests. Note that Arbin requires unique test names for each test.
+- `schedule` - The schedule to use for testing.
 - `test_schedule` - The test procedure to be used, if starting a test with a procedure. Not needed with direct control.
 - `arbin_ip` - The IP address of the Arbin server. Use 127.0.0.1 if running on the same machine as the server.
 - `arbin_port` - The port to TCP/IP port to communicate through.
+
+ARBIN_INTERFACE_CONFIG = {`
+    "username": "123",
+    "password": "123",
+    "test_name": "fake_test_name",
+    "schedule": "Rest+207855.sdx",
+    "channel": ARBIN_CHANNEL+1,
+    "arbin_ip": SPOOFER_CONFIG_DICT['ip'],
+    "arbin_port": SPOOFER_CONFIG_DICT['port'],
+    "timeout_s": 3,
+    "msg_buffer_size": 2**12
+}
+
 
 ## <a name="Readings"></a>Getting Channel Readings
 
@@ -106,6 +106,18 @@ To run the tests navigate to the "tests" directory and type the following:
 
 ```
 pytest .
+```
+
+To run tests and generate a coverage report:
+
+```
+coverage run -m pytest
+```
+
+To view the generated coverage report:
+
+```
+coverage report -m 
 ```
 
 ### <a name="ArbinSpoofer"></a>MaccorSpoofer

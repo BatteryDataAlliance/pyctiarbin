@@ -98,7 +98,6 @@ class SocketWorker:
         s : socket.socket
             Socket connection to client.
         """
-        print("created worker!!!")
         self.__channel_data = channel_data
 
         self.stop = False
@@ -168,10 +167,7 @@ class SocketWorker:
         cmd_code_end_byte = MessageABC.base_template['command_code']['start_byte'] + + struct.calcsize(cmd_code_format)
         cmd_code = struct.unpack(cmd_code_format, rx_msg[cmd_code_start_byte:cmd_code_end_byte])[0]
 
-        print("cmd code")
-        print(cmd_code)
         if cmd_code == Msg.Login.Client.command_code:
-            print("made it here")
             rx_msg_dict = Msg.Login.Client.unpack(rx_msg)
             tx_msg = Msg.Login.Server.pack()
         elif cmd_code == Msg.ChannelInfo.Client.command_code:
