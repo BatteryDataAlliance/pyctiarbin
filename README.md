@@ -72,19 +72,8 @@ pip install .
 - `test_schedule` - The test procedure to be used, if starting a test with a procedure. Not needed with direct control.
 - `arbin_ip` - The IP address of the Arbin server. Use 127.0.0.1 if running on the same machine as the server.
 - `arbin_port` - The port to TCP/IP port to communicate through.
-
-ARBIN_INTERFACE_CONFIG = {`
-    "username": "123",
-    "password": "123",
-    "test_name": "fake_test_name",
-    "schedule": "Rest+207855.sdx",
-    "channel": ARBIN_CHANNEL+1,
-    "arbin_ip": SPOOFER_CONFIG_DICT['ip'],
-    "arbin_port": SPOOFER_CONFIG_DICT['port'],
-    "timeout_s": 3,
-    "msg_buffer_size": 2**12
-}
-
+- `timeout_s` - How long to wait on Arbin messages before giving a timeout error.
+- `msg_buffer_size` - How large of a message buffer size to use.
 
 ## <a name="Readings"></a>Getting Channel Readings
 
@@ -96,7 +85,7 @@ This section contains various information to help developers further extend and 
 
 ## <a name="Contributing"></a>Contributing
 
-As it exists now, `pycti` only implements a fraction of the messages supported by CTI. Further work can be done to expand `pycti` to include more of the messages detailed in the CTI documentation `docs/ArbinCTI_Protocol v1.1.pdf`.
+As it exists now `pycti` only implements a fraction of the messages supported by CTI. Further work can be done to expand `pycti` to include more of the messages detailed in the CTI documentation `docs/ArbinCTI_Protocol v1.1.pdf`.
 
 We welcome your help in expanding `pycti`! Please see the [CONTRIBUTING.md](https://github.com/BattGenie/pycti/blob/main/CONTRIBUTING.md) file in this repository for contribution guidelines. 
 
