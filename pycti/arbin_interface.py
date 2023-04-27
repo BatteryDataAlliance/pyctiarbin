@@ -12,11 +12,6 @@ class ArbinInterface:
     Class for controlling Maccor Cycler using MacNet.
     """
 
-    login_feedback = {}
-    assign_schedule_feedback = {}
-    start_test_feedback = {}
-    stop_test_feedback = {}
-
     def __init__(self, config: dict):
         """
         A class for interfacing with the Arbin cycler.
@@ -26,6 +21,10 @@ class ArbinInterface:
         config : dict
             A configuration dictionary.
         """
+        self.login_feedback = {}
+        self.assign_schedule_feedback = {}
+        self.start_test_feedback = {}
+        self.stop_test_feedback = {}
 
         # Channels are zero indexed within CTI so we must subtract one here.
         self.channel = config['channel'] - 1
