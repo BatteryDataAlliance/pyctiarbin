@@ -173,7 +173,7 @@ class SocketWorker:
 
         if cmd_code == Msg.Login.Client.command_code:
             rx_msg_dict = Msg.Login.Client.unpack(rx_msg)
-            tx_msg = Msg.Login.Server.pack()
+            tx_msg = Msg.Login.Server.pack({'num_channels':self.__channel_data.num_channels})
         elif cmd_code == Msg.ChannelInfo.Client.command_code:
             rx_msg_dict = Msg.ChannelInfo.Client.unpack(rx_msg)
             channel_values = self.__channel_data.fetch_channel_readings(

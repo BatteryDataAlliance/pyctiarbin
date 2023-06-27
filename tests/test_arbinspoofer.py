@@ -16,14 +16,17 @@ def test_messages():
     """
     Test that the spoofer replies correctly to all messages.
     """
+    print("Made it here!")
     arbin_spoofer = ArbinSpoofer(CONFIG_DICT)
     arbin_spoofer.start()
+
+    
 
     client = TcpClient(CONFIG_DICT)
 
     # Send all messages and make sure we get the correct responses.
     messages = [(Msg.Login.Client.pack(),
-                    Msg.Login.Server.pack()),
+                    Msg.Login.Server.pack({'num_channels':CONFIG_DICT['num_channels']})),
                 (Msg.ChannelInfo.Client.pack(),
                     Msg.ChannelInfo.Server.pack()),
                 (Msg.AssignSchedule.Client.pack(),
