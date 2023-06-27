@@ -53,7 +53,8 @@ class ChannelInterface(CyclerInterface):
         status : dict
             A dictionary detailing the status of the channel. Returns None if there is an issue.
         """
-        return self.read_channel_status(channel=self.__config.channel)
+        # Add to channel value to account for zero indexing subtraction in parent method.
+        return self.read_channel_status(channel=(self.__config.channel+1))
 
     def assign_schedule(self) -> bool:
         """

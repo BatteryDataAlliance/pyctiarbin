@@ -74,8 +74,9 @@ class CyclerInterface:
             logger.error(f'Invalid channel value {channel}!')
             return channel_info_msg_rx_dict
 
+        # Subtract one from the passed channel value to account for zero indexing
         channel_info_msg_tx = Msg.ChannelInfo.Client.pack(
-            {'channel': channel})
+            {'channel': (channel-1)})
         response_msg_bin = self._send_receive_msg(
             channel_info_msg_tx)
 
@@ -205,8 +206,7 @@ class CyclerInterface:
                 logger.info(
                     "Successfully logged in to cycler " + str(login_msg_rx_dict['cycler_sn']))
                 logger.info(login_msg_rx_dict)
-            # Typo is on purpose
-            elif login_msg_rx_dict['result'] == "aleady logged in":
+            elif login_msg_rx_dict['result'] == "already logged in":
                 success = True
                 logger.warning(
                     "Already logged in to cycler " + str(login_msg_rx_dict['cycler_sn']))
