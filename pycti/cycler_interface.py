@@ -1,6 +1,8 @@
 import socket
 import logging
 import struct
+import dotenv
+import os
 from .messages import Msg
 from .messages import MessageABC
 
@@ -12,7 +14,7 @@ class CyclerInterface:
     Class for interfacing with Arbin battery cycler at a cycler-level.
     """
 
-    def __init__(self, config: dict):
+    def __init__(self, config: dict, env_path: str = os.path.join(os.getcwd(), '.env')):
         """
         A class for interfacing with the Arbin cycler.
 
@@ -23,7 +25,7 @@ class CyclerInterface:
             - `ip_address` - The IP address of the Maccor server. Use 127.0.0.1 if running on the same machine as the server.
             - `port` - The port to communicate through with JSON messages. Default set to 57570.
             - `timeout_s` - *optional* - How long to wait before timing out on TCP communication. Defaults to 2 seconds. 
-            - `msg_buffer_size_bytes` - *optional* How big of a message buffer to use for sending/receiving messages. 
+            - `msg_buffer_size_bytes` - *optional* - How big of a message buffer to use for sending/receiving messages. 
                A minimum of 1024 bytes is recommended. Defaults to 4096 bytes. 
         """
         
@@ -38,7 +40,7 @@ class CyclerInterface:
         self.__config = config
 
         assert(self.__create_connection( ip=config['ip_address'], port=config['port']))
-        assert(self.__login())
+        assert(self.__login(env_path))
 
     def get_login_feedback(self):
         """
@@ -161,9 +163,9 @@ class CyclerInterface:
 
         return success
 
-    def __login(self) -> bool:
+    def __login(self, env_path: str) -> bool:
         """
-        Logs into the Arbin server with the username/password defined in the config. 
+        Logs into the Arbin server with the username/password given in the env file defined in the path. 
         Must be done before issuing other commands.
 
         Returns
@@ -173,8 +175,17 @@ class CyclerInterface:
         """
         success = False
 
+        logger.info(f'Loading environment variables from {env_path}')
+        dotenv.load_dotenv(env_path, override=True)
+
+        # Validate username and password are in the .env file.
+        if not os.getenv('ARBIN_CTI_USERNAME'):
+            raise ValueError('ARBIN_CTI_USERNAME not set in environment variables.')
+        if not os.getenv('ARBIN_CTI_PASSWORD'):
+            raise ValueError('ARBIN_CTI_PASSWORD not set in environment variables.')
+
         login_msg_tx = Msg.Login.Client.pack(
-            msg_values={'username': self.__config['username'], 'password': self.__config['password']})
+            msg_values={'username': os.getenv('ARBIN_CTI_USERNAME'), 'password': os.getenv('ARBIN_CTI_PASSWORD')})
 
         response_msg_bin = self._send_receive_msg(login_msg_tx)
 

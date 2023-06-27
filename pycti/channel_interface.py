@@ -1,8 +1,6 @@
-import socket
 import logging
-import struct
+import os
 from .messages import Msg
-from .messages import MessageABC
 
 from .cycler_interface import CyclerInterface
 
@@ -14,7 +12,7 @@ class ChannelInterface(CyclerInterface):
     Class for controlling Maccor Cycler using MacNet.
     """
 
-    def __init__(self, config: dict):
+    def __init__(self, config: dict, env_path: str = os.path.join(os.getcwd(), '.env')):
         """
         A class for interfacing with the Arbin cycler.
 
@@ -32,7 +30,7 @@ class ChannelInterface(CyclerInterface):
         self.__start_test_feedback = {}
         self.__stop_test_feedback = {}
 
-        super().__init__(self.__config)
+        super().__init__(self.__config, env_path)
 
     def read_status(self) -> dict:
         """
