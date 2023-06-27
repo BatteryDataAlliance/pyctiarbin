@@ -34,7 +34,7 @@ class ChannelInterface(CyclerInterface):
                     The TCP port to communicate through.
                 timeout_s : *optional* : float 
                     How long to wait before timing out on TCP communication. Defaults to 3 seconds. 
-                msg_buffer_size : *optional* : float 
+                msg_buffer_size : *optional* : int 
                     How big of a message buffer to use for sending/receiving messages. 
                     A minimum of 1024 bytes is recommended. Defaults to 4096 bytes. 
         env_path : *optional* : str
@@ -215,7 +215,7 @@ class ChannelInterfaceConfig(BaseModel):
             The TCP port to communicate through.
         timeout_s : float 
             How long to wait before timing out on TCP communication. Defaults to 3 seconds. 
-        msg_buffer_size : float 
+        msg_buffer_size : int 
              How big of a message buffer to use for sending/receiving messages. 
             A minimum of 1024 bytes is recommended. Defaults to 4096 bytes. 
     '''

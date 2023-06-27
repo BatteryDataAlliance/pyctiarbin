@@ -1,34 +1,35 @@
 # pycti
 
-`pytcti` is a Python module that provides a channel level interface for communication and control of [Arbin cyclers](https://arbin.com/) via their Console TCP/IP Interface (CTI). `pycti` provides a hassle-free way to utilize CTI with a simple Python class.
+`pytcti` is a Python module that provides cycler and channel level interface for communication and control of [Arbin cyclers](https://arbin.com/) via their Console TCP/IP Interface (CTI).
 
-### Overview
+## Overview
 
-- [Motivation](#Motivation)
-- [Installation](#Installation)
-    - [Requirements](#Requirements)
-    - [Source Installation](#source-installation)
-- [CTI Message Anatomy]
-- [Examples](#Examples)
+- [Motivation](#motivation)
+- [Installation](#installation)
+  - [Source Installation](#source-installation)
+- [Examples](#examples)
   - [Getting Started](#getting-started)
-    - [Configuration](#Configuration)
-  - [Getting Channel Readings](#getting-channel-readings) 
+    - [Configuration](#configuration)
+      -[CyclerInterface Configuration](#cyclerinterface-configuration)
+      -[ChannelInterface Configuration](#channelinterface-configuration)
+    - [Env](#env)
+  - [Getting Channel Readings](#getting-channel-readings)
   - [Starting a Test](#starting-a-test)
   - [Setting Variables](#setting-variables)
-- [Development](#Dev)
-  - [Contributing](#Contributing)
-  - [Testing](#Testing)
-    - [MaccorSpoofer](#MaccorSpoofer)
-  - [Documentation](#Documentation)
-- [License](#License)
+- [Development](#dev)
+  - [Contributing](#contributing)
+  - [Testing](#testing)
+    - [ArbinSpoofer](#aaccorppoofer)
+  - [Documentation](#documentation)
+- [License](#license)
 
-# <a name="Motivation"></a>Motivation
+## Motivation
 
 Why did we create `pycti`? This package enables a wide variety of applications such as:
 
 - Real-time data logging, monitoring and alerting
 
-`pycti` can be used to passively monitor running tests and log readings directly to a database, bypassing the need to manually export data. Moreover, it's possible to create automated alerts based on incoming real-time data. For example, if a test were to fault or temperature were to exceed a set threshold. While Arbin already has a built-in notification system with MacNotify, `pycti` provides a more flexible and customizable solution without having to directly modify test procedures. 
+`pycti` can be used to passively monitor running tests and log readings directly to a database, bypassing the need to manually export data. Moreover, it's possible to create automated alerts based on incoming real-time data. For example, if a test were to fault or temperature were to exceed a set threshold. While Arbin already has a built-in notification system with MacNotify, `pycti` provides a more flexible and customizable solution without having to directly modify test procedures.
 
 - Automated test management
 
@@ -38,94 +39,160 @@ The GUI provided by Arbin for test management is straight-forward and easy to us
 
 While conventional constant-current followed by constant-voltage (CCCV) charging has been the industry standard for many years and is well supported by cyclers, there is movement towards advanced [closed-loop control charging techniques that provide improved battery life and decreased charge times](https://battgenie.life/technology/). `pycti` enables testing of closed-loop battery charging methods by providing an interface between software hosting battery charging algorithms and active Arbin tests, allowing the charge current to be dynamically set.
 
-- Well tested, easy to use, community supported interface in the most popular programming language. 
+- Well tested, easy to use, community supported interface in the most popular programming language.
 
-It is entirely possible to write one's own CTI wrapper, but `pycti` provides a well-tested ready to use package that takes care of lower level communication, providing a simple yet powerful interface in the most popular programming language. 
+It is entirely possible to write one's own CTI wrapper, but `pycti` provides a well-tested ready to use package that takes care of lower level communication, providing a simple yet powerful interface in the most popular programming language.
 
-# <a name="Installation"></a>Installation
+## Installation
 
-## <a name="Requirements"></a>Requirements
+### Source Installation
 
-`pycti` requires only Python 3 and packages from the standard library. It has been tested on on Windows, Mac, and Debian operating systems.
+To install from source, type the following into the command line:
 
-## <a name="Source Installation"></a>Source Installation
-
-To install from source clone [this repository](https://github.com/BattGenie/pycti), navigate into the directory, and type the following into the command line:
-
-```
+```bash
+git clone https://github.com/BattGenie/pycti.git
+cd pycti
+pip install -r requirements.txt
 pip install .
 ```
 
-# <a name="Examples"></a>Examples
+## Examples
 
-## <a name="Getting Started"></a>Getting Started
+## Getting Started
 
-`pycti` provides a class `ArbinInterface` that communicates with the Arbin cycler via CTI. Each class instance targets a specific channel of the cycler and requires a configuration dictionary with the following fields:
+`pycti` provides two distinct classes for interacting with Arbin cyclers:
 
-### <a name="Configuration"></a>Configuration
+- `CyclerInterface` : A cycler-level interface for reading channel status of any channel on the cycler. This class is capable of read only operations on the cycler.
 
-- `username` - The username to login to the Arbin server.
-- `password` - The password to login to the Arbin server.
-- `channel` - The channel to be targeted for all operations.
-- `test_name` - The test name to be used for any tests started. If left blank, Arbin will generate a unique random name for any started tests. Note that Arbin requires unique test names for each test.
-- `schedule` - The schedule to use for testing.
-- `test_schedule` - The test procedure to be used, if starting a test with a procedure. Not needed with direct control.
-- `ip_address` - The IP address of the Arbin server. Use 127.0.0.1 if running on the same machine as the server.
-- `port` - The port to TCP/IP port to communicate through.
-- `timeout_s` - How long to wait on Arbin messages before giving a timeout error.
-- `msg_buffer_size` - How large of a message buffer size to use.
+- `ChannelInterface` : A channel-level interface for reading status of a specific channel, starting/stopping tests on that channel, and assigning meta variables during active tests on the channel. This class is capable of read and write operations on a single channel. `ChannelInterface` is a child class of `CyclerInterface` and shares the same base methods.
 
-## <a name="Readings"></a>Getting Channel Readings
+### Configuration
 
-## <a name="Test"></a>Starting a Test
+Both `CyclerInterface` and `ChannelInterface` require configuration dictionaries upon initialization. The fields of these configuration dictionaries are detailed in the following sections.
 
-# <a name="Dev"></a>Development
+#### CyclerInterface Configuration
+
+An example `CyclerInterface` configuration dictionary is shown below:
+
+```python
+CYCLER_INTERFACE_CONFIG = {
+    "ip_address": 127.0.0.1,
+    "port": 1234,
+    "timeout_s": 3,
+    "msg_buffer_size": 4096
+}
+```
+
+Where the fields are as follows:
+
+- `ip_address` : str
+    The IP address of the Maccor server. Use 127.0.0.1 if running on the same machine as the server.
+- `port` : int
+    The TCP port to communicate through.
+- `timeout_s` : *optional* : float
+    How long to wait before timing out on TCP communication. Defaults to 3 seconds.
+- `msg_buffer_size` : *optional* : int
+    How big of a message buffer to use for sending/receiving messages.
+    A minimum of 1024 bytes is recommended. Defaults to 4096 bytes.
+
+#### ChannelInterface Configuration
+
+An example `ChannelInterface` configuration dictionary is shown below:
+
+```python
+CHANNEL_INTERFACE_CONFIG = {
+  "channel": 1,
+  "test_name": "fake_test_name",
+  "schedule_name": "Rest+207855.sdx",
+  "ip_address": 127.0.0.1,
+  "port": 1234,
+  "timeout_s": 3,
+  "msg_buffer_size": 4096
+}
+```
+
+Where the fields are as follows:
+
+- `channel` : int
+    The channel to target with the ChannelInterface class instance.
+- `test_name` : *optional* : str
+    The test name to use if using the ChannelInterface to start a test.
+- `schedule_name` : *optional* : str
+    The name of the schedule file to use if using the ChannelInterface to start a test.
+- `ip_address` : str
+    The IP address of the Maccor server. Use 127.0.0.1 if running on the same machine as the server.
+- `port` : int
+    The TCP port to communicate through.
+- `timeout_s` : *optional* : float
+    How long to wait before timing out on TCP communication. Defaults to 3 seconds.
+- `msg_buffer_size` : *optional* : int
+    How big of a message buffer to use for sending/receiving messages.
+    A minimum of 1024 bytes is recommended. Defaults to 4096 bytes.
+
+### Env
+
+In addition to a configuration dictionary, both interfaces require a `.env` file containing the Arbin CTI username and password to use for communication. The `.env` file path can be passed as a constructor argument. If it is not specified, the the program looks in the working directly for a `.env` file.
+
+The file must contain the following fields:
+
+```bash
+ARBIN_CTI_USERNAME='your_username'
+ARBIN_CTI_PASSWORD='your_password'
+```
+
+Where `your_username` and `your_password` should be replaced with your username and password.
+
+### Getting Channel Readings
+
+### Starting a Test
+
+## Development
 
 This section contains various information to help developers further extend and test `pycti`
 
-## <a name="Contributing"></a>Contributing
+## Contributing
 
 As it exists now `pycti` only implements a fraction of the messages supported by CTI. Further work can be done to expand `pycti` to include more of the messages detailed in the CTI documentation `docs/ArbinCTI_Protocol v1.1.pdf`.
 
-We welcome your help in expanding `pycti`! Please see the [CONTRIBUTING.md](https://github.com/BattGenie/pycti/blob/main/CONTRIBUTING.md) file in this repository for contribution guidelines. 
+We welcome your help in expanding `pycti`! Please see the [CONTRIBUTING.md](https://github.com/BattGenie/pycti/blob/main/CONTRIBUTING.md) file in this repository for contribution guidelines.
 
-## <a name="Testing"></a>Testing
+## Testing
 
 To run the tests navigate to the "tests" directory and type the following:
 
-```
+```bash
 pytest .
 ```
 
 To run tests and generate a coverage report:
 
-```
+```bash
 coverage run -m pytest
 ```
 
 To view the generated coverage report:
 
-```
+```bash
 coverage report -m 
 ```
 
-### <a name="ArbinSpoofer"></a>MaccorSpoofer
+### Arbin Spoofer
 
-Testing software on a real cycler is dangerous so we've created a submodule `arbinspoofer` to emulate some of the behavior of the Arbin software with a class `ArbinSpoofer`. This class creates a local TCP server and that accepts connections from n number of clients. The `ArbinSpoofer` does not perfectly emulate a Arbin cycler (for example, it does not track if a test is already running on a channel) and merely checks that the message format is correct and responds with standard messages. 
+Testing software on a real cycler is dangerous so we've created a submodule `arbinspoofer` to emulate some of the behavior of the Arbin software with a class `ArbinSpoofer`. This class creates a local TCP server and that accepts connections from n number of clients. The `ArbinSpoofer` does not perfectly emulate a Arbin cycler (for example, it does not track if a test is already running on a channel) and merely checks that the message format is correct and responds with standard messages.
 
-## <a name="Documentation"></a>Documentation
+## Documentation
 
 All documentation was generated with [pydoc](https://docs.python.org/3/library/pydoc.html). To re-generate the documentation type the following command from the top level directory of the repository:
 
-```
+```bash
 pdoc --html .
 ```
 
-# <a name="License"></a>License
+## License
 
 MIT License
 
-Copyright (c) 2023 BattGenie Inc. 
+Copyright (c) 2023 BattGenie Inc.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
