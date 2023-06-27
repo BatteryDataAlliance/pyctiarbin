@@ -10,8 +10,6 @@ SPOOFER_CONFIG_DICT = {"ip": "127.0.0.1",
                        "num_channels": 16}
 
 CHANNEL_INTERFACE_CONFIG = {
-    "username": "123",
-    "password": "123",
     "test_name": "fake_test_name",
     "schedule_name": "Rest+207855.sdx",
     "channel": ARBIN_CHANNEL+1,
@@ -25,7 +23,7 @@ ARBIN_SPOOFER = ArbinSpoofer(SPOOFER_CONFIG_DICT)
 ARBIN_SPOOFER.start()
 
 
-@pytest.mark.channelinterface
+@pytest.mark.channel_interface
 def test_read_status():
     """
     Test that sending the channel info message works correctly.
@@ -38,7 +36,7 @@ def test_read_status():
     assert(channel_status == channel_status_key)
 
 
-@pytest.mark.channelinterface
+@pytest.mark.channel_interface
 def test_assign_schedule():
     """
     Test that sending the assign schedule message works correctly.
@@ -47,7 +45,7 @@ def test_assign_schedule():
     assert(arbin_interface.assign_schedule())
 
 
-@pytest.mark.channelinterface
+@pytest.mark.channel_interface
 def test_start_test():
     """
     Test that sending the start test message works correctly.
@@ -56,7 +54,7 @@ def test_start_test():
     assert(arbin_interface.start_test())
 
 
-@pytest.mark.channelinterface
+@pytest.mark.channel_interface
 def test_stop_test():
     """
     Test that sending the stop test message works correctly.
@@ -65,7 +63,7 @@ def test_stop_test():
     assert(arbin_interface.stop_test())
 
 
-@pytest.mark.channelinterface
+@pytest.mark.channel_interface
 def test_set_meta_variable():
     """
     Test that assigning schedule  works correctly.

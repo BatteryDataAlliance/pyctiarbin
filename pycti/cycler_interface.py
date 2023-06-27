@@ -12,12 +12,12 @@ logger = logging.getLogger(__name__)
 
 class CyclerInterface:
     """
-    Class for interfacing with Arbin battery cycler at a cycler-level.
+    Class for interfacing with Arbin battery cycler at a cycler level.
     """
 
     def __init__(self, config: dict, env_path: str = os.path.join(os.getcwd(), '.env')):
         """
-        A class for interfacing with the Arbin cycler.
+        Creates a class instance for interfacing with Arbin battery cycler at a cycler level.
 
         Parameters
         ----------
@@ -26,9 +26,9 @@ class CyclerInterface:
                 ip_address : str 
                     The IP address of the Maccor server. Use 127.0.0.1 if running on the same machine as the server.
                 port : int 
-                    The port to communicate through with JSON messages. Default set to 57570.
+                    The TCP port to communicate through.
                 timeout_s : *optional* : float 
-                    How long to wait before timing out on TCP communication. Defaults to 2 seconds. 
+                    How long to wait before timing out on TCP communication. Defaults to 3 seconds. 
                 msg_buffer_size : *optional* : float 
                     How big of a message buffer to use for sending/receiving messages. 
                     A minimum of 1024 bytes is recommended. Defaults to 4096 bytes. 
@@ -36,11 +36,17 @@ class CyclerInterface:
             The path to the `.env` file containing the Arbin CTI username,`ARBIN_CTI_USERNAME`, and password, `ARBIN_CTI_PASSWORD`.
             Defaults to looking in the working directory.
         """
-        
         self.__config = CyclerInterfaceConfig(**config)
         assert(self.__create_connection( 
             ip=self.__config.ip_address, port=self.__config.port, timeout_s=self.__config.timeout_s))
         assert(self.__login(env_path))
+        self.__num_channels = self.get_login_feedback()['num_channels']
+
+    def get_num_channels(self):
+        '''
+        Returns the number of channels on the cycler
+        '''
+        return self.__num_channels
 
     def get_login_feedback(self):
         """
@@ -63,6 +69,10 @@ class CyclerInterface:
             A dictionary detailing the status of the channel. Returns None if there is an issue.
         """
         channel_info_msg_rx_dict = {}
+
+        if (channel > self.__num_channels) or (channel < 0):
+            logger.error(f'Invalid channel value {channel}!')
+            return channel_info_msg_rx_dict
 
         channel_info_msg_tx = Msg.ChannelInfo.Client.pack(
             {'channel': channel})
@@ -220,14 +230,14 @@ class CyclerInterfaceConfig(BaseModel):
         ip_address : str 
             The IP address of the Maccor server. Use 127.0.0.1 if running on the same machine as the server.
         port : int 
-            The port to communicate through with JSON messages. Default set to 57570.
+            The TCP port to communicate through.
         timeout_s : float 
-            How long to wait before timing out on TCP communication. Defaults to 2 seconds. 
+            How long to wait before timing out on TCP communication. Defaults to 3 seconds. 
         msg_buffer_size : float 
              How big of a message buffer to use for sending/receiving messages. 
             A minimum of 1024 bytes is recommended. Defaults to 4096 bytes. 
     '''
     ip_address: str
     port: int
-    timeout_s: float = 2.0
+    timeout_s: float = 3.0
     msg_buffer_size: int = 4096

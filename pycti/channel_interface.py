@@ -1,6 +1,7 @@
 import logging
 import os
-from pydantic import BaseModel, validator
+from pydantic import BaseModel
+from pydantic import validator
 from .messages import Msg
 
 from .cycler_interface import CyclerInterface
@@ -10,12 +11,12 @@ logger = logging.getLogger(__name__)
 
 class ChannelInterface(CyclerInterface):
     """
-    Class for controlling Maccor Cycler using MacNet.
+    Class for interfacing with Arbin battery cycler at a channel level.
     """
 
     def __init__(self, config: dict, env_path: str = os.path.join(os.getcwd(), '.env')):
         """
-        A class for interfacing with the Arbin cycler.
+        Creates a class instance for interfacing with Arbin battery cycler at a channel level.
 
         Parameters
         ----------
@@ -30,9 +31,9 @@ class ChannelInterface(CyclerInterface):
                 ip_address : str 
                     The IP address of the Maccor server. Use 127.0.0.1 if running on the same machine as the server.
                 port : int 
-                    The port to communicate through with JSON messages. Default set to 57570.
+                    The TCP port to communicate through.
                 timeout_s : *optional* : float 
-                    How long to wait before timing out on TCP communication. Defaults to 2 seconds. 
+                    How long to wait before timing out on TCP communication. Defaults to 3 seconds. 
                 msg_buffer_size : *optional* : float 
                     How big of a message buffer to use for sending/receiving messages. 
                     A minimum of 1024 bytes is recommended. Defaults to 4096 bytes. 
@@ -210,9 +211,9 @@ class ChannelInterfaceConfig(BaseModel):
         ip_address : str 
             The IP address of the Maccor server. Use 127.0.0.1 if running on the same machine as the server.
         port : int 
-            The port to communicate through with JSON messages. Default set to 57570.
+            The TCP port to communicate through.
         timeout_s : float 
-            How long to wait before timing out on TCP communication. Defaults to 2 seconds. 
+            How long to wait before timing out on TCP communication. Defaults to 3 seconds. 
         msg_buffer_size : float 
              How big of a message buffer to use for sending/receiving messages. 
             A minimum of 1024 bytes is recommended. Defaults to 4096 bytes. 
@@ -222,7 +223,7 @@ class ChannelInterfaceConfig(BaseModel):
     schedule_name: str = None
     ip_address: str
     port: int
-    timeout_s: float = 2.0
+    timeout_s: float = 3.0
     msg_buffer_size: int = 4096
 
     @validator('channel')
