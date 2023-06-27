@@ -24,12 +24,12 @@ ARBIN_SPOOFER.start()
 
 
 @pytest.mark.channel_interface
-def test_read_status():
+def test_read_channel_status():
     """
     Test that sending the channel info message works correctly.
     """
     arbin_interface = ChannelInterface(CHANNEL_INTERFACE_CONFIG)
-    channel_status = arbin_interface.read_status()
+    channel_status = arbin_interface.read_channel_status()
 
     channel_status_bin_key = Msg.ChannelInfo.Server.pack({'channel': 1})
     channel_status_key = Msg.ChannelInfo.Server.unpack(channel_status_bin_key)

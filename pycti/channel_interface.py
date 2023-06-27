@@ -44,7 +44,7 @@ class ChannelInterface(CyclerInterface):
         self.__config = ChannelInterfaceConfig(**config)
         super().__init__(self.__config.dict(), env_path)
 
-    def read_status(self) -> dict:
+    def read_channel_status(self) -> dict:
         """
         Method to read the status of the channel defined in the config.
 
@@ -54,7 +54,7 @@ class ChannelInterface(CyclerInterface):
             A dictionary detailing the status of the channel. Returns None if there is an issue.
         """
         # Add to channel value to account for zero indexing subtraction in parent method.
-        return self.read_channel_status(channel=(self.__config.channel+1))
+        return super().read_channel_status(channel=(self.__config.channel+1))
 
     def assign_schedule(self) -> bool:
         """

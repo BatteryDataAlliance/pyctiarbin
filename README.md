@@ -88,7 +88,7 @@ Where the fields are as follows:
 - `ip_address` : str
     The IP address of the Maccor server. Use 127.0.0.1 if running on the same machine as the server.
 - `port` : int
-    The TCP port to communicate through.
+    The TCP port to communicate through. This is generally going to be 7031
 - `timeout_s` : *optional* : float
     How long to wait before timing out on TCP communication. Defaults to 3 seconds.
 - `msg_buffer_size` : *optional* : int
@@ -122,7 +122,7 @@ Where the fields are as follows:
 - `ip_address` : str
     The IP address of the Maccor server. Use 127.0.0.1 if running on the same machine as the server.
 - `port` : int
-    The TCP port to communicate through.
+    The TCP port to communicate through. This is generally going to be 7031
 - `timeout_s` : *optional* : float
     How long to wait before timing out on TCP communication. Defaults to 3 seconds.
 - `msg_buffer_size` : *optional* : int
@@ -143,6 +143,24 @@ ARBIN_CTI_PASSWORD='your_password'
 Where `your_username` and `your_password` should be replaced with your username and password.
 
 ### Getting Channel Readings
+
+To get channel readings with a `CyclerInterface` you must specify which channel you want to read from:
+
+```python
+from pycti import CyclerInterface
+
+CYCLER_INTERFACE_CONFIG = {
+    "ip_address": 127.0.0.1,
+    "port": 1234,
+    "timeout_s": 3,
+    "msg_buffer_size": 4096
+}
+
+cycler_interface = CyclerInterface(CYCLER_INTERFACE_CONFIG)
+cycler_interface.read_channel_status(channel=1)
+```
+
+For a `ChannelInterface` there is no need to specify the channel since we define it in the config:
 
 ### Starting a Test
 
