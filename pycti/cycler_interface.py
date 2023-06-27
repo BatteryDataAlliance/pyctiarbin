@@ -19,21 +19,25 @@ class CyclerInterface:
         Parameters
         ----------
         config : dict
-            A configuration dictionary. Must contain the following keys:
+            A configuration dictionary. Must contain the following keys:s
             - `ip_address` - The IP address of the Maccor server. Use 127.0.0.1 if running on the same machine as the server.
             - `port` - The port to communicate through with JSON messages. Default set to 57570.
-            - `msg_buffer_size_bytes` - How big of a message buffer to use for sending/receiving messages. A minimum of 1024 bytes is recommended.
+            - `timeout_s` - *optional* - How long to wait before timing out on TCP communication. Defaults to 2 seconds. 
+            - `msg_buffer_size_bytes` - *optional* How big of a message buffer to use for sending/receiving messages. 
+               A minimum of 1024 bytes is recommended. Defaults to 4096 bytes. 
         """
-
-        # Copy the verify the config
-        self.__config = config
-        assert(self.__verify_config())
-
-
-        self.__tcp_timeout_s = 2
-
         
-        assert(self.__create_connection())
+        self.__msg_buffer_size = config.get('msg_buffer_size_bytes')
+        if not self.__msg_buffer_size:
+            self.__msg_buffer_size  = 4096
+
+        self.__timeout_s = config.get('timeout_s')
+        if not self.__timeout_s:
+            self.__timeout_s  = 2
+
+        self.__config = config
+
+        assert(self.__create_connection( ip=config['ip_address'], port=config['port']))
         assert(self.__login())
 
     def get_login_feedback(self):
@@ -106,8 +110,7 @@ class CyclerInterface:
             if send_msg_success:
                 try:
                     # Receive first part of message and determine length of entire message.
-                    rx_msg += self.__sock.recv(
-                        self.__config['msg_buffer_size'])
+                    rx_msg += self.__sock.recv(self.__msg_buffer_size)
                     expected_rx_msg_len = struct.unpack(
                         msg_length_format,
                         rx_msg[msg_length_start_byte_idx:msg_length_end_byte_idx])[0]
@@ -128,35 +131,16 @@ class CyclerInterface:
 
         return rx_msg
 
-    def __verify_config(self) -> bool:
-        """
-        Verifies that the config passed on construction is valid.
-
-        Returns
-        --------------------------
-        success : bool
-            True/False based on whether the config passed at construction is valid.
-        """
-        required_config_keys = ['username',
-                                'password',
-                                'test_name',
-                                'schedule',
-                                'channel',
-                                'ip_address',
-                                'port',
-                                'timeout_s',
-                                'msg_buffer_size']
-
-        for key in required_config_keys:
-            if key not in self.__config:
-                logger.error("Missing key from config! Missing : " + key)
-                return False
-        logger.info("Config check passed")
-        return True
-
-    def __create_connection(self) -> bool:
+    def __create_connection(self, ip: str, port: int) -> bool:
         """
         Creates a TCP/IP connection with Arbin server.
+
+        Parameters
+        ----------
+        ip : str
+            The IP address of the Arbin cycler computer.
+        port : int
+            the port to connect to.
 
         Returns
        ----------
@@ -166,13 +150,9 @@ class CyclerInterface:
         success = False
 
         try:
-            self.__sock = socket.socket(
-                socket.AF_INET, socket.SOCK_STREAM
-            )
-            self.__sock.settimeout(self.__tcp_timeout_s)
-            self.__sock.connect(
-                (self.__config['ip_address'], self.__config['port'])
-            )
+            self.__sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.__sock.settimeout(self.__timeout_s)
+            self.__sock.connect((ip, port))
             logger.info("Connected to Arbin server!")
             success = True
         except:
@@ -200,15 +180,15 @@ class CyclerInterface:
 
         if response_msg_bin:
             login_msg_rx_dict = Msg.Login.Server.unpack(response_msg_bin)
-
             if login_msg_rx_dict['result'] == 'success':
                 success = True
                 logger.info(
                     "Successfully logged in to cycler " + str(login_msg_rx_dict['cycler_sn']))
+                logger.info(login_msg_rx_dict)
             # Typo is on purpose
             elif login_msg_rx_dict['result'] == "aleady logged in":
                 success = True
-                logger.info(
+                logger.warning(
                     "Already logged in to cycler " + str(login_msg_rx_dict['cycler_sn']))
             elif login_msg_rx_dict['result'] == 'fail':
                 logger.error(

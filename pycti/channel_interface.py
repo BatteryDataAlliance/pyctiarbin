@@ -26,9 +26,7 @@ class ChannelInterface(CyclerInterface):
 
         # Channels are zero indexed within CTI so we must subtract one here.
         self.__channel = config['channel'] - 1
-        self.__timeout_s = config['timeout_s']
         self.__config = config
-        self.__sock = None
 
         self.__assign_schedule_feedback = {}
         self.__start_test_feedback = {}
@@ -45,18 +43,7 @@ class ChannelInterface(CyclerInterface):
         status : dict
             A dictionary detailing the status of the channel. Returns None if there is an issue.
         """
-        channel_info_msg_rx_dict = {}
-
-        channel_info_msg_tx = Msg.ChannelInfo.Client.pack(
-            {'channel': self.__channel})
-        response_msg_bin = self._send_receive_msg(
-            channel_info_msg_tx)
-
-        if response_msg_bin:
-            channel_info_msg_rx_dict = Msg.ChannelInfo.Server.unpack(
-                response_msg_bin)
-
-        return channel_info_msg_rx_dict
+        return self.read_channel_status(channel=self.__channel)
 
     def assign_schedule(self) -> bool:
         """
