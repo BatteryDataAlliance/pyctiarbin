@@ -1,6 +1,5 @@
 import logging
 import os
-from typing import Optional, Literal, Dict
 from pydantic import BaseModel, validator
 from .messages import Msg
 
@@ -21,24 +20,27 @@ class ChannelInterface(CyclerInterface):
         Parameters
         ----------
         config : dict
-            A configuration dictionary. Must contain the following keys:s
-            - `ip_address` - The IP address of the Maccor server. Use 127.0.0.1 if running on the same machine as the server.
-            - `port` - The port to communicate through with JSON messages. Default set to 57570.
-            - `timeout_s` - *optional* - How long to wait before timing out on TCP communication. Defaults to 2 seconds. 
-            - `msg_buffer_size_bytes` - *optional* - How big of a message buffer to use for sending/receiving messages. 
-               A minimum of 1024 bytes is recommended. Defaults to 4096 bytes. 
+            A configuration dictionary. Must contain the following keys:
+                channel : int
+                    The channel to target with the ChannelInterface class instance.
+                test_name : *optional* : str
+                    The test name to use if using the ChannelInterface to start a test.
+                schedule_name : *optional* : str
+                    The name of the schedule file to use if using the ChannelInterface to start a test.
+                ip_address : str 
+                    The IP address of the Maccor server. Use 127.0.0.1 if running on the same machine as the server.
+                port : int 
+                    The port to communicate through with JSON messages. Default set to 57570.
+                timeout_s : *optional* : float 
+                    How long to wait before timing out on TCP communication. Defaults to 2 seconds. 
+                msg_buffer_size : *optional* : float 
+                    How big of a message buffer to use for sending/receiving messages. 
+                    A minimum of 1024 bytes is recommended. Defaults to 4096 bytes. 
         env_path : *optional* : str
             The path to the `.env` file containing the Arbin CTI username,`ARBIN_CTI_USERNAME`, and password, `ARBIN_CTI_PASSWORD`.
             Defaults to looking in the working directory.
         """
-
-       # Validate and create a config container class
         self.__config = ChannelInterfaceConfig(**config)
-
-        self.__assign_schedule_feedback = {}
-        self.__start_test_feedback = {}
-        self.__stop_test_feedback = {}
-
         super().__init__(self.__config.dict(), env_path)
 
     def read_status(self) -> dict:
@@ -79,11 +81,10 @@ class ChannelInterface(CyclerInterface):
                 success = True
                 logger.info(
                     f'Successfully assigned schedule {self.__config.schedule_name} to channel {self.__config.channel}')
-                logger.info(assign_schedule_msg_rx_dict)
+                logger.debug(assign_schedule_msg_rx_dict)
             else:
                 logger.error(
                     f'Failed to assign schedule {self.__config.schedule_name}! Issue: {assign_schedule_msg_rx_dict["result"]}')
-            self.__assign_schedule_feedback = assign_schedule_msg_rx_dict
 
         return success
 
@@ -115,11 +116,10 @@ class ChannelInterface(CyclerInterface):
                     success = True
                     logger.info(
                         f'Successfully started test {self.__config.test_name} with schedule {self.__config.schedule_name} on channel {self.__config.channel}')
-                    logger.info(start_test_msg_rx_dict)
+                    logger.debug(start_test_msg_rx_dict)
                 else:
                     logger.error(
                         f'Failed to start test {self.__config.test_name} with schedule {self.__config.schedule_name} on channel {self.__config.channel}. Issue: {start_test_msg_rx_dict["result"]}')
-                self.__start_test_feedback = start_test_msg_rx_dict
 
         return success
 
@@ -147,11 +147,10 @@ class ChannelInterface(CyclerInterface):
                 success = True
                 logger.info(
                     f'Successfully stopped test on channel {self.__config.channel}')
-                logger.info(stop_test_msg_rx_dict)
+                logger.debug(stop_test_msg_rx_dict)
             else:
                 logger.error(
                     f'Failed to stop test on channel {self.__config.channel}! Issue: {stop_test_msg_rx_dict["result"]}')
-            self.__stop_test_feedback = stop_test_msg_rx_dict
 
         return success
 
@@ -189,11 +188,10 @@ class ChannelInterface(CyclerInterface):
                 success = True
                 logger.info(
                     f'Successfully set meta variable {mv_num} to a value of {mv_value}')
-                logger.info(set_mv_msg_rx_dict)
+                logger.debug(set_mv_msg_rx_dict)
             else:
                 logger.error(
                     f'Failed to set meta variable {mv_num} to a value of {mv_value}! Issue: {set_mv_msg_rx_dict["result"]}')
-            self.set_mv_feedback = set_mv_msg_rx_dict
 
         return success
 

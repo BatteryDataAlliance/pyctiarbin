@@ -3,6 +3,7 @@ import logging
 import struct
 import dotenv
 import os
+from pydantic import BaseModel
 from .messages import Msg
 from .messages import MessageABC
 
@@ -22,25 +23,23 @@ class CyclerInterface:
         ----------
         config : dict
             A configuration dictionary. Must contain the following keys:
-            - `ip_address` - The IP address of the Maccor server. Use 127.0.0.1 if running on the same machine as the server.
-            - `port` - The port to communicate through with JSON messages. Default set to 57570.
-            - `timeout_s` - *optional* - How long to wait before timing out on TCP communication. Defaults to 2 seconds. 
-            - `msg_buffer_size_bytes` - *optional* - How big of a message buffer to use for sending/receiving messages. 
-               A minimum of 1024 bytes is recommended. Defaults to 4096 bytes. 
+                ip_address : str 
+                    The IP address of the Maccor server. Use 127.0.0.1 if running on the same machine as the server.
+                port : int 
+                    The port to communicate through with JSON messages. Default set to 57570.
+                timeout_s : *optional* : float 
+                    How long to wait before timing out on TCP communication. Defaults to 2 seconds. 
+                msg_buffer_size : *optional* : float 
+                    How big of a message buffer to use for sending/receiving messages. 
+                    A minimum of 1024 bytes is recommended. Defaults to 4096 bytes. 
         env_path : *optional* : str
             The path to the `.env` file containing the Arbin CTI username,`ARBIN_CTI_USERNAME`, and password, `ARBIN_CTI_PASSWORD`.
             Defaults to looking in the working directory.
         """
         
-        self.__msg_buffer_size = config.get('msg_buffer_size_bytes')
-        if not self.__msg_buffer_size:
-            self.__msg_buffer_size  = 4096
-
-        self.__timeout_s = config.get('timeout_s')
-        if not self.__timeout_s:
-            self.__timeout_s  = 2
-
-        assert(self.__create_connection( ip=config['ip_address'], port=config['port']))
+        self.__config = CyclerInterfaceConfig(**config)
+        assert(self.__create_connection( 
+            ip=self.__config.ip_address, port=self.__config.port, timeout_s=self.__config.timeout_s))
         assert(self.__login(env_path))
 
     def get_login_feedback(self):
@@ -113,14 +112,14 @@ class CyclerInterface:
             if send_msg_success:
                 try:
                     # Receive first part of message and determine length of entire message.
-                    rx_msg += self.__sock.recv(self.__msg_buffer_size)
+                    rx_msg += self.__sock.recv(self.__config.msg_buffer_size)
                     expected_rx_msg_len = struct.unpack(
                         msg_length_format,
                         rx_msg[msg_length_start_byte_idx:msg_length_end_byte_idx])[0]
 
                     # Keep reading message in pieces until rx_msg is as long as expected_rx_msg_len.
                     while len(rx_msg) < (expected_rx_msg_len):
-                        rx_msg += self.__sock.recv(self.__msg_buffer_size)
+                        rx_msg += self.__sock.recv(self.__config.msg_buffer_size)
                 except socket.timeout:
                     logger.error(
                         "Timeout on receiving message from Arbin!", exc_info=True)
@@ -133,7 +132,7 @@ class CyclerInterface:
 
         return rx_msg
 
-    def __create_connection(self, ip: str, port: int) -> bool:
+    def __create_connection(self, ip: str, port: int, timeout_s: float) -> bool:
         """
         Creates a TCP/IP connection with Arbin server.
 
@@ -153,7 +152,7 @@ class CyclerInterface:
 
         try:
             self.__sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.__sock.settimeout(self.__timeout_s)
+            self.__sock.settimeout(timeout_s)
             self.__sock.connect((ip, port))
             logger.info("Connected to Arbin server!")
             success = True
@@ -211,3 +210,24 @@ class CyclerInterface:
             self.__login_feedback = login_msg_rx_dict
 
         return success
+    
+class CyclerInterfaceConfig(BaseModel):
+    '''
+    Holds channel config information for the CyclerInterface class.
+
+    Parameters
+    ----------
+        ip_address : str 
+            The IP address of the Maccor server. Use 127.0.0.1 if running on the same machine as the server.
+        port : int 
+            The port to communicate through with JSON messages. Default set to 57570.
+        timeout_s : float 
+            How long to wait before timing out on TCP communication. Defaults to 2 seconds. 
+        msg_buffer_size : float 
+             How big of a message buffer to use for sending/receiving messages. 
+            A minimum of 1024 bytes is recommended. Defaults to 4096 bytes. 
+    '''
+    ip_address: str
+    port: int
+    timeout_s: float = 2.0
+    msg_buffer_size: int = 4096
