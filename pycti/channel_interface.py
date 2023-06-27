@@ -4,10 +4,12 @@ import struct
 from .messages import Msg
 from .messages import MessageABC
 
+from .cycler_interface import CyclerInterface
+
 logger = logging.getLogger(__name__)
 
 
-class ArbinInterface:
+class ChannelInterface(CyclerInterface):
     """
     Class for controlling Maccor Cycler using MacNet.
     """
@@ -21,20 +23,18 @@ class ArbinInterface:
         config : dict
             A configuration dictionary.
         """
-        self.login_feedback = {}
-        self.assign_schedule_feedback = {}
-        self.start_test_feedback = {}
-        self.stop_test_feedback = {}
 
         # Channels are zero indexed within CTI so we must subtract one here.
         self.__channel = config['channel'] - 1
         self.__timeout_s = config['timeout_s']
-        self.config = config
+        self.__config = config
         self.__sock = None
 
-        assert( self.__verify_config())
-        assert( self.__create_connection())
-        assert( self.__login())
+        self.__assign_schedule_feedback = {}
+        self.__start_test_feedback = {}
+        self.__stop_test_feedback = {}
+
+        super().__init__(self.__config)
 
     def read_status(self) -> dict:
         """
@@ -49,7 +49,7 @@ class ArbinInterface:
 
         channel_info_msg_tx = Msg.ChannelInfo.Client.pack(
             {'channel': self.__channel})
-        response_msg_bin = self.__send_receive_msg(
+        response_msg_bin = self._send_receive_msg(
             channel_info_msg_tx)
 
         if response_msg_bin:
@@ -70,8 +70,8 @@ class ArbinInterface:
         success = False
 
         assign_schedule_msg_tx_bin = Msg.AssignSchedule.Client.pack(
-            {'channel': self.__channel, 'schedule': self.config['schedule']})
-        response_msg_bin = self.__send_receive_msg(
+            {'channel': self.__channel, 'schedule': self.__config['schedule']})
+        response_msg_bin = self._send_receive_msg(
             assign_schedule_msg_tx_bin)
 
         if response_msg_bin:
@@ -80,11 +80,11 @@ class ArbinInterface:
             if assign_schedule_msg_rx_dict['result'] == 'success':
                 success = True
                 logger.info(
-                    f'Successfully assigned schedule {self.config["schedule"]} to channel {self.config["channel"]}')
+                    f'Successfully assigned schedule {self.__config["schedule"]} to channel {self.__config["channel"]}')
             else:
                 logger.error(
-                    f'Failed to assign schedule {self.config["schedule"]}! Issue: {assign_schedule_msg_rx_dict["result"]}')
-            self.assign_schedule_feedback = assign_schedule_msg_rx_dict
+                    f'Failed to assign schedule {self.__config["schedule"]}! Issue: {assign_schedule_msg_rx_dict["result"]}')
+            self.__assign_schedule_feedback = assign_schedule_msg_rx_dict
 
         return success
 
@@ -102,8 +102,8 @@ class ArbinInterface:
         # Make sure the schedule is assigned before starting the test to avoid any funny business
         if self.assign_schedule():
             start_test_msg_tx_bin = Msg.StartSchedule.Client.pack(
-                {'channel': self.__channel, 'test_name': self.config['test_name']})
-            response_msg_bin = self.__send_receive_msg(
+                {'channel': self.__channel, 'test_name': self.__config['test_name']})
+            response_msg_bin = self._send_receive_msg(
                 start_test_msg_tx_bin)
 
             if response_msg_bin:
@@ -112,11 +112,11 @@ class ArbinInterface:
                 if start_test_msg_rx_dict['result'] == 'success':
                     success = True
                     logger.info(
-                        f'Successfully started test {self.config["test_name"]} with schedule {self.config["schedule"]} on channel {self.config["channel"]}')
+                        f'Successfully started test {self.__config["test_name"]} with schedule {self.__config["schedule"]} on channel {self.__config["channel"]}')
                 else:
                     logger.error(
-                        f'Failed to start test {self.config["test_name"]} with schedule {self.config["schedule"]} on channel {self.config["channel"]}. Issue: {start_test_msg_rx_dict["result"]}')
-                self.start_test_feedback = start_test_msg_rx_dict
+                        f'Failed to start test {self.__config["test_name"]} with schedule {self.__config["schedule"]} on channel {self.__config["channel"]}. Issue: {start_test_msg_rx_dict["result"]}')
+                self.__start_test_feedback = start_test_msg_rx_dict
 
         return success
 
@@ -134,7 +134,7 @@ class ArbinInterface:
 
         stop_test_msg_tx_bin = Msg.StopSchedule.Client.pack(
             {'channel': self.__channel})
-        response_msg_bin = self.__send_receive_msg(
+        response_msg_bin = self._send_receive_msg(
             stop_test_msg_tx_bin)
 
         if response_msg_bin:
@@ -143,11 +143,11 @@ class ArbinInterface:
             if stop_test_msg_rx_dict['result'] == 'success':
                 success = True
                 logger.info(
-                    f'Successfully stopped test on channel {self.config["channel"]}')
+                    f'Successfully stopped test on channel {self.__config["channel"]}')
             else:
                 logger.error(
-                    f'Failed to stop test on channel {self.config["channel"]}! Issue: {stop_test_msg_rx_dict["result"]}')
-            self.stop_test_feedback = stop_test_msg_rx_dict
+                    f'Failed to stop test on channel {self.__config["channel"]}! Issue: {stop_test_msg_rx_dict["result"]}')
+            self.__stop_test_feedback = stop_test_msg_rx_dict
 
         return success
 
@@ -175,7 +175,7 @@ class ArbinInterface:
         updated_msg_vals['mv_data'] = mv_value
 
         set_mv_msg_tx_bin = Msg.SetMetaVariable.Client.pack(updated_msg_vals)
-        response_msg_bin = self.__send_receive_msg(
+        response_msg_bin = self._send_receive_msg(
             set_mv_msg_tx_bin)
 
         if response_msg_bin:
@@ -212,125 +212,8 @@ class ArbinInterface:
                                 'msg_buffer_size']
 
         for key in required_config_keys:
-            if key not in self.config:
+            if key not in self.__config:
                 logger.error("Missing key from config! Missing : " + key)
                 return False
         logger.info("Config check passed")
         return True
-
-    def __login(self) -> bool:
-        """
-        Logs into the Arbin server with the username/password defined in the config. 
-        Must be done before issuing other commands.
-
-        Returns
-        -------
-        success : bool
-            True/False based on whether the login was successful
-        """
-        success = False
-
-        login_msg_tx = Msg.Login.Client.pack(
-            msg_values={'username': self.config['username'], 'password': self.config['password']})
-
-        response_msg_bin = self.__send_receive_msg(login_msg_tx)
-
-        if response_msg_bin:
-            login_msg_rx_dict = Msg.Login.Server.unpack(response_msg_bin)
-
-            if login_msg_rx_dict['result'] == 'success':
-                success = True
-                logger.info(
-                    "Successfully logged in to cycler " + str(login_msg_rx_dict['cycler_sn']))
-            elif login_msg_rx_dict['result'] == "aleady logged in":
-                success = True
-                logger.info(
-                    "Already logged in to cycler " + str(login_msg_rx_dict['cycler_sn']))
-            elif login_msg_rx_dict['result'] == 'fail':
-                logger.error(
-                    "Login failed with provided credentials!")
-            else:
-                logger.error(
-                    f'Unknown login result {login_msg_rx_dict["result"]}')
-
-            self.login_feedback = login_msg_rx_dict
-
-        return success
-
-    def __create_connection(self) -> bool:
-        """
-        Creates a TCP/IP connection with Arbin server.
-
-        Returns
-       ----------
-        success : bool
-            True/False based on whether or not the Arbin server connection was created.
-        """
-        success = False
-
-        try:
-            self.__sock = socket.socket(
-                socket.AF_INET, socket.SOCK_STREAM
-            )
-            self.__sock.settimeout(self.__timeout_s)
-            self.__sock.connect(
-                (self.config['ip_address'], self.config['port'])
-            )
-            logger.info("Connected to Arbin server!")
-            success = True
-        except:
-            logger.error(
-                "Failed to create TCP/IP connection with Arbin server!", exc_info=True)
-
-        return success
-
-    def __send_receive_msg(self, tx_msg):
-        """
-        Sends the passed message and receives the response.
-
-        Parameters
-        ----------
-        tx_msg : bytearray
-            Message to send.
-
-        Returns
-        -------
-        rx_msg : bytearray
-            Response message..
-        """
-
-        rx_msg = b''
-        send_msg_success = False
-
-        msg_length_format = MessageABC.base_template['msg_length']['format']
-        msg_length_start_byte_idx = MessageABC.base_template['msg_length']['start_byte']
-        msg_length_end_byte_idx = msg_length_start_byte_idx + \
-            struct.calcsize(msg_length_format)
-
-        if self.__sock:
-            try:
-                self.__sock.sendall(tx_msg)
-                send_msg_success = True
-            except socket.error:
-                logger.error(
-                    "Failed to send message to Arbin server!", exc_info=True)
-
-            if send_msg_success:
-                try:
-                    # Receive first part of message and determine length of entire message.
-                    rx_msg += self.__sock.recv(self.config['msg_buffer_size'])
-                    expected_rx_msg_len = struct.unpack(
-                        msg_length_format,
-                        rx_msg[msg_length_start_byte_idx:msg_length_end_byte_idx])[0]
-                    
-                    # Keep reading message in pieces until rx_msg is as long as expected_rx_msg_len.
-                    while len(rx_msg) < (expected_rx_msg_len):
-                        rx_msg += self.__sock.recv(
-                            self.config['msg_buffer_size'])
-                except socket.error:
-                    logger.error("Error receiving message!!", exc_info=True)
-        else:
-            logger.error(
-                "Cannot send message! Socket does not exist!")
-
-        return rx_msg
