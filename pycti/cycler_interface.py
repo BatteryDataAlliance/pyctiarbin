@@ -37,8 +37,6 @@ class CyclerInterface:
         if not self.__timeout_s:
             self.__timeout_s  = 2
 
-        self.__config = config
-
         assert(self.__create_connection( ip=config['ip_address'], port=config['port']))
         assert(self.__login(env_path))
 
@@ -119,8 +117,7 @@ class CyclerInterface:
 
                     # Keep reading message in pieces until rx_msg is as long as expected_rx_msg_len.
                     while len(rx_msg) < (expected_rx_msg_len):
-                        rx_msg += self.__sock.recv(
-                            self.__config['msg_buffer_size'])
+                        rx_msg += self.__sock.recv(self.__msg_buffer_size)
                 except socket.timeout:
                     logger.error(
                         "Timeout on receiving message from Arbin!", exc_info=True)
