@@ -162,7 +162,24 @@ cycler_interface.read_channel_status(channel=1)
 
 For a `ChannelInterface` there is no need to specify the channel since we define it in the config:
 
-### Starting a Test
+```python
+from pycti import ChannelInterface
+
+CHANNEL_INTERFACE_CONFIG = {
+  "channel": 1,
+  "test_name": "fake_test_name",
+  "schedule_name": "Rest+207855.sdx",
+  "ip_address": 127.0.0.1,
+  "port": 1234,
+  "timeout_s": 3,
+  "msg_buffer_size": 4096
+}
+
+channel_interface = ChannelInterface(CHANNEL_INTERFACE_CONFIG)
+channel_interface.read_channel_status()
+```
+
+For more examples of how to use the `CyclerInterface` and `ChannelInterface` class see the `demo_notebook.ipynb` and documentation.
 
 ## Development
 
