@@ -52,12 +52,12 @@ class CyclerInterface:
         config : dict
             A configuration dictionary. Must contain the following keys:
                 ip_address : str 
-                    The IP address of the Maccor server. Use 127.0.0.1 if running on the same machine as the server.
+                    The IP address of the Arbin host computer.
                 port : int 
                     The TCP port to communicate through.
                 timeout_s : *optional* : float 
                     How long to wait before timing out on TCP communication. Defaults to 3 seconds. 
-                msg_buffer_size : *optional* : float 
+                msg_buffer_size : *optional* : int 
                     How big of a message buffer to use for sending/receiving messages. 
                     A minimum of 1024 bytes is recommended. Defaults to 4096 bytes. 
         env_path : *optional* : str
@@ -256,12 +256,12 @@ class CyclerInterfaceConfig(BaseModel):
     Parameters
     ----------
         ip_address : str 
-            The IP address of the Maccor server. Use 127.0.0.1 if running on the same machine as the server.
+            The IP address of the Arbin host computer.
         port : int 
             The TCP port to communicate through.
         timeout_s : float 
             How long to wait before timing out on TCP communication. Defaults to 3 seconds. 
-        msg_buffer_size : float 
+        msg_buffer_size : int 
              How big of a message buffer to use for sending/receiving messages. 
             A minimum of 1024 bytes is recommended. Defaults to 4096 bytes. 
     &#39;&#39;&#39;
@@ -292,12 +292,12 @@ class CyclerInterfaceConfig(BaseModel):
 <dt><strong><code>config</code></strong> :&ensp;<code>dict</code></dt>
 <dd>A configuration dictionary. Must contain the following keys:
 ip_address : str
-The IP address of the Maccor server. Use 127.0.0.1 if running on the same machine as the server.
+The IP address of the Arbin host computer.
 port : int
 The TCP port to communicate through.
 timeout_s : <em>optional</em> : float
 How long to wait before timing out on TCP communication. Defaults to 3 seconds.
-msg_buffer_size : <em>optional</em> : float
+msg_buffer_size : <em>optional</em> : int
 How big of a message buffer to use for sending/receiving messages.
 A minimum of 1024 bytes is recommended. Defaults to 4096 bytes.</dd>
 <dt><strong><code>env_path</code></strong> :&ensp;<code>*optional* : str</code></dt>
@@ -322,12 +322,12 @@ Defaults to looking in the working directory.</dd>
         config : dict
             A configuration dictionary. Must contain the following keys:
                 ip_address : str 
-                    The IP address of the Maccor server. Use 127.0.0.1 if running on the same machine as the server.
+                    The IP address of the Arbin host computer.
                 port : int 
                     The TCP port to communicate through.
                 timeout_s : *optional* : float 
                     How long to wait before timing out on TCP communication. Defaults to 3 seconds. 
-                msg_buffer_size : *optional* : float 
+                msg_buffer_size : *optional* : int 
                     How big of a message buffer to use for sending/receiving messages. 
                     A minimum of 1024 bytes is recommended. Defaults to 4096 bytes. 
         env_path : *optional* : str
@@ -619,12 +619,12 @@ Defaults to looking in the working directory.</dd>
 <div class="desc"><p>Holds channel config information for the CyclerInterface class.</p>
 <h2 id="parameters">Parameters</h2>
 <pre><code>ip_address : str 
-    The IP address of the Maccor server. Use 127.0.0.1 if running on the same machine as the server.
+    The IP address of the Arbin host computer.
 port : int 
     The TCP port to communicate through.
 timeout_s : float 
     How long to wait before timing out on TCP communication. Defaults to 3 seconds. 
-msg_buffer_size : float 
+msg_buffer_size : int 
      How big of a message buffer to use for sending/receiving messages. 
     A minimum of 1024 bytes is recommended. Defaults to 4096 bytes.
 </code></pre>
@@ -641,12 +641,12 @@ msg_buffer_size : float
     Parameters
     ----------
         ip_address : str 
-            The IP address of the Maccor server. Use 127.0.0.1 if running on the same machine as the server.
+            The IP address of the Arbin host computer.
         port : int 
             The TCP port to communicate through.
         timeout_s : float 
             How long to wait before timing out on TCP communication. Defaults to 3 seconds. 
-        msg_buffer_size : float 
+        msg_buffer_size : int 
              How big of a message buffer to use for sending/receiving messages. 
             A minimum of 1024 bytes is recommended. Defaults to 4096 bytes. 
     &#39;&#39;&#39;

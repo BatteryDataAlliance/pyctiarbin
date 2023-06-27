@@ -57,12 +57,12 @@ class ChannelInterface(CyclerInterface):
                 schedule_name : *optional* : str
                     The name of the schedule file to use if using the ChannelInterface to start a test.
                 ip_address : str 
-                    The IP address of the Maccor server. Use 127.0.0.1 if running on the same machine as the server.
+                    The IP address of the Arbin host computer.
                 port : int 
                     The TCP port to communicate through.
                 timeout_s : *optional* : float 
                     How long to wait before timing out on TCP communication. Defaults to 3 seconds. 
-                msg_buffer_size : *optional* : float 
+                msg_buffer_size : *optional* : int 
                     How big of a message buffer to use for sending/receiving messages. 
                     A minimum of 1024 bytes is recommended. Defaults to 4096 bytes. 
         env_path : *optional* : str
@@ -72,7 +72,7 @@ class ChannelInterface(CyclerInterface):
         self.__config = ChannelInterfaceConfig(**config)
         super().__init__(self.__config.dict(), env_path)
 
-    def read_status(self) -&gt; dict:
+    def read_channel_status(self) -&gt; dict:
         &#34;&#34;&#34;
         Method to read the status of the channel defined in the config.
 
@@ -82,7 +82,7 @@ class ChannelInterface(CyclerInterface):
             A dictionary detailing the status of the channel. Returns None if there is an issue.
         &#34;&#34;&#34;
         # Add to channel value to account for zero indexing subtraction in parent method.
-        return self.read_channel_status(channel=(self.__config.channel+1))
+        return super().read_channel_status(channel=(self.__config.channel+1))
 
     def assign_schedule(self) -&gt; bool:
         &#34;&#34;&#34;
@@ -238,12 +238,12 @@ class ChannelInterfaceConfig(BaseModel):
         schedule_name : str
             The name of the schedule file to use if using the ChannelInterface to start a test.
         ip_address : str 
-            The IP address of the Maccor server. Use 127.0.0.1 if running on the same machine as the server.
+            The IP address of the Arbin host computer.
         port : int 
             The TCP port to communicate through.
         timeout_s : float 
             How long to wait before timing out on TCP communication. Defaults to 3 seconds. 
-        msg_buffer_size : float 
+        msg_buffer_size : int 
              How big of a message buffer to use for sending/receiving messages. 
             A minimum of 1024 bytes is recommended. Defaults to 4096 bytes. 
     &#39;&#39;&#39;
@@ -289,12 +289,12 @@ The test name to use if using the ChannelInterface to start a test.
 schedule_name : <em>optional</em> : str
 The name of the schedule file to use if using the ChannelInterface to start a test.
 ip_address : str
-The IP address of the Maccor server. Use 127.0.0.1 if running on the same machine as the server.
+The IP address of the Arbin host computer.
 port : int
 The TCP port to communicate through.
 timeout_s : <em>optional</em> : float
 How long to wait before timing out on TCP communication. Defaults to 3 seconds.
-msg_buffer_size : <em>optional</em> : float
+msg_buffer_size : <em>optional</em> : int
 How big of a message buffer to use for sending/receiving messages.
 A minimum of 1024 bytes is recommended. Defaults to 4096 bytes.</dd>
 <dt><strong><code>env_path</code></strong> :&ensp;<code>*optional* : str</code></dt>
@@ -325,12 +325,12 @@ Defaults to looking in the working directory.</dd>
                 schedule_name : *optional* : str
                     The name of the schedule file to use if using the ChannelInterface to start a test.
                 ip_address : str 
-                    The IP address of the Maccor server. Use 127.0.0.1 if running on the same machine as the server.
+                    The IP address of the Arbin host computer.
                 port : int 
                     The TCP port to communicate through.
                 timeout_s : *optional* : float 
                     How long to wait before timing out on TCP communication. Defaults to 3 seconds. 
-                msg_buffer_size : *optional* : float 
+                msg_buffer_size : *optional* : int 
                     How big of a message buffer to use for sending/receiving messages. 
                     A minimum of 1024 bytes is recommended. Defaults to 4096 bytes. 
         env_path : *optional* : str
@@ -340,7 +340,7 @@ Defaults to looking in the working directory.</dd>
         self.__config = ChannelInterfaceConfig(**config)
         super().__init__(self.__config.dict(), env_path)
 
-    def read_status(self) -&gt; dict:
+    def read_channel_status(self) -&gt; dict:
         &#34;&#34;&#34;
         Method to read the status of the channel defined in the config.
 
@@ -350,7 +350,7 @@ Defaults to looking in the working directory.</dd>
             A dictionary detailing the status of the channel. Returns None if there is an issue.
         &#34;&#34;&#34;
         # Add to channel value to account for zero indexing subtraction in parent method.
-        return self.read_channel_status(channel=(self.__config.channel+1))
+        return super().read_channel_status(channel=(self.__config.channel+1))
 
     def assign_schedule(self) -&gt; bool:
         &#34;&#34;&#34;
@@ -548,8 +548,8 @@ Defaults to looking in the working directory.</dd>
     return success</code></pre>
 </details>
 </dd>
-<dt id="pycti.channel_interface.ChannelInterface.read_status"><code class="name flex">
-<span>def <span class="ident">read_status</span></span>(<span>self) ‑> dict</span>
+<dt id="pycti.channel_interface.ChannelInterface.read_channel_status"><code class="name flex">
+<span>def <span class="ident">read_channel_status</span></span>(<span>self) ‑> dict</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Method to read the status of the channel defined in the config.</p>
@@ -562,7 +562,7 @@ Defaults to looking in the working directory.</dd>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def read_status(self) -&gt; dict:
+<pre><code class="python">def read_channel_status(self) -&gt; dict:
     &#34;&#34;&#34;
     Method to read the status of the channel defined in the config.
 
@@ -572,7 +572,7 @@ Defaults to looking in the working directory.</dd>
         A dictionary detailing the status of the channel. Returns None if there is an issue.
     &#34;&#34;&#34;
     # Add to channel value to account for zero indexing subtraction in parent method.
-    return self.read_channel_status(channel=(self.__config.channel+1))</code></pre>
+    return super().read_channel_status(channel=(self.__config.channel+1))</code></pre>
 </details>
 </dd>
 <dt id="pycti.channel_interface.ChannelInterface.set_meta_variable"><code class="name flex">
@@ -744,7 +744,6 @@ Also returns True if no test was running on the channel.</dd>
 <ul class="hlist">
 <li><code><a title="pycti.cycler_interface.CyclerInterface.get_login_feedback" href="cycler_interface.html#pycti.cycler_interface.CyclerInterface.get_login_feedback">get_login_feedback</a></code></li>
 <li><code><a title="pycti.cycler_interface.CyclerInterface.get_num_channels" href="cycler_interface.html#pycti.cycler_interface.CyclerInterface.get_num_channels">get_num_channels</a></code></li>
-<li><code><a title="pycti.cycler_interface.CyclerInterface.read_channel_status" href="cycler_interface.html#pycti.cycler_interface.CyclerInterface.read_channel_status">read_channel_status</a></code></li>
 </ul>
 </li>
 </ul>
@@ -763,12 +762,12 @@ test_name : *optional*
 schedule_name : str
     The name of the schedule file to use if using the ChannelInterface to start a test.
 ip_address : str 
-    The IP address of the Maccor server. Use 127.0.0.1 if running on the same machine as the server.
+    The IP address of the Arbin host computer.
 port : int 
     The TCP port to communicate through.
 timeout_s : float 
     How long to wait before timing out on TCP communication. Defaults to 3 seconds. 
-msg_buffer_size : float 
+msg_buffer_size : int 
      How big of a message buffer to use for sending/receiving messages. 
     A minimum of 1024 bytes is recommended. Defaults to 4096 bytes.
 </code></pre>
@@ -791,12 +790,12 @@ msg_buffer_size : float
         schedule_name : str
             The name of the schedule file to use if using the ChannelInterface to start a test.
         ip_address : str 
-            The IP address of the Maccor server. Use 127.0.0.1 if running on the same machine as the server.
+            The IP address of the Arbin host computer.
         port : int 
             The TCP port to communicate through.
         timeout_s : float 
             How long to wait before timing out on TCP communication. Defaults to 3 seconds. 
-        msg_buffer_size : float 
+        msg_buffer_size : int 
              How big of a message buffer to use for sending/receiving messages. 
             A minimum of 1024 bytes is recommended. Defaults to 4096 bytes. 
     &#39;&#39;&#39;
@@ -890,7 +889,7 @@ def username_alphanumeric(cls, v):
 <h4><code><a title="pycti.channel_interface.ChannelInterface" href="#pycti.channel_interface.ChannelInterface">ChannelInterface</a></code></h4>
 <ul class="">
 <li><code><a title="pycti.channel_interface.ChannelInterface.assign_schedule" href="#pycti.channel_interface.ChannelInterface.assign_schedule">assign_schedule</a></code></li>
-<li><code><a title="pycti.channel_interface.ChannelInterface.read_status" href="#pycti.channel_interface.ChannelInterface.read_status">read_status</a></code></li>
+<li><code><a title="pycti.channel_interface.ChannelInterface.read_channel_status" href="#pycti.channel_interface.ChannelInterface.read_channel_status">read_channel_status</a></code></li>
 <li><code><a title="pycti.channel_interface.ChannelInterface.set_meta_variable" href="#pycti.channel_interface.ChannelInterface.set_meta_variable">set_meta_variable</a></code></li>
 <li><code><a title="pycti.channel_interface.ChannelInterface.start_test" href="#pycti.channel_interface.ChannelInterface.start_test">start_test</a></code></li>
 <li><code><a title="pycti.channel_interface.ChannelInterface.stop_test" href="#pycti.channel_interface.ChannelInterface.stop_test">stop_test</a></code></li>
