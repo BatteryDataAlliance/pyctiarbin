@@ -1,6 +1,6 @@
 # pycti
 
-`pytcti` is a Python module that provides a channel level interface for communication and control of [Arbin cyclers](https://arbin.com/ via the Console TCP/IP Interface (CTI). `pycti` provides a hassle-free way to utilize CTI with a simple Python class.
+`pytcti` is a Python module that provides a channel level interface for communication and control of [Arbin cyclers](https://arbin.com/) via their Console TCP/IP Interface (CTI). `pycti` provides a hassle-free way to utilize CTI with a simple Python class.
 
 ### Overview
 
@@ -70,8 +70,8 @@ pip install .
 - `test_name` - The test name to be used for any tests started. If left blank, Arbin will generate a unique random name for any started tests. Note that Arbin requires unique test names for each test.
 - `schedule` - The schedule to use for testing.
 - `test_schedule` - The test procedure to be used, if starting a test with a procedure. Not needed with direct control.
-- `arbin_ip` - The IP address of the Arbin server. Use 127.0.0.1 if running on the same machine as the server.
-- `arbin_port` - The port to TCP/IP port to communicate through.
+- `ip_address` - The IP address of the Arbin server. Use 127.0.0.1 if running on the same machine as the server.
+- `port` - The port to TCP/IP port to communicate through.
 - `timeout_s` - How long to wait on Arbin messages before giving a timeout error.
 - `msg_buffer_size` - How large of a message buffer size to use.
 

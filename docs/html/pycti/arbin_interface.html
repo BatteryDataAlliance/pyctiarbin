@@ -249,8 +249,8 @@ class ArbinInterface:
                                 &#39;test_name&#39;,
                                 &#39;schedule&#39;,
                                 &#39;channel&#39;,
-                                &#39;arbin_ip&#39;,
-                                &#39;arbin_port&#39;,
+                                &#39;ip_address&#39;,
+                                &#39;port&#39;,
                                 &#39;timeout_s&#39;,
                                 &#39;msg_buffer_size&#39;]
 
@@ -317,7 +317,7 @@ class ArbinInterface:
             )
             self.__sock.settimeout(self.timeout_s)
             self.__sock.connect(
-                (self.config[&#39;arbin_ip&#39;], self.config[&#39;arbin_port&#39;])
+                (self.config[&#39;ip_address&#39;], self.config[&#39;port&#39;])
             )
             logger.info(&#34;Connected to Arbin server!&#34;)
             success = True
@@ -618,8 +618,8 @@ class ArbinInterface:
                                 &#39;test_name&#39;,
                                 &#39;schedule&#39;,
                                 &#39;channel&#39;,
-                                &#39;arbin_ip&#39;,
-                                &#39;arbin_port&#39;,
+                                &#39;ip_address&#39;,
+                                &#39;port&#39;,
                                 &#39;timeout_s&#39;,
                                 &#39;msg_buffer_size&#39;]
 
@@ -686,7 +686,7 @@ class ArbinInterface:
             )
             self.__sock.settimeout(self.timeout_s)
             self.__sock.connect(
-                (self.config[&#39;arbin_ip&#39;], self.config[&#39;arbin_port&#39;])
+                (self.config[&#39;ip_address&#39;], self.config[&#39;port&#39;])
             )
             logger.info(&#34;Connected to Arbin server!&#34;)
             success = True

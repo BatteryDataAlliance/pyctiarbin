@@ -27,28 +27,14 @@ class ArbinInterface:
         self.stop_test_feedback = {}
 
         # Channels are zero indexed within CTI so we must subtract one here.
-        self.channel = config['channel'] - 1
-        self.timeout_s = config['timeout_s']
+        self.__channel = config['channel'] - 1
+        self.__timeout_s = config['timeout_s']
         self.config = config
         self.__sock = None
 
-    def start(self) -> bool:
-        """
-        Verifies the config, creates a connection to the Arbin, and logs in.
-
-        Returns
-        -------
-        success : bool
-            True or False based on whether or not the connection was created.
-        """
-        success = False
-
-        if self.__verify_config():
-            if self.__create_connection():
-                if self.__login():
-                    success = True
-
-        return success
+        assert( self.__verify_config())
+        assert( self.__create_connection())
+        assert( self.__login())
 
     def read_status(self) -> dict:
         """
@@ -62,7 +48,7 @@ class ArbinInterface:
         channel_info_msg_rx_dict = {}
 
         channel_info_msg_tx = Msg.ChannelInfo.Client.pack(
-            {'channel': self.channel})
+            {'channel': self.__channel})
         response_msg_bin = self.__send_receive_msg(
             channel_info_msg_tx)
 
@@ -84,7 +70,7 @@ class ArbinInterface:
         success = False
 
         assign_schedule_msg_tx_bin = Msg.AssignSchedule.Client.pack(
-            {'channel': self.channel, 'schedule': self.config['schedule']})
+            {'channel': self.__channel, 'schedule': self.config['schedule']})
         response_msg_bin = self.__send_receive_msg(
             assign_schedule_msg_tx_bin)
 
@@ -116,7 +102,7 @@ class ArbinInterface:
         # Make sure the schedule is assigned before starting the test to avoid any funny business
         if self.assign_schedule():
             start_test_msg_tx_bin = Msg.StartSchedule.Client.pack(
-                {'channel': self.channel, 'test_name': self.config['test_name']})
+                {'channel': self.__channel, 'test_name': self.config['test_name']})
             response_msg_bin = self.__send_receive_msg(
                 start_test_msg_tx_bin)
 
@@ -147,7 +133,7 @@ class ArbinInterface:
         success = False
 
         stop_test_msg_tx_bin = Msg.StopSchedule.Client.pack(
-            {'channel': self.channel})
+            {'channel': self.__channel})
         response_msg_bin = self.__send_receive_msg(
             stop_test_msg_tx_bin)
 
@@ -184,7 +170,7 @@ class ArbinInterface:
         success = False
 
         updated_msg_vals = {}
-        updated_msg_vals['channel'] = self.channel
+        updated_msg_vals['channel'] = self.__channel
         updated_msg_vals['mv_meta_code'] = Msg.SetMetaVariable.Client.mv_channel_codes[mv_num]
         updated_msg_vals['mv_data'] = mv_value
 
@@ -220,8 +206,8 @@ class ArbinInterface:
                                 'test_name',
                                 'schedule',
                                 'channel',
-                                'arbin_ip',
-                                'arbin_port',
+                                'ip_address',
+                                'port',
                                 'timeout_s',
                                 'msg_buffer_size']
 
@@ -286,9 +272,9 @@ class ArbinInterface:
             self.__sock = socket.socket(
                 socket.AF_INET, socket.SOCK_STREAM
             )
-            self.__sock.settimeout(self.timeout_s)
+            self.__sock.settimeout(self.__timeout_s)
             self.__sock.connect(
-                (self.config['arbin_ip'], self.config['arbin_port'])
+                (self.config['ip_address'], self.config['port'])
             )
             logger.info("Connected to Arbin server!")
             success = True
