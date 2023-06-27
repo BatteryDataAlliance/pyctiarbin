@@ -24,7 +24,7 @@ class CyclerInterface:
         config : dict
             A configuration dictionary. Must contain the following keys:
                 ip_address : str 
-                    The IP address of the Maccor server. Use 127.0.0.1 if running on the same machine as the server.
+                    The IP address of the Arbin host computer.
                 port : int 
                     The TCP port to communicate through.
                 timeout_s : *optional* : float 
@@ -228,7 +228,7 @@ class CyclerInterfaceConfig(BaseModel):
     Parameters
     ----------
         ip_address : str 
-            The IP address of the Maccor server. Use 127.0.0.1 if running on the same machine as the server.
+            The IP address of the Arbin host computer.
         port : int 
             The TCP port to communicate through.
         timeout_s : float 

@@ -29,7 +29,7 @@ class ChannelInterface(CyclerInterface):
                 schedule_name : *optional* : str
                     The name of the schedule file to use if using the ChannelInterface to start a test.
                 ip_address : str 
-                    The IP address of the Maccor server. Use 127.0.0.1 if running on the same machine as the server.
+                    The IP address of the Arbin host computer.
                 port : int 
                     The TCP port to communicate through.
                 timeout_s : *optional* : float 
@@ -210,7 +210,7 @@ class ChannelInterfaceConfig(BaseModel):
         schedule_name : str
             The name of the schedule file to use if using the ChannelInterface to start a test.
         ip_address : str 
-            The IP address of the Maccor server. Use 127.0.0.1 if running on the same machine as the server.
+            The IP address of the Arbin host computer.
         port : int 
             The TCP port to communicate through.
         timeout_s : float 

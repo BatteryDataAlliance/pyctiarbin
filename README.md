@@ -1,25 +1,22 @@
 # pycti
 
-`pytcti` is a Python module that provides cycler and channel level interface for communication and control of [Arbin cyclers](https://arbin.com/) via their Console TCP/IP Interface (CTI).
+`pycti` is a Python module that provides cycler and channel level interfaces for communication and control of [Arbin cyclers](https://arbin.com/) via their Console TCP/IP Interface (CTI).
 
 ## Overview
 
 - [Motivation](#motivation)
 - [Installation](#installation)
   - [Source Installation](#source-installation)
-- [Examples](#examples)
-  - [Getting Started](#getting-started)
-    - [Configuration](#configuration)
-      -[CyclerInterface Configuration](#cyclerinterface-configuration)
-      -[ChannelInterface Configuration](#channelinterface-configuration)
-    - [Env](#env)
-  - [Getting Channel Readings](#getting-channel-readings)
-  - [Starting a Test](#starting-a-test)
-  - [Setting Variables](#setting-variables)
-- [Development](#dev)
+- [Getting Started](#getting-started)
+  - [Configuration](#configuration)
+    -[CyclerInterface Configuration](#cyclerinterface-configuration)
+    -[ChannelInterface Configuration](#channelinterface-configuration)
+  - [Env](#env)
+- [Getting Channel Readings](#getting-channel-readings)
+- [Development](#development)
   - [Contributing](#contributing)
   - [Testing](#testing)
-    - [ArbinSpoofer](#aaccorppoofer)
+    - [ArbinSpoofer](#arbinspoofer)
   - [Documentation](#documentation)
 - [License](#license)
 
@@ -56,15 +53,13 @@ pip install -r requirements.txt
 pip install .
 ```
 
-## Examples
-
 ## Getting Started
 
 `pycti` provides two distinct classes for interacting with Arbin cyclers:
 
 - `CyclerInterface` : A cycler-level interface for reading channel status of any channel on the cycler. This class is capable of read only operations on the cycler.
 
-- `ChannelInterface` : A channel-level interface for reading status of a specific channel, starting/stopping tests on that channel, and assigning meta variables during active tests on the channel. This class is capable of read and write operations on a single channel. `ChannelInterface` is a child class of `CyclerInterface` and shares the same base methods.
+- `ChannelInterface` : A channel-level interface for reading status of a specific channel, starting/stopping tests on that channel, and assigning meta variables during active tests on the channel. This class is capable of read and write operations on a single channel.
 
 ### Configuration
 
@@ -86,7 +81,7 @@ CYCLER_INTERFACE_CONFIG = {
 Where the fields are as follows:
 
 - `ip_address` : str
-    The IP address of the Maccor server. Use 127.0.0.1 if running on the same machine as the server.
+    The IP address of the Arbin host computer.
 - `port` : int
     The TCP port to communicate through. This is generally going to be 7031
 - `timeout_s` : *optional* : float
@@ -120,7 +115,7 @@ Where the fields are as follows:
 - `schedule_name` : *optional* : str
     The name of the schedule file to use if using the ChannelInterface to start a test.
 - `ip_address` : str
-    The IP address of the Maccor server. Use 127.0.0.1 if running on the same machine as the server.
+    The IP address of the Arbin host computer.
 - `port` : int
     The TCP port to communicate through. This is generally going to be 7031
 - `timeout_s` : *optional* : float
@@ -133,7 +128,7 @@ Where the fields are as follows:
 
 In addition to a configuration dictionary, both interfaces require a `.env` file containing the Arbin CTI username and password to use for communication. The `.env` file path can be passed as a constructor argument. If it is not specified, the the program looks in the working directly for a `.env` file.
 
-The file must contain the following fields:
+The `.env` file must contain the following fields:
 
 ```bash
 ARBIN_CTI_USERNAME='your_username'
@@ -150,7 +145,7 @@ To get channel readings with a `CyclerInterface` you must specify which channel 
 from pycti import CyclerInterface
 
 CYCLER_INTERFACE_CONFIG = {
-    "ip_address": 127.0.0.1,
+    "ip_address": "127.0.0.1"
     "port": 1234,
     "timeout_s": 3,
     "msg_buffer_size": 4096
@@ -169,7 +164,7 @@ CHANNEL_INTERFACE_CONFIG = {
   "channel": 1,
   "test_name": "fake_test_name",
   "schedule_name": "Rest+207855.sdx",
-  "ip_address": 127.0.0.1,
+  "ip_address": "127.0.0.1"
   "port": 1234,
   "timeout_s": 3,
   "msg_buffer_size": 4096
@@ -211,7 +206,7 @@ To view the generated coverage report:
 coverage report -m 
 ```
 
-### Arbin Spoofer
+### ArbinSpoofer
 
 Testing software on a real cycler is dangerous so we've created a submodule `arbinspoofer` to emulate some of the behavior of the Arbin software with a class `ArbinSpoofer`. This class creates a local TCP server and that accepts connections from n number of clients. The `ArbinSpoofer` does not perfectly emulate a Arbin cycler (for example, it does not track if a test is already running on a channel) and merely checks that the message format is correct and responds with standard messages.
 
