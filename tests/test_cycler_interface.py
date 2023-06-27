@@ -19,6 +19,13 @@ CYCLER_INTERFACE_CONFIG = {
 ARBIN_SPOOFER = ArbinSpoofer(SPOOFER_CONFIG_DICT)
 ARBIN_SPOOFER.start()
 
+@pytest.mark.cycler_interface
+def test_get_num_channels():
+    """
+    Test that sending the channel info message works correctly.
+    """
+    arbin_interface = CyclerInterface(CYCLER_INTERFACE_CONFIG)
+    assert( arbin_interface.get_num_channels() == 16)
 
 @pytest.mark.cycler_interface
 def test_read_channel_status():
@@ -26,10 +33,10 @@ def test_read_channel_status():
     Test that sending the channel info message works correctly.
     """
     arbin_interface = CyclerInterface(CYCLER_INTERFACE_CONFIG)
-    channel_status = arbin_interface.read_channel_status(channel=1)
+    channel_status = arbin_interface.read_channel_status(channel=(ARBIN_CHANNEL+1))
 
     print(arbin_interface.get_num_channels())
 
-    #channel_status_bin_key = Msg.ChannelInfo.Server.pack({'channel': 1})
-    #channel_status_key = Msg.ChannelInfo.Server.unpack(channel_status_bin_key)
-    #assert(channel_status == channel_status_key)
+    channel_status_bin_key = Msg.ChannelInfo.Server.pack({'channel': 1})
+    channel_status_key = Msg.ChannelInfo.Server.unpack(channel_status_bin_key)
+    assert(channel_status == channel_status_key)
