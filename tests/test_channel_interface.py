@@ -13,7 +13,7 @@ CHANNEL_INTERFACE_CONFIG = {
     "username": "123",
     "password": "123",
     "test_name": "fake_test_name",
-    "schedule": "Rest+207855.sdx",
+    "schedule_name": "Rest+207855.sdx",
     "channel": ARBIN_CHANNEL+1,
     "ip_address": SPOOFER_CONFIG_DICT['ip'],
     "port": SPOOFER_CONFIG_DICT['port'],

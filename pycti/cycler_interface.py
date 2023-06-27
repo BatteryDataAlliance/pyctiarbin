@@ -21,12 +21,15 @@ class CyclerInterface:
         Parameters
         ----------
         config : dict
-            A configuration dictionary. Must contain the following keys:s
+            A configuration dictionary. Must contain the following keys:
             - `ip_address` - The IP address of the Maccor server. Use 127.0.0.1 if running on the same machine as the server.
             - `port` - The port to communicate through with JSON messages. Default set to 57570.
             - `timeout_s` - *optional* - How long to wait before timing out on TCP communication. Defaults to 2 seconds. 
             - `msg_buffer_size_bytes` - *optional* - How big of a message buffer to use for sending/receiving messages. 
                A minimum of 1024 bytes is recommended. Defaults to 4096 bytes. 
+        env_path : *optional* : str
+            The path to the `.env` file containing the Arbin CTI username,`ARBIN_CTI_USERNAME`, and password, `ARBIN_CTI_PASSWORD`.
+            Defaults to looking in the working directory.
         """
         
         self.__msg_buffer_size = config.get('msg_buffer_size_bytes')
