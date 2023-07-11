@@ -12,12 +12,12 @@ class ChannelData:
 
     def __init__(self, num_channels):
         """
-        Container class that will hold all of the specific channel data for MaccorSpoofer.
+        Container class that will hold all of the specific channel data for ArbinSpoofer.
 
         Parameters
         ----------
             num_channels : int
-                Number of channels in our hypothetical Maccor cycler.
+                Number of channels in our hypothetical Arbin cycler.
         """
         self.num_channels = num_channels
 
