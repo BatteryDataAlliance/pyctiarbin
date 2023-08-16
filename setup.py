@@ -15,7 +15,7 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
-        "Operating System :: Linux",
+        "Operating System :: OS Independent",
     ],
     python_requires='>=3.8',
 )
