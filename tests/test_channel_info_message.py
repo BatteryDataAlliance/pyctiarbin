@@ -2,7 +2,7 @@ import pytest
 import os
 import copy
 import struct
-from pycti import Msg
+from pyctiarbin import Msg
 from helper_test_utils import Constants, message_file_loader, aux_dict_builder
 
 MSG_DIR = os.path.join(os.path.dirname(__file__), 'example_messages')

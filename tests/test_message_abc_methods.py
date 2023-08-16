@@ -1,6 +1,6 @@
 import pytest
 import struct
-from pycti import MessageABC
+from pyctiarbin import MessageABC
 
 
 class TestMessageClass(MessageABC):

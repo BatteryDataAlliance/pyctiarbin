@@ -719,7 +719,7 @@ class Msg:
                     'start_byte': 20,
                     'value': 0
                 },
-                # Always 0x00 for PyCTI since we only work with single channels
+                # Always 0x00 for PyCTI-Arbin since we only work with single channels
                 'assign_all_channels': {
                     'format': '1s',
                     'start_byte': 24,
@@ -905,7 +905,7 @@ class Msg:
                     # Read as wchar_t which has length of 2 bytes each.
                     'format': '144s',
                     'start_byte': 20,
-                    'value': 'pycti test name',
+                    'value': 'pycti-arbin test name',
                     'text_encoding': 'utf-16-le',
                 },
                 'num_channels_to_start': {

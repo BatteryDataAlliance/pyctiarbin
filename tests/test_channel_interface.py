@@ -1,7 +1,7 @@
 import pytest
-from pycti import ChannelInterface
-from pycti.arbinspoofer import ArbinSpoofer
-from pycti.messages import Msg
+from pyctiarbin import ChannelInterface
+from pyctiarbin.arbinspoofer import ArbinSpoofer
+from pyctiarbin.messages import Msg
 
 ARBIN_CHANNEL = 1
 

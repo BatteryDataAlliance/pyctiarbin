@@ -1,7 +1,7 @@
 import pytest
 import os
 import copy
-from pycti import Msg
+from pyctiarbin import Msg
 from helper_test_utils import message_file_loader
 
 MSG_DIR = os.path.join(os.path.dirname(__file__), 'example_messages')

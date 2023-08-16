@@ -4,7 +4,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="pycti",
+    name="pycti-arbin",
     version="0.0.3",
     author="Zander Nevitt",
     author_email="zandern@battgenie.life",

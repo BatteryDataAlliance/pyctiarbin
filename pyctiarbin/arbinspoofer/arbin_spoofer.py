@@ -2,7 +2,7 @@ import socket
 import threading
 import struct
 import copy
-from pycti.messages import Msg, MessageABC
+from pyctiarbin.messages import Msg, MessageABC
 
 
 class ChannelData:
@@ -313,6 +313,8 @@ class ArbinSpoofer:
                 client_workers[:] = [
                     worker for worker in client_workers if worker.is_alive()
                 ]
+
+        sock.close()
 
     def stop(self):
         """
