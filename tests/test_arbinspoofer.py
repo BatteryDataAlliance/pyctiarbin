@@ -1,7 +1,7 @@
 import pytest
 from helper_test_utils import Constants, TcpClient
-from pycti.arbinspoofer import ArbinSpoofer
-from pycti.messages import Msg
+from pyctiarbin.arbinspoofer import ArbinSpoofer
+from pyctiarbin.messages import Msg
 
 """
 Various parameters we will use across all the tests.
@@ -11,22 +11,21 @@ CONFIG_DICT = {"ip": "127.0.0.1",
                "num_channels": 16}
 CHANNEL = 5  # The channel we will use to associated tests messages.
 
+
 @pytest.mark.arbinspoofer
 def test_messages():
     """
     Test that the spoofer replies correctly to all messages.
     """
-    print("Made it here!")
+    CONFIG_DICT['port'] = 5678
     arbin_spoofer = ArbinSpoofer(CONFIG_DICT)
     arbin_spoofer.start()
-
-    
 
     client = TcpClient(CONFIG_DICT)
 
     # Send all messages and make sure we get the correct responses.
     messages = [(Msg.Login.Client.pack(),
-                    Msg.Login.Server.pack({'num_channels':CONFIG_DICT['num_channels']})),
+                 Msg.Login.Server.pack({'num_channels': CONFIG_DICT['num_channels']})),
                 (Msg.ChannelInfo.Client.pack(),
                     Msg.ChannelInfo.Server.pack()),
                 (Msg.AssignSchedule.Client.pack(),
@@ -45,12 +44,13 @@ def test_messages():
 
     arbin_spoofer.stop()
 
+
 @pytest.mark.arbinspoofer
 def test_update_status():
     """
     Check that updating channel status info works.
     """
-
+    CONFIG_DICT['port'] = 5679
     arbin_spoofer = ArbinSpoofer(CONFIG_DICT)
     arbin_spoofer.start()
 
@@ -61,7 +61,7 @@ def test_update_status():
     rx_msg = client.send_recv_msg(tx_msg)
     # Generate the message we would expect to get back
     rx_msg_expected = Msg.ChannelInfo.Server.pack({'channel': CHANNEL})
-    assert(rx_msg == rx_msg_expected)
+    assert (rx_msg == rx_msg_expected)
 
     # Now check updating the values
     updated_readings = {'voltage_v': 2.69, 'current_a': 1.19}
@@ -71,7 +71,7 @@ def test_update_status():
     rx_msg_expected = Msg.ChannelInfo.Server.pack(
         {**{'channel': CHANNEL}, **updated_readings})
     # Check it in binary
-    assert(rx_msg == rx_msg_expected)
+    assert (rx_msg == rx_msg_expected)
 
     # Now check it unpacked
     rx_msg_dict = Msg.ChannelInfo.Server.unpack(rx_msg)

@@ -1,6 +1,6 @@
-# pycti
+# PyCTI-Arbin
 
-`pycti` is a Python module that provides cycler and channel level interfaces for communication and control of [Arbin cyclers](https://arbin.com/) via their Console TCP/IP Interface (CTI).
+`pycti-arbin` is a Python module that provides cycler and channel level interfaces for communication and control of [Arbin cyclers](https://arbin.com/) via their Console TCP/IP Interface (CTI).
 
 ## Overview
 
@@ -22,23 +22,23 @@
 
 ## Motivation
 
-Why did we create `pycti`? This package enables a wide variety of applications such as:
+Why did we create `pycti-arbin`? This package enables a wide variety of applications such as:
 
 - Real-time data logging, monitoring and alerting
 
-`pycti` can be used to passively monitor running tests and log readings directly to a database, bypassing the need to manually export data. Moreover, it's possible to create automated alerts based on incoming real-time data. For example, if a test were to fault or temperature were to exceed a set threshold. While Arbin already has a built-in notification system with MacNotify, `pycti` provides a more flexible and customizable solution without having to directly modify test procedures.
+`pycti-arbin` can be used to passively monitor running tests and log readings directly to a database, bypassing the need to manually export data. Moreover, it's possible to create automated alerts based on incoming real-time data. For example, if a test were to fault or temperature were to exceed a set threshold. While Arbin already has a built-in notification system with MacNotify, `pycti-arbin` provides a more flexible and customizable solution without having to directly modify test procedures.
 
 - Automated test management
 
-The GUI provided by Arbin for test management is straight-forward and easy to use, but requires significant manual work. With `pycti` it is possible to write programs to automatically start tests simultaneously across many channels (or even many cyclers) at once.
+The GUI provided by Arbin for test management is straight-forward and easy to use, but requires significant manual work. With `pycti-arbin` it is possible to write programs to automatically start tests simultaneously across many channels (or even many cyclers) at once.
 
 - Testing of next generation closed-loop charging methods
 
-While conventional constant-current followed by constant-voltage (CCCV) charging has been the industry standard for many years and is well supported by cyclers, there is movement towards advanced [closed-loop control charging techniques that provide improved battery life and decreased charge times](https://battgenie.life/technology/). `pycti` enables testing of closed-loop battery charging methods by providing an interface between software hosting battery charging algorithms and active Arbin tests, allowing the charge current to be dynamically set.
+While conventional constant-current followed by constant-voltage (CCCV) charging has been the industry standard for many years and is well supported by cyclers, there is movement towards advanced [closed-loop control charging techniques that provide improved battery life and decreased charge times](https://battgenie.life/technology/). `pycti-arbin` enables testing of closed-loop battery charging methods by providing an interface between software hosting battery charging algorithms and active Arbin tests, allowing the charge current to be dynamically set.
 
 - Well tested, easy to use, community supported interface in the most popular programming language.
 
-It is entirely possible to write one's own CTI wrapper, but `pycti` provides a well-tested ready to use package that takes care of lower level communication, providing a simple yet powerful interface in the most popular programming language.
+It is entirely possible to write one's own CTI wrapper, but `pycti-arbin` provides a well-tested ready to use package that takes care of lower level communication, providing a simple yet powerful interface in the most popular programming language.
 
 ## Installation
 
@@ -55,7 +55,7 @@ pip install .
 
 ## Getting Started
 
-`pycti` provides two distinct classes for interacting with Arbin cyclers:
+`pycti-arbin` provides two distinct classes for interacting with Arbin cyclers:
 
 - `CyclerInterface` : A cycler-level interface for reading channel status of any channel on the cycler. This class is capable of read only operations on the cycler.
 
@@ -142,7 +142,7 @@ Where `your_username` and `your_password` should be replaced with your username 
 To get channel readings with a `CyclerInterface` you must specify which channel you want to read from:
 
 ```python
-from pycti import CyclerInterface
+from pyctiarbin import CyclerInterface
 
 CYCLER_INTERFACE_CONFIG = {
     "ip_address": "127.0.0.1"
@@ -158,7 +158,7 @@ cycler_interface.read_channel_status(channel=1)
 For a `ChannelInterface` there is no need to specify the channel since we define it in the config:
 
 ```python
-from pycti import ChannelInterface
+from pyctiarbin import ChannelInterface
 
 CHANNEL_INTERFACE_CONFIG = {
   "channel": 1,
@@ -178,13 +178,13 @@ For more examples of how to use the `CyclerInterface` and `ChannelInterface` cla
 
 ## Development
 
-This section contains various information to help developers further extend and test `pycti`
+This section contains various information to help developers further extend and test `pycti-arbin`
 
 ## Contributing
 
-As it exists now `pycti` only implements a fraction of the messages supported by CTI. Further work can be done to expand `pycti` to include more of the messages detailed in the CTI documentation `docs/ArbinCTI_Protocol v1.1.pdf`.
+As it exists now `pycti-arbin` only implements a fraction of the messages supported by CTI. Further work can be done to expand `pycti-arbin` to include more of the messages detailed in the CTI documentation `docs/ArbinCTI_Protocol v1.1.pdf`.
 
-We welcome your help in expanding `pycti`! Please see the [CONTRIBUTING.md](https://github.com/BattGenie/pycti/blob/main/CONTRIBUTING.md) file in this repository for contribution guidelines.
+We welcome your help in expanding `pycti-arbin`! Please see the [CONTRIBUTING.md](https://github.com/BattGenie/pycti/blob/main/CONTRIBUTING.md) file in this repository for contribution guidelines.
 
 ## Testing
 

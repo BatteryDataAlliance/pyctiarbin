@@ -1,15 +1,15 @@
 import pytest
 import os
 import copy
-from pycti import Msg
+from pyctiarbin import Msg
 from helper_test_utils import message_file_loader
 
 MSG_DIR = os.path.join(os.path.dirname(__file__), 'example_messages')
 
 @pytest.mark.messages
-def test_start_schedule_client_msg():
+def test_set_meta_variable_client_msg():
     '''
-    Test packing/parsing a client start schedule request message
+    Test packing/parsing a client a set meta variable request message
     '''
 
     example_msg_name = 'client_set_meta_variable_msg'
@@ -25,9 +25,9 @@ def test_start_schedule_client_msg():
 
 
 @pytest.mark.messages
-def test_start_schedule_server_msg():
+def test_set_meta_variable_server_msg():
     '''
-    Test parsing/packing a server start schedule response message
+    Test parsing/packing a set meta variable server response message
     '''
     example_msg_name = 'server_set_meta_variable_msg'
     (msg_bin, msg_dict) = message_file_loader(MSG_DIR, example_msg_name)

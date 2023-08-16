@@ -2,7 +2,7 @@ import os
 import socket
 import json
 import struct
-from pycti import MessageABC
+from pyctiarbin import MessageABC
 
 class Constants:
     FLOAT_TOLERANCE = 0.0001
