@@ -42,6 +42,14 @@ It is entirely possible to write one's own CTI wrapper, but `pycti-arbin` provid
 
 ## Installation
 
+### Using pip
+
+`pycti-arbin` can be installed using pip:
+
+```bash
+pip install pycti-arbin
+```
+
 ### Source Installation
 
 To install from source, type the following into the command line:
@@ -83,7 +91,7 @@ Where the fields are as follows:
 - `ip_address` : str
     The IP address of the Arbin host computer.
 - `port` : int
-    The TCP port to communicate through. This is generally going to be 7031
+    The TCP port to communicate through. This is generally going to be 9031
 - `timeout_s` : *optional* : float
     How long to wait before timing out on TCP communication. Defaults to 3 seconds.
 - `msg_buffer_size` : *optional* : int
@@ -176,6 +184,13 @@ channel_interface.read_channel_status()
 
 For more examples of how to use the `CyclerInterface` and `ChannelInterface` class see the `demo_notebook.ipynb` and documentation.
 
+## Tested MITS Pro Version
+
+| Version         | Build      | pycti-arbin |
+|-----------------|------------|-------------|
+| Mits8 PV.202110 | Oct 4 2021 | 0.0.4       |
+|                 |            |             |
+
 ## Development
 
 This section contains various information to help developers further extend and test `pycti-arbin`
@@ -215,7 +230,7 @@ Testing software on a real cycler is dangerous so we've created a submodule `arb
 All documentation was generated with [pydoc](https://docs.python.org/3/library/pydoc.html). To re-generate the documentation type the following command from the top level directory of the repository:
 
 ```bash
-pdoc --html .
+pydoc --html .
 ```
 
 ## License

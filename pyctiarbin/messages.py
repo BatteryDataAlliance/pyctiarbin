@@ -73,8 +73,13 @@ class MessageABC(ABC):
 
             # Decode and strip trailing 0x00s from strings.
             if item['format'].endswith('s'):
-                decoded_msg_dict[item_name] = decoded_msg_dict[item_name].decode(
-                    item['text_encoding']).rstrip('\x00')
+                # ignore utf-8 characters that cannot be decoded
+                if item['text_encoding'] == 'utf-8':
+                    decoded_msg_dict[item_name] = decoded_msg_dict[item_name].decode(
+                        item['text_encoding'], errors='ignore').rstrip('\x00')
+                else:
+                    decoded_msg_dict[item_name] = decoded_msg_dict[item_name].decode(
+                        item['text_encoding']).rstrip('\x00')
 
         if decoded_msg_dict['command_code'] != cls.command_code:
             logger.warning(
