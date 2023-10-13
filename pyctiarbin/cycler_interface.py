@@ -116,9 +116,10 @@ class CyclerInterface:
             except socket.timeout:
                 logger.error(
                     "Timeout on sending message from Arbin!", exc_info=True)
-            except socket.error:
+            except socket.error as e:
                 logger.error(
                     "Failed to send message to Arbin!", exc_info=True)
+                logger.error(e)
 
             if send_msg_success:
                 try:
@@ -134,9 +135,14 @@ class CyclerInterface:
                 except socket.timeout:
                     logger.error(
                         "Timeout on receiving message from Arbin!", exc_info=True)
-                except socket.error:
+                except socket.error as e:
                     logger.error(
                         "Error receiving message from Arbin!", exc_info=True)
+                    logger.error(e)
+                except struct.error as e:
+                    logger.error(
+                        "Error unpacking message from Arbin!", exc_info=True)
+                    logger.error(e)
         else:
             logger.error(
                 "Cannot send message! Socket does not exist!")
@@ -167,9 +173,10 @@ class CyclerInterface:
             self.__sock.connect((ip, port))
             logger.info("Connected to Arbin server!")
             success = True
-        except:
+        except Exception as e:
             logger.error(
                 "Failed to create TCP/IP connection with Arbin server!", exc_info=True)
+            logger.error(e)
 
         return success
 
