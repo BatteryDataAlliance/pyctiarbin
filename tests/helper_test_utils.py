@@ -4,16 +4,35 @@ import json
 import struct
 from pyctiarbin import MessageABC
 
+
 class Constants:
     FLOAT_TOLERANCE = 0.0001
+
 
 class TcpClient():
 
     msg_buffer_size = 2**12
 
-    def __init__(self, config):
+    def __init__(self, config, retries=5, timeout=1):
         self.__s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.__s.connect((config["ip"], config["port"])) 
+        self.__s.settimeout(timeout)
+
+        connect = False
+        retrycnt = retries
+        while connect == False and retrycnt > 0:
+            try:
+                self.__s.connect((config["ip"], config["port"]))
+                connect = True
+            except socket.timeout:
+                print("Connection timed out.")
+            except ConnectionRefusedError:
+                print("Connection refused.")
+            except ConnectionAbortedError:
+                print("Connection aborted.")
+
+            if connect == False:
+                print("Retrying connection attempt {} of {}.".format(retrycnt, retries))
+                retrycnt -= 1
 
     def send_recv_msg(self, tx_msg) -> bytearray:
         """
@@ -33,7 +52,8 @@ class TcpClient():
         """
         rx_msg_length_format = MessageABC.base_template['msg_length']['format']
         rx_msg_length_start_byte = MessageABC.base_template['msg_length']['start_byte']
-        rx_msg_length_end_byte = MessageABC.base_template['msg_length']['start_byte'] + struct.calcsize(rx_msg_length_format)
+        rx_msg_length_end_byte = MessageABC.base_template['msg_length']['start_byte'] + struct.calcsize(
+            rx_msg_length_format)
 
         self.__s.sendall(tx_msg)
 
@@ -46,9 +66,10 @@ class TcpClient():
             rx_msg += self.__s.recv(self.msg_buffer_size)
 
         return rx_msg
-    
+
     def __delete__(self):
         self.__s.close()
+
 
 def message_file_loader(msg_dir, msg_file_name: str) -> tuple:
     '''
@@ -79,6 +100,7 @@ def message_file_loader(msg_dir, msg_file_name: str) -> tuple:
         msg_dict = json.load(file)
 
     return (msg_bin, msg_dict)
+
 
 def aux_dict_builder() -> dict:
     msg_dict = {}

@@ -1,7 +1,7 @@
 import logging
 import os
 from pydantic import BaseModel
-from pydantic import validator
+from pydantic import field_validator
 from .messages import Msg
 
 from .cycler_interface import CyclerInterface
@@ -42,7 +42,7 @@ class ChannelInterface(CyclerInterface):
             Defaults to looking in the working directory.
         """
         self.__config = ChannelInterfaceConfig(**config)
-        super().__init__(self.__config.dict(), env_path)
+        super().__init__(self.__config.model_dump(), env_path)
 
     def read_channel_status(self) -> dict:
         """
@@ -227,7 +227,7 @@ class ChannelInterfaceConfig(BaseModel):
     timeout_s: float = 3.0
     msg_buffer_size: int = 4096
 
-    @validator('channel')
+    @field_validator('channel')
     def username_alphanumeric(cls, v):
         if v < 1:
             raise ValueError('Channel must be greater than zero!')
