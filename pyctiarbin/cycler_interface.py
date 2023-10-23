@@ -74,15 +74,20 @@ class CyclerInterface:
             logger.error(f'Invalid channel value {channel}!')
             return channel_info_msg_rx_dict
 
-        # Subtract one from the passed channel value to account for zero indexing
-        channel_info_msg_tx = Msg.ChannelInfo.Client.pack(
-            {'channel': (channel-1)})
-        response_msg_bin = self._send_receive_msg(
-            channel_info_msg_tx)
+        try:
+            # Subtract one from the passed channel value to account for zero indexing
+            channel_info_msg_tx = Msg.ChannelInfo.Client.pack(
+                {'channel': (channel-1)})
+            response_msg_bin = self._send_receive_msg(
+                channel_info_msg_tx)
 
-        if response_msg_bin:
-            channel_info_msg_rx_dict = Msg.ChannelInfo.Server.unpack(
-                response_msg_bin)
+            if response_msg_bin:
+                channel_info_msg_rx_dict = Msg.ChannelInfo.Server.unpack(
+                    response_msg_bin)
+        except Exception as e:
+            logger.error(
+                f'Error reading channel status for channel {channel}', exc_info=True)
+            logger.error(e)
 
         return channel_info_msg_rx_dict
 
