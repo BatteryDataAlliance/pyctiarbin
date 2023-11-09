@@ -1205,7 +1205,13 @@ class Msg:
                 """
                 msg_dict = super().unpack(msg_bin)
 
-                msg_dict['result'] = cls.mv_result_decoder[
-                    ord(msg_dict['result'])]
+                # Convert the result code to a string
+                result = ord(msg_dict['result'])
+                if result not in cls.mv_result_decoder.keys():
+                    logger.warning(
+                        f'Unknown result code {result} for SetMetaVariable message!')
+                    msg_dict['result'] = 'Unknown'
+                else:
+                    msg_dict['result'] = cls.mv_result_decoder[result]
 
                 return msg_dict
