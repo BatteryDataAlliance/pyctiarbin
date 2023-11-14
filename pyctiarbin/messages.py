@@ -569,7 +569,7 @@ class Msg:
                 0: 'Idle',
                 1: 'Transition',
                 2: 'Charge',
-                3: 'Disharge',
+                3: 'Discharge',
                 4: 'Rest',
                 5: 'Wait',
                 6: 'External Charge',
