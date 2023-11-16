@@ -1,0 +1,2 @@
+include *.txt # requirements.txt
+recursive-include docs *.pdf *.html # static files
