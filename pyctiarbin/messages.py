@@ -1090,17 +1090,17 @@ class Msg:
         in Arbin docs for more info.
         '''
         class Client(MessageABC):
-            msg_length = 131
+            msg_length = 119
             command_code = 0xBB320005
 
             msg_specific_template = {
                 'step_num': {
-                    'format': '<I',
+                    'format': '<L',
                     'start_byte': 20,
                     'value': 0,
                 },
                 'channel': {
-                    'format': '<I',
+                    'format': '<L',
                     'start_byte': 24,
                     'value': 0
                 },
