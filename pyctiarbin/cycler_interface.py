@@ -37,9 +37,9 @@ class CyclerInterface:
             Defaults to looking in the working directory.
         """
         self.__config = CyclerInterfaceConfig(**config)
-        assert(self.__create_connection( 
+        assert (self.__create_connection(
             ip=self.__config.ip_address, port=self.__config.port, timeout_s=self.__config.timeout_s))
-        assert(self.__login(env_path))
+        assert (self.__login(env_path))
         self.__num_channels = self.get_login_feedback()['num_channels']
 
     def get_num_channels(self):
@@ -121,10 +121,12 @@ class CyclerInterface:
             except socket.timeout:
                 logger.error(
                     "Timeout on sending message from Arbin!", exc_info=True)
+                self.__reconnect()
             except socket.error as e:
                 logger.error(
                     "Failed to send message to Arbin!", exc_info=True)
                 logger.error(e)
+                self.__reconnect()
 
             if send_msg_success:
                 try:
@@ -136,7 +138,8 @@ class CyclerInterface:
 
                     # Keep reading message in pieces until rx_msg is as long as expected_rx_msg_len.
                     while len(rx_msg) < (expected_rx_msg_len):
-                        rx_msg += self.__sock.recv(self.__config.msg_buffer_size)
+                        rx_msg += self.__sock.recv(
+                            self.__config.msg_buffer_size)
                 except socket.timeout:
                     logger.error(
                         "Timeout on receiving message from Arbin!", exc_info=True)
@@ -202,9 +205,11 @@ class CyclerInterface:
 
         # Validate username and password are in the .env file.
         if not os.getenv('ARBIN_CTI_USERNAME'):
-            raise ValueError('ARBIN_CTI_USERNAME not set in environment variables.')
+            raise ValueError(
+                'ARBIN_CTI_USERNAME not set in environment variables.')
         if not os.getenv('ARBIN_CTI_PASSWORD'):
-            raise ValueError('ARBIN_CTI_PASSWORD not set in environment variables.')
+            raise ValueError(
+                'ARBIN_CTI_PASSWORD not set in environment variables.')
 
         login_msg_tx = Msg.Login.Client.pack(
             msg_values={'username': os.getenv('ARBIN_CTI_USERNAME'), 'password': os.getenv('ARBIN_CTI_PASSWORD')})
@@ -232,7 +237,17 @@ class CyclerInterface:
             self.__login_feedback = login_msg_rx_dict
 
         return success
-    
+
+    def __reconnect(self):
+        '''
+        Reconnects to the Arbin server.
+        '''
+        logger.info('Reconnecting to Arbin server...')
+        self.__sock.close()
+        self.__create_connection(
+            ip=self.__config.ip_address, port=self.__config.port, timeout_s=self.__config.timeout_s)
+
+
 class CyclerInterfaceConfig(BaseModel):
     '''
     Holds channel config information for the CyclerInterface class.
