@@ -143,10 +143,12 @@ class CyclerInterface:
                 except socket.timeout:
                     logger.error(
                         "Timeout on receiving message from Arbin!", exc_info=True)
+                    self.__reconnect()
                 except socket.error as e:
                     logger.error(
                         "Error receiving message from Arbin!", exc_info=True)
                     logger.error(e)
+                    self.__reconnect()
                 except struct.error as e:
                     logger.error(
                         "Error unpacking message from Arbin!", exc_info=True)
